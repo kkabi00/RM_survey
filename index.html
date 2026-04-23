@@ -154,6 +154,23 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
   font-size:13px; color:#7a4800; font-weight:500; line-height:1.55;
   text-align:center; margin:0 0 6px 0;
 }
+
+/* Demographic items */
+.demo-radio-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.demo-radio{display:flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:13px;transition:all .15s;}
+.demo-radio:hover{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+.demo-radio input{display:none;}
+.demo-radio input:checked ~ span{color:var(--accent);}
+.demo-radio:has(input:checked){border-color:var(--accent);background:var(--accent-light);}
+.demo-input{width:160px;padding:9px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:13.5px;font-family:inherit;outline:none;margin-top:8px;transition:border-color .15s;}
+.demo-input:focus{border-color:var(--accent);}
+.demo-note{font-size:11.5px;color:var(--system-text);margin-top:8px;padding:8px 12px;background:#f5f0e8;border-radius:8px;line-height:1.5;}
+
+.survey-page-indicator{
+  display:inline-block; margin-top:6px;
+  font-size:11.5px; font-weight:600; color:var(--accent);
+  background:var(--accent-light); padding:3px 10px; border-radius:20px;
+}
 </style>
 </head>
 <body>
@@ -323,6 +340,17 @@ var T = {
     mv_section:'Q6. 심리적 소유감 (MV)', mv_sub:'내가 방금 만든 AI 영상에 대해 다음 내용에 얼마나 동의합니까?', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
     dv_section:'Q7. 죄책감 (DV)', dv_sub:'이런 영상을 만들고 나면, 다음 감정을 얼마나 느낄 것 같습니까? (Fisher, 1993)', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
     scale_lo:'전혀 그렇지 않다', scale_hi:'매우 그렇다', submit:'설문 제출하기', submit_done:'제출 완료! (프로토타입)', rev:'역채점',
+    survey_next:'다음 →',
+    survey_page1_label:'1 / 2 페이지',
+    survey_page2_label:'2 / 2 페이지',
+    demo_section:'Q8. 인구통계학적 정보',
+    demo_gender_q:'귀하의 성별은 무엇입니까?',
+    demo_gender_opts:['남성','여성','논바이너리 / 기타','응답하지 않음'],
+    demo_birth_q:'출생연도를 입력해주세요.',
+    demo_birth_placeholder:'예) 2000',
+    demo_ai_q:'이 설문에 참여하기 전에 AI가 생성한 영상(예: 딥페이크)을 보거나 들어본 적이 있습니까?',
+    demo_ai_opts:['예','아니오'],
+    demo_ai_note:'아니오를 선택하신 경우 연구자가 개념을 간략히 설명해드립니다.',
     scenario_c1:'당신은 평소 사이가 좋지 않던 친구가 마음에 들지 않습니다. 그 친구를 망신 주기 위해, 실제로는 존재하지 않는 당혹스러운 장면을 VideoAI 챗봇으로 조작하여 영상을 만들고 단체 채팅에 공유하려 합니다.',
     scenario_c2:'당신은 최근 친구들과 함께 간 놀이공원 여행의 추억 영상을 만들고 싶습니다. 친구들도 동의했으며 VideoAI 챗봇을 통해 하이라이트 영상을 제작하려 합니다.',
     scenario_c3:'당신은 평소 사이가 좋지 않던 친구가 마음에 들지 않습니다. 그 친구를 망신 주기 위해, 실제로는 존재하지 않는 당혹스러운 장면을 VideoAI 챗봇으로 조작하여 영상을 만들고 단체 채팅에 공유하려 합니다.',
@@ -366,6 +394,17 @@ var T = {
     mv_section:'Q6. Psychological Ownership (MV)', mv_sub:'Thinking about the video you just created with AI, please rate your agreement.', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
     dv_section:'Q7. Guilt (DV)', dv_sub:'After making a video like this, how strongly do you think one would feel the following? (Fisher, 1993)', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
     scale_lo:'Strongly disagree', scale_hi:'Strongly agree', submit:'Submit Survey', submit_done:'Submitted! (Prototype)', rev:'Reverse coded',
+    survey_next:'Next →',
+    survey_page1_label:'Page 1 / 2',
+    survey_page2_label:'Page 2 / 2',
+    demo_section:'Q8. Demographic Information',
+    demo_gender_q:'What is your gender?',
+    demo_gender_opts:['Male','Female','Non-binary / Other','Prefer not to answer'],
+    demo_birth_q:'What is your year of birth?',
+    demo_birth_placeholder:'e.g. 2000',
+    demo_ai_q:'Have you ever seen or heard of an AI-generated video (e.g., deepfake) before this survey?',
+    demo_ai_opts:['Yes','No'],
+    demo_ai_note:'If No, the researcher will briefly explain the concept before continuing.',
     scenario_c1:"There is a friend you dislike. To embarrass them, you plan to use VideoAI to fabricate a fake embarrassing video of them — one that never actually happened — and share it in a group chat.",
     scenario_c2:'You want to create a fun memory video from a recent theme park trip with friends. Everyone agreed, and you plan to use VideoAI to create a highlight reel.',
     scenario_c3:"There is a friend you dislike. To embarrass them, you plan to use VideoAI to fabricate a fake embarrassing video of them — one that never actually happened — and share it in a group chat.",
@@ -409,6 +448,17 @@ var T = {
     mv_section:'Q6. 心理所有感（MV）', mv_sub:'请思考您刚刚用AI制作的这段视频，对以下陈述表示同意程度。', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
     dv_section:'Q7. 内疚感（DV）', dv_sub:'制作了这样的视频之后，您认为一般人会在多大程度上感受到以下情绪？（Fisher, 1993）', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
     scale_lo:'完全不同意', scale_hi:'完全同意', submit:'提交问卷', submit_done:'提交完成！（原型）', rev:'反向计分',
+    survey_next:'下一页 →',
+    survey_page1_label:'第 1 / 2 页',
+    survey_page2_label:'第 2 / 2 页',
+    demo_section:'Q8. 人口统计学信息',
+    demo_gender_q:'您的性别是？',
+    demo_gender_opts:['男','女','非二元性别 / 其他','不愿透露'],
+    demo_birth_q:'请输入您的出生年份。',
+    demo_birth_placeholder:'例：2000',
+    demo_ai_q:'在参与本次问卷之前，您是否曾见过或听说过AI生成的视频（例如：深度伪造）？',
+    demo_ai_opts:['是','否'],
+    demo_ai_note:'若选择"否"，研究者将在继续之前简要说明相关概念。',
     scenario_c1:'您不喜欢某位朋友，与他/她关系不好。为了让他/她出丑，您打算用VideoAI伪造一段根本没有发生过的尴尬视频，并将其分享到群聊中。',
     scenario_c2:'您想用最近与朋友一起去游乐园时拍摄的视频制作一段回忆视频。朋友们都同意了，您计划使用VideoAI制作一段精彩集锦。',
     scenario_c3:'您不喜欢某位朋友，与他/她关系不好。为了让他/她出丑，您打算用VideoAI伪造一段根本没有发生过的尴尬视频，并将其分享到群聊中。',
@@ -881,17 +931,77 @@ function renderSurvey(){
     return qs.map(function(q,j){ var rv=revs[j]?'<span class="item-reverse">&#9660; '+Lv.rev+'</span>':''; return '<div class="survey-item"><div class="survey-q"><span class="q-num">'+codes[j]+'</span> '+q+' '+rv+'</div>'+row(prefix,j)+'</div>'; }).join('');
   }
   var hi=isHigh(), mp=isMP();
+  showSurveyPage(1);
+}
 
+// ─── 설문 페이지 렌더링 ───────────────────────────────────
+function showSurveyPage(page){
+  var Lv=T[lang];
+  var hi=isHigh(), mp=isMP();
 
-  document.getElementById('survey-section').innerHTML=
-    '<div class="survey-header"><h2>'+Lv.survey_title+'</h2><p>'+Lv.survey_sub+'</p></div>'+
-    '<div class="note-box" style="margin-bottom:16px;">'+Lv[mp?'share_context_h':'share_context_l']+'</div>'+
-    '<div class="survey-block"><div class="survey-block-title">'+Lv.iv1_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.iv1_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.iv1_ref+'</span></p>'+items(Lv.iv1_q,Lv.iv1_codes,Lv.iv1_rev,'iv1_')+'</div>'+
-    '<div class="survey-block"><div class="survey-block-title">'+Lv.mc_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.mc_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.mc_ref+'</span></p>'+items(Lv.mc_q,Lv.mc_codes,Lv.mc_rev,'mc_')+'</div>'+
-    '<div class="survey-block"><div class="survey-block-title">'+Lv.mv_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.mv_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.mv_ref+'</span></p>'+items(Lv.mv_q,Lv.mv_codes,Lv.mv_rev,'mv_')+'</div>'+
-    '<div class="survey-block"><div class="survey-block-title">'+Lv.dv_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.dv_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.dv_ref+'</span></p>'+items(Lv.dv_q,Lv.dv_codes,Lv.dv_rev,'dv_')+'</div>'+
-    '<button class="survey-submit" id="ssb">'+Lv.submit+'</button>';
-  document.getElementById('ssb').addEventListener('click',function(){ alert(Lv.submit_done); });
+  function row(prefix,j){
+    var opts=''; for(var v=1;v<=7;v++) opts+='<label class="likert-opt"><input type="radio" name="'+prefix+j+'" value="'+v+'"><div class="likert-circle">'+v+'</div></label>';
+    return '<div class="likert-wrap"><span class="likert-end">'+Lv.scale_lo+'</span><div class="likert-options">'+opts+'</div><span class="likert-end r">'+Lv.scale_hi+'</span></div>';
+  }
+  function items(qs,codes,revs,prefix){
+    return qs.map(function(q,j){ var rv=revs[j]?'<span class="item-reverse">&#9660; '+Lv.rev+'</span>':''; return '<div class="survey-item"><div class="survey-q"><span class="q-num">'+codes[j]+'</span> '+q+' '+rv+'</div>'+row(prefix,j)+'</div>'; }).join('');
+  }
+
+  var sec = document.getElementById('survey-section');
+
+  if(page === 1){
+    sec.innerHTML =
+      '<div class="survey-header">'+
+        '<h2>'+Lv.survey_title+'</h2>'+
+        '<p>'+Lv.survey_sub+'</p>'+
+        '<div class="survey-page-indicator">'+Lv.survey_page1_label+'</div>'+
+      '</div>'+
+      '<div class="note-box" style="margin-bottom:16px;">'+Lv[mp?'share_context_h':'share_context_l']+'</div>'+
+      '<div class="survey-block"><div class="survey-block-title">'+Lv.iv1_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.iv1_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.iv1_ref+'</span></p>'+items(Lv.iv1_q,Lv.iv1_codes,Lv.iv1_rev,'iv1_')+'</div>'+
+      '<div class="survey-block"><div class="survey-block-title">'+Lv.mc_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.mc_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.mc_ref+'</span></p>'+items(Lv.mc_q,Lv.mc_codes,Lv.mc_rev,'mc_')+'</div>'+
+      '<div class="survey-block"><div class="survey-block-title">'+Lv.mv_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.mv_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.mv_ref+'</span></p>'+items(Lv.mv_q,Lv.mv_codes,Lv.mv_rev,'mv_')+'</div>'+
+      '<div class="survey-block"><div class="survey-block-title">'+Lv.dv_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.dv_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.dv_ref+'</span></p>'+items(Lv.dv_q,Lv.dv_codes,Lv.dv_rev,'dv_')+'</div>'+
+      '<button class="survey-submit" id="ssb">'+Lv.survey_next+'</button>';
+
+    document.getElementById('ssb').addEventListener('click', function(){
+      sec.scrollTop = 0;
+      showSurveyPage(2);
+    });
+
+  } else {
+    sec.innerHTML =
+      '<div class="survey-header">'+
+        '<h2>'+Lv.demo_section+'</h2>'+
+        '<div class="survey-page-indicator">'+Lv.survey_page2_label+'</div>'+
+      '</div>'+
+      '<div class="survey-block">'+
+        '<div class="survey-item">'+
+          '<div class="survey-q">Q8-1. '+Lv.demo_gender_q+'</div>'+
+          '<div class="demo-radio-group">'+
+          Lv.demo_gender_opts.map(function(opt,i){
+            return '<label class="demo-radio"><input type="radio" name="demo_gender" value="'+i+'"><span>'+opt+'</span></label>';
+          }).join('')+
+          '</div>'+
+        '</div>'+
+        '<div class="survey-item">'+
+          '<div class="survey-q">Q8-2. '+Lv.demo_birth_q+'</div>'+
+          '<input type="number" class="demo-input" name="demo_birth" placeholder="'+Lv.demo_birth_placeholder+'" min="1940" max="2015">'+
+        '</div>'+
+        '<div class="survey-item" style="margin-bottom:0">'+
+          '<div class="survey-q">Q8-3. '+Lv.demo_ai_q+'</div>'+
+          '<div class="demo-radio-group">'+
+          Lv.demo_ai_opts.map(function(opt,i){
+            return '<label class="demo-radio"><input type="radio" name="demo_ai" value="'+i+'"><span>'+opt+'</span></label>';
+          }).join('')+
+          '</div>'+
+          '<div class="demo-note">'+Lv.demo_ai_note+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<button class="survey-submit" id="ssb">'+Lv.submit+'</button>';
+
+    document.getElementById('ssb').addEventListener('click', function(){ alert(Lv.submit_done); });
+    sec.scrollTop = 0;
+  }
 }
 
 // ─── events ──────────────────────────────────────────────
