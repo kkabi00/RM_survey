@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Video Simulation — Research Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f0e8; --sidebar-bg:#faf7f2; --header-bg:#faf7f2; --border:#e8e0d0;
+  --accent:#d4570a; --accent-light:#fde8d8; --accent-hover:#b84708;
+  --user-bubble:#d4570a; --user-text:#fff;
+  --ai-bubble:#ede8df; --ai-text:#1a1208; --system-text:#8c7e6a;
+  --decision-border:#e8a43a;
+  --final-bg:#e6f4ea; --final-border:#34a853;
+  --reverse-bg:#fff0f0; --reverse-border:#e88;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);height:100vh;display:flex;overflow:hidden;color:var(--ai-text);}
+
+.sidebar{width:272px;background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sidebar-top{padding:18px 16px 12px;border-bottom:1px solid var(--border);}
+.lang-switcher{display:flex;gap:4px;margin-bottom:14px;}
+.lang-btn{flex:1;padding:6px 0;font-size:12px;font-weight:600;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--system-text);cursor:pointer;transition:all .15s;}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);}
+.lang-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.sidebar-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--system-text);margin-bottom:8px;}
+.cond-list{padding:10px 10px 0;}
+.condition-btn{display:flex;flex-direction:column;gap:4px;width:100%;padding:11px 13px;margin-bottom:3px;border:1.5px solid transparent;border-radius:10px;background:transparent;cursor:pointer;text-align:left;transition:all .15s;}
+.condition-btn:hover{background:var(--accent-light);}
+.condition-btn.active{background:var(--accent-light);border-color:var(--accent);}
+.condition-btn .c-label{font-size:12.5px;font-weight:700;color:#1a1208;}
+.condition-btn.active .c-label{color:var(--accent);}
+.condition-btn .c-desc{font-size:11px;color:var(--system-text);line-height:1.4;}
+.badge-row{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;}
+.badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;}
+.badge.aa-h{background:#fde8d8;color:#b84708;}
+.badge.aa-l{background:#ede0f5;color:#7b2fbe;}
+.badge.mp-h{background:#fef3c7;color:#92400e;}
+.badge.mp-l{background:#dcfce7;color:#15803d;}
+.sidebar-divider{height:1px;background:var(--border);margin:12px 16px;}
+.sidebar-note{font-size:11px;color:var(--system-text);padding:0 16px 16px;line-height:1.8;}
+.sidebar-note strong{color:#1a1208;font-weight:600;}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.tab-row{display:flex;background:var(--header-bg);border-bottom:1px solid var(--border);padding:0 20px;flex-shrink:0;}
+.tab-btn{padding:13px 16px;font-size:13px;font-weight:500;background:transparent;border:none;border-bottom:2.5px solid transparent;cursor:pointer;color:var(--system-text);transition:color .15s;white-space:nowrap;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+#chat-view{display:flex;flex-direction:column;flex:1;min-height:0;}
+.chat-header{background:var(--header-bg);border-bottom:1px solid var(--border);padding:13px 20px;display:flex;align-items:center;gap:11px;flex-shrink:0;}
+.agent-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#d4570a,#e8852a);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.h-name{font-size:15px;font-weight:600;color:#1a1208;}
+.h-status{font-size:12px;color:var(--system-text);}
+.condition-tag{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);padding:2px 9px;border-radius:20px;margin-left:8px;}
+.aa-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:4px;}
+.aa-tag.high{background:#fde8d8;color:#b84708;}
+.aa-tag.low{background:#ede0f5;color:#7b2fbe;}
+
+.chat-messages{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:3px;scroll-behavior:smooth;}
+.msg-row{display:flex;align-items:flex-end;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .3s ease,transform .3s ease;}
+.msg-row.show{opacity:1;transform:translateY(0);}
+.msg-row.user{flex-direction:row-reverse;}
+.msg-row.system-row{justify-content:center;margin:4px 0;}
+.avatar-sm{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#d4570a,#e8852a);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-bottom:2px;}
+.bubble{max-width:68%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.65;word-break:keep-all;}
+.bubble.user{background:var(--user-bubble);color:var(--user-text);border-bottom-right-radius:4px;}
+.bubble.ai{background:var(--ai-bubble);color:var(--ai-text);border-bottom-left-radius:4px;}
+.system-label{font-size:11px;color:var(--system-text);padding:3px 12px;background:var(--border);border-radius:20px;}
+
+/* Loading bar — prominently displayed */
+.loading-block{display:flex;align-items:flex-start;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .3s ease,transform .3s ease;margin:4px 0;}
+.loading-block.show{opacity:1;transform:translateY(0);}
+.loading-card{background:var(--ai-bubble);border-radius:18px;border-bottom-left-radius:4px;padding:14px 18px;min-width:280px;max-width:72%;}
+.loading-title{font-size:12px;color:var(--system-text);margin-bottom:10px;font-weight:500;}
+.loading-bar-track{height:8px;background:#ddd6cc;border-radius:4px;overflow:hidden;margin-bottom:8px;}
+.loading-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#e8852a);border-radius:4px;width:0%;}
+.loading-timer{display:flex;justify-content:space-between;align-items:baseline;}
+.loading-elapsed{font-size:24px;font-weight:700;color:var(--accent);letter-spacing:-0.5px;font-variant-numeric:tabular-nums;}
+.loading-total{font-size:11px;color:var(--system-text);}
+.loading-proc{font-size:11px;color:var(--system-text);margin-top:6px;min-height:16px;display:flex;align-items:center;gap:5px;}
+.proc-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pdot 1.4s ease-in-out infinite;}
+@keyframes pdot{0%,100%{opacity:.2}50%{opacity:1}}
+
+.result-card{max-width:74%;padding:14px 16px;border-radius:14px;background:var(--final-bg);border:1.5px solid var(--final-border);line-height:1.6;margin:4px 0;border-bottom-left-radius:4px;}
+.rc-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1a6130;margin-bottom:5px;}
+.rc-title{font-weight:700;font-size:15px;color:#1a6130;}
+.rc-body{color:#1a4a28;margin-top:4px;font-size:12.5px;}
+
+/* Input area */
+.input-area{border-top:1px solid var(--border);background:var(--header-bg);padding:12px 20px;display:none;flex-direction:column;gap:8px;flex-shrink:0;}
+.input-hint{font-size:11.5px;color:var(--system-text);padding:0 2px;}
+.input-row{display:flex;gap:8px;align-items:flex-end;}
+.input-box{flex:1;padding:10px 14px;font-size:13.5px;line-height:1.5;border:1.5px solid var(--border);border-radius:18px;background:#fff;color:var(--ai-text);resize:none;outline:none;font-family:inherit;min-height:42px;max-height:100px;overflow-y:auto;transition:border-color .15s;}
+.input-box:focus{border-color:var(--accent);}
+.input-box:disabled{background:#f5f0e8;color:#aaa;cursor:not-allowed;}
+.send-btn{padding:10px 18px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;flex-shrink:0;font-family:inherit;}
+.send-btn:hover{background:var(--accent-hover);}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.chat-footer{border-top:1px solid var(--border);background:var(--header-bg);padding:10px 20px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.play-btn{padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;font-family:inherit;}
+.play-btn:hover{background:var(--accent-hover);}
+.play-btn:disabled{opacity:.4;cursor:not-allowed;}
+.reset-btn{padding:9px 15px;background:transparent;color:var(--system-text);border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;}
+.reset-btn:hover{background:var(--accent-light);}
+.footer-info{margin-left:auto;font-size:11.5px;color:var(--system-text);}
+
+/* Survey */
+.survey-section{display:none;flex:1;overflow-y:auto;padding:28px 36px 40px;background:var(--bg);}
+.survey-section.active{display:block;}
+.survey-header{margin-bottom:24px;}
+.survey-header h2{font-size:19px;font-weight:700;color:#1a1208;margin-bottom:5px;}
+.survey-header p{font-size:12.5px;color:var(--system-text);line-height:1.6;}
+.survey-block{background:var(--sidebar-bg);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:16px;}
+.survey-block-title{font-size:11px;font-weight:700;color:var(--system-text);text-transform:uppercase;letter-spacing:.08em;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.survey-item{margin-bottom:24px;}
+.survey-item:last-child{margin-bottom:0;}
+.survey-q{font-size:13.5px;font-weight:500;color:#1a1208;margin-bottom:10px;line-height:1.6;}
+.q-num{font-weight:700;color:var(--accent);margin-right:3px;}
+.item-reverse{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:3px;vertical-align:middle;background:var(--reverse-bg);color:#c0392b;border:1px solid var(--reverse-border);}
+.likert-wrap{display:flex;align-items:center;gap:8px;}
+.likert-end{font-size:11px;color:var(--system-text);min-width:70px;line-height:1.3;}
+.likert-end.r{text-align:right;}
+.likert-options{display:flex;gap:5px;flex:1;justify-content:center;}
+.likert-opt{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+.likert-opt input{display:none;}
+.likert-circle{width:33px;height:33px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:var(--system-text);transition:all .15s;cursor:pointer;}
+.likert-opt:hover .likert-circle{border-color:var(--accent);color:var(--accent);}
+.likert-opt input:checked + .likert-circle{background:var(--accent);border-color:var(--accent);color:#fff;}
+.survey-submit{display:block;width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;transition:background .15s;font-family:inherit;}
+.survey-submit:hover{background:var(--accent-hover);}
+.scenario-box{background:#fffdf7;border:1.5px solid var(--decision-border);border-radius:12px;padding:16px 18px;margin-bottom:14px;font-size:13px;line-height:1.75;color:#3a2a0a;}
+.scenario-box-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#b84708;margin-bottom:8px;}
+.note-box{background:#f0f7ff;border:1px solid #b3d4f5;border-radius:10px;padding:10px 14px;font-size:11.5px;color:#1a3a5c;line-height:1.65;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-top">
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="ko">한국어</button>
+      <button class="lang-btn" data-lang="en">English</button>
+      <button class="lang-btn" data-lang="zh">中文</button>
+    </div>
+    <div class="sidebar-label" id="lb-conditions"></div>
+  </div>
+  <div class="cond-list">
+    <button class="condition-btn active" data-cond="c1" id="btn-c1">
+      <div class="c-label">C1 — High AA × High MP</div>
+      <div class="badge-row"><span class="badge aa-h" id="b-aah-1"></span><span class="badge mp-h" id="b-mph-1"></span></div>
+      <div class="c-desc" id="lb-c1-desc"></div>
+    </button>
+    <button class="condition-btn" data-cond="c2" id="btn-c2">
+      <div class="c-label">C2 — High AA × Low MP</div>
+      <div class="badge-row"><span class="badge aa-h" id="b-aah-2"></span><span class="badge mp-l" id="b-mpl-2"></span></div>
+      <div class="c-desc" id="lb-c2-desc"></div>
+    </button>
+    <button class="condition-btn" data-cond="c3" id="btn-c3">
+      <div class="c-label">C3 — Low AA × High MP</div>
+      <div class="badge-row"><span class="badge aa-l" id="b-aal-3"></span><span class="badge mp-h" id="b-mph-3"></span></div>
+      <div class="c-desc" id="lb-c3-desc"></div>
+    </button>
+    <button class="condition-btn" data-cond="c4" id="btn-c4">
+      <div class="c-label">C4 — Low AA × Low MP</div>
+      <div class="badge-row"><span class="badge aa-l" id="b-aal-4"></span><span class="badge mp-l" id="b-mpl-4"></span></div>
+      <div class="c-desc" id="lb-c4-desc"></div>
+    </button>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-note" id="lb-note"></div>
+</div>
+
+<div class="main">
+  <div class="tab-row">
+    <button class="tab-btn active" id="tab-chat" data-tab="chat"></button>
+    <button class="tab-btn" id="tab-survey" data-tab="survey"></button>
+  </div>
+
+  <div id="chat-view">
+    <div class="chat-header">
+      <div class="agent-avatar">✦</div>
+      <div>
+        <div class="h-name">VideoAI <span class="condition-tag" id="condition-tag">C1</span><span class="aa-tag high" id="aa-loading-tag"></span></div>
+        <div class="h-status" id="lb-agent-status"></div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg-row system-row show"><div class="system-label" id="lb-start-hint"></div></div>
+    </div>
+    <div class="input-area" id="input-area">
+      <div class="input-hint" id="input-hint"></div>
+      <div class="input-row">
+        <textarea class="input-box" id="input-box" rows="1"></textarea>
+        <button class="send-btn" id="send-btn"></button>
+      </div>
+    </div>
+    <div class="chat-footer">
+      <button class="play-btn" id="play-btn"></button>
+      <button class="reset-btn" id="reset-btn"></button>
+      <span class="footer-info" id="footer-info"></span>
+    </div>
+  </div>
+
+  <div class="survey-section" id="survey-section"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  LOADING TIME — 10s (Low AA) vs 40s (High AA)
+//
+//  Theoretical basis:
+//  ─ Nielsen (1993, Usability Engineering): 10 s = upper limit
+//    for maintaining task focus. Below this threshold users do
+//    NOT strongly attribute processing effort to the system.
+//  ─ Bouch, Kuchinsky & Bhatti (2000): delays ≤10 s rated
+//    "acceptable"; system still feels responsive.
+//  ─ Selvidge (1999): statistically significant frustration and
+//    "heavy processing" perception emerge at 30 s+; no difference
+//    found between 10 s and 20 s conditions.
+//  ─ Nah (2003, Information & Management): 41 s is the empirical
+//    cut-off for users classifying a wait as "long".
+//
+//  Therefore:
+//    Low AA  = 10 s  → sits at the attention-limit boundary;
+//                       users feel the system is merely "processing"
+//    High AA = 40 s  → clearly inside the "heavy autonomous work"
+//                       zone; strongly signals AI effort/autonomy
+// ═══════════════════════════════════════════════════════════
+var LOAD_MS = { high: 40000, low: 10000 };
+
+var VIDEO_URLS = { c1:'vedio_sample/high_pressure.mp4', c2:'vedio_sample/low_pressure.mp4', c3:'vedio_sample/high_pressure.mp4', c4:'vedio_sample/low_pressure.mp4' };
+var COND_META  = { c1:{aa:'high',mp:'h'}, c2:{aa:'high',mp:'l'}, c3:{aa:'low',mp:'h'}, c4:{aa:'low',mp:'l'} };
+
+var PROC = {
+  ko: { high:['방대한 데이터셋 분석 중...','문맥 및 의도 심층 파악 중...','클립 최적화 알고리즘 실행 중...','타임라인 정밀 계산 중...','편집 결과 최적화 중...','최종 출력 생성 중...'], low:['처리 중...','생성 중...','완료 중...'] },
+  en: { high:['Analyzing large-scale dataset...','Deep-parsing context and intent...','Running clip optimization algorithm...','Computing precise timeline...','Optimizing edit result...','Generating final output...'], low:['Processing...','Generating...','Finalizing...'] },
+  zh: { high:['正在分析大规模数据集...','深度解析上下文与意图...','运行片段优化算法...','精确计算时间线...','优化剪辑结果...','生成最终输出...'], low:['处理中...','生成中...','完成中...'] },
+};
+
+var T = {
+  ko:{
+    conditions:'실험 조건', aa_h:'High AA (40초)', aa_l:'Low AA (10초)', mp_h:'High MP (할로윈)', mp_l:'Low MP (놀이공원)',
+    c1_desc:'할로윈 창피 영상 · High AA (40초)', c2_desc:'놀이공원 추억 · High AA (40초)', c3_desc:'할로윈 창피 영상 · Low AA (10초)', c4_desc:'놀이공원 추억 · Low AA (10초)',
+    note:'<strong>2×2 Between-Subjects</strong>\nIV1: AI 자율성 (로딩 시간 조작)\n  High AA: 매 턴 40초\n  Low AA: 매 턴 10초\nIV2: 도덕 압박 (시나리오 내용)\nMV: 심리적 소유감 (7pt)\nDV: 죄책감 (7pt)\nn=120 (~30/조건)',
+    tab_chat:'💬 채팅 시뮬레이션', tab_survey:'📋 설문 문항',
+    agent_status:'영상 제작 AI 도우미', aa_tag_high:'40초 · High AA', aa_tag_low:'10초 · Low AA',
+    start_hint:'조건 선택 후 시뮬레이션 시작을 눌러주세요',
+    btn_start:'▶ 시뮬레이션 시작', btn_reset:'↺ 초기화', btn_replay:'↺ 다시 재생',
+    send:'전송', no_video:'영상 준비 중', video_done:'영상 완성 🎉',
+    loading_label_high:'AI가 방대한 데이터를 처리하고 있습니다', loading_label_low:'처리 중',
+    loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
+    hint_1:'Step 1 / 3 — 요청을 입력하고 전송하세요', hint_2:'Step 2 / 3 — 추가 정보를 입력하세요', hint_3:'Step 3 / 3 — 최종 요청을 입력하세요',
+    ph_h_1:'예) 할로윈 파티에서 코스튬 혼자 입고 온 친구 영상 만들고 싶어요.', ph_h_2:'예) 친구 표정이 잘 보이게 편집해주세요.', ph_h_3:'예) 자막도 넣어서 더 웃기게 만들어주세요.',
+    ph_l_1:'예) 놀이공원에서 친구들이랑 찍은 영상으로 추억 영상 만들고 싶어요.', ph_l_2:'예) 신나는 음악이랑 같이 편집해주세요.', ph_l_3:'예) 롤러코스터 장면은 꼭 넣어주세요.',
+    ai_h_1:'네, 요청 확인했습니다. 최적의 편집 방향을 분석하겠습니다.', ai_h_2:'분석 완료. 세부 편집 옵션을 계산하고 있습니다.', ai_h_3:'마지막 요청도 확인했습니다. 영상을 생성하겠습니다.',
+    ai_l_1:'네, 확인했습니다. 바로 처리하겠습니다.', ai_l_2:'추가 요청 확인했습니다.', ai_l_3:'최종 요청 확인. 영상을 생성합니다.',
+    result_h:'할로윈 파티 창피 영상 제작 완료', result_l:'놀이공원 추억 영상 제작 완료',
+    result_sub_high:'총 3턴 · 매 턴 40초 처리 (High AA)', result_sub_low:'총 3턴 · 매 턴 10초 처리 (Low AA)',
+    sys_start:'시뮬레이션이 시작되었습니다.',
+    survey_title:'설문 문항 (정식 버전)', survey_sub:'시나리오를 읽은 후 아래 문항에 응답해주세요. 7점 척도를 사용합니다.',
+    scenario_label:'📄 시나리오', iv1_section:'Q4. AI 자율성 지각 체크 (IV1)', iv1_sub:'방금 읽은 시나리오에서 AI에 대해 다음 내용에 얼마나 동의하십니까?', iv1_ref:'Sundar (2020)',
+    mc_section:'Q5. 조작 확인', mc_sub:'시나리오에서 읽은 내용만을 바탕으로 답해주세요.', mc_ref:'MC-1: AI 자율성 / MC-2: 참여도 / MC-3~4: 도덕 압박',
+    mv_section:'Q6. 심리적 소유감 (MV)', mv_sub:'시나리오의 AI 생성 영상에 대해 다음 내용에 얼마나 동의하십니까?', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
+    dv_section:'Q7. 죄책감 (DV)', dv_sub:'시나리오 속 인물 입장에서 다음 감정을 얼마나 느낄 것 같습니까?', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
+    scale_lo:'전혀 그렇지 않다', scale_hi:'매우 그렇다', submit:'설문 제출하기', submit_done:'제출 완료! (프로토타입)', rev:'역채점',
+    scenario_c1:'당신은 지난 주 할로윈 파티에서 친구가 혼자 코스튬을 입고 와 당혹스러운 순간을 맞이했습니다. 당신은 친구의 동의 없이 VideoAI 챗봇을 사용해 그 순간을 담은 짧은 영상을 만들어 단체 채팅에 공유하려 합니다.',
+    scenario_c2:'당신은 최근 친구들과 함께 간 놀이공원 여행의 추억 영상을 만들고 싶습니다. 친구들도 동의했으며 VideoAI 챗봇을 통해 하이라이트 영상을 제작하려 합니다.',
+    scenario_c3:'당신은 지난 주 할로윈 파티에서 친구가 혼자 코스튬을 입고 와 당혹스러운 순간을 맞이했습니다. 당신은 친구의 동의 없이 VideoAI 챗봇을 사용해 그 순간을 담은 짧은 영상을 만들어 단체 채팅에 공유하려 합니다.',
+    scenario_c4:'당신은 최근 친구들과 함께 간 놀이공원 여행의 추억 영상을 만들고 싶습니다. 친구들도 동의했으며 VideoAI 챗봇을 통해 하이라이트 영상을 제작하려 합니다.',
+    iv1_q:['AI가 영상 제작 과정에서 내 요청을 처리하는 데 오랜 시간이 걸렸다.','AI가 영상의 각 단계를 생성하기 위해 많은 복잡한 작업을 하는 것처럼 보였다.','AI가 내 입력에 거의 즉시 응답했다.','AI가 내 요청을 이행하기 위해 내부적으로 열심히 작동하는 것처럼 보였다.'],
+    iv1_codes:['IV-1','IV-2','IV-3 ▼','IV-4'], iv1_rev:[false,false,true,false],
+    mc_q:['AI가 영상 제작 중 내 요청을 처리하는 데 오랜 시간이 걸렸다.','나는 영상 제작 과정에서 의미 있는 입력과 결정을 했다.','시나리오에 묘사된 행동은 관련된 사람에게 당혹감이나 피해를 줄 수 있다.','시나리오의 콘텐츠는 대상자의 명시적 동의 없이 제작되었다.'],
+    mc_codes:['MC-1','MC-2','MC-3','MC-4'], mc_rev:[false,false,false,false],
+    mv_q:['이 AI 생성 영상은 내 것처럼 느껴진다.','나는 이 AI 생성 콘텐츠에 대해 소유감을 느낀다.','이 영상은 나와 개인적으로 연결된 것 같다.','나는 이 영상과 그 잠재적 결과에 대해 책임감을 느낀다.','이 영상은 나와 전혀 관계가 없다고 느낀다.'],
+    mv_codes:['MV-1','MV-2','MV-3','MV-4','MV-5 ▼'], mv_rev:[false,false,false,false,true],
+    dv_q:['나는 내가 한 행동에 대해 죄책감을 느낄 것이다.','나는 이 영상을 만든 것에 대해 후회할 것이다.','나는 내가 한 행동이 잘못되었다고 느낄 것이다.','이 행동은 오랫동안 내 양심에 걸릴 것이다.','나는 이 콘텐츠를 만든 것에 대해 자책할 것이다.','나는 이 시나리오에서 일어난 일에 대해 개인적으로 책임감을 느끼지 않을 것이다.'],
+    dv_codes:['DV-1','DV-2','DV-3','DV-4','DV-5','DV-6 ▼'], dv_rev:[false,false,false,false,false,true],
+  },
+  en:{
+    conditions:'Conditions', aa_h:'High AA (40s)', aa_l:'Low AA (10s)', mp_h:'High MP (Halloween)', mp_l:'Low MP (Theme Park)',
+    c1_desc:'Halloween shaming · High AA (40s)', c2_desc:'Theme park memory · High AA (40s)', c3_desc:'Halloween shaming · Low AA (10s)', c4_desc:'Theme park memory · Low AA (10s)',
+    note:'<strong>2×2 Between-Subjects</strong>\nIV1: AI Autonomy (loading time)\n  High AA: 40s per turn\n  Low AA: 10s per turn\nIV2: Moral Pressure (scenario)\nMV: Psych. Ownership (7pt)\nDV: Guilt (7pt)\nn=120 (~30/condition)',
+    tab_chat:'💬 Chat Simulation', tab_survey:'📋 Survey',
+    agent_status:'Video creation AI assistant', aa_tag_high:'40s · High AA', aa_tag_low:'10s · Low AA',
+    start_hint:'Select a condition and press Start',
+    btn_start:'▶ Start Simulation', btn_reset:'↺ Reset', btn_replay:'↺ Replay',
+    send:'Send', no_video:'Video pending', video_done:'Video Complete 🎉',
+    loading_label_high:'AI is processing a large amount of data', loading_label_low:'Processing',
+    loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
+    hint_1:'Step 1 / 3 — Type your request and send', hint_2:'Step 2 / 3 — Add more details', hint_3:'Step 3 / 3 — Send your final request',
+    ph_h_1:"e.g. I want a video of my friend's embarrassing Halloween costume moment.", ph_h_2:'e.g. Please make the expression clearly visible.', ph_h_3:'e.g. Add a funny caption to make it funnier.',
+    ph_l_1:'e.g. I want a memory video from our theme park trip.', ph_l_2:'e.g. Edit it with some upbeat music.', ph_l_3:'e.g. Make sure to include the roller coaster clip.',
+    ai_h_1:"Got it. I'll analyze the optimal editing direction.", ai_h_2:'Analysis complete. Calculating detailed editing options.', ai_h_3:'Final request confirmed. Generating video.',
+    ai_l_1:'Got it. Processing right away.', ai_l_2:'Additional request received.', ai_l_3:'Final request confirmed. Generating video.',
+    result_h:'Halloween embarrassment video created', result_l:'Theme park memory video created',
+    result_sub_high:'3 turns · 40s processing each (High AA)', result_sub_low:'3 turns · 10s processing each (Low AA)',
+    sys_start:'Simulation started.',
+    survey_title:'Survey Items (Formal Version)', survey_sub:'Please answer after reading the scenario. 7-point scale.',
+    scenario_label:'📄 Scenario', iv1_section:'Q4. AI Autonomy Perception Check (IV1)', iv1_sub:'Based on the scenario, please rate your agreement with the following.', iv1_ref:'Sundar (2020)',
+    mc_section:'Q5. Manipulation Check', mc_sub:'Answer based strictly on what you read in the scenario.', mc_ref:'MC-1: AI autonomy / MC-2: Engagement / MC-3~4: Moral pressure',
+    mv_section:'Q6. Psychological Ownership (MV)', mv_sub:'Thinking about the AI-generated video, please rate your agreement.', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
+    dv_section:'Q7. Guilt (DV)', dv_sub:'Imagining yourself in the scenario, how strongly would you feel the following?', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
+    scale_lo:'Strongly disagree', scale_hi:'Strongly agree', submit:'Submit Survey', submit_done:'Submitted! (Prototype)', rev:'Reverse coded',
+    scenario_c1:"Last week at a Halloween party, your friend showed up alone in a costume and had an embarrassing moment. Without their permission, you plan to use VideoAI to create a short video of that moment and share it in a group chat.",
+    scenario_c2:'You want to create a fun memory video from a recent theme park trip with friends. Everyone agreed, and you plan to use VideoAI to create a highlight reel.',
+    scenario_c3:"Last week at a Halloween party, your friend showed up alone in a costume and had an embarrassing moment. Without their permission, you plan to use VideoAI to create a short video of that moment and share it in a group chat.",
+    scenario_c4:'You want to create a fun memory video from a recent theme park trip with friends. Everyone agreed, and you plan to use VideoAI to create a highlight reel.',
+    iv1_q:['The AI took a long time to process my requests during video creation.','The AI seemed to be doing a lot of complex work to generate each step.','The AI responded to my inputs almost instantly.','The AI seemed to be working hard behind the scenes to fulfill my requests.'],
+    iv1_codes:['IV-1','IV-2','IV-3 ▼','IV-4'], iv1_rev:[false,false,true,false],
+    mc_q:['The AI took a long time to process my requests during video creation.','I made meaningful inputs and decisions during the video creation process.','The action in the scenario could cause embarrassment or harm to the person involved.','The content was created without the subject\'s explicit consent.'],
+    mc_codes:['MC-1','MC-2','MC-3','MC-4'], mc_rev:[false,false,false,false],
+    mv_q:['This AI-generated video feels like it is mine.','I feel a sense of ownership over this AI-generated content.','This video feels personally connected to me.','I feel responsible for this video and its potential consequences.','I do not feel that this video has anything to do with me.'],
+    mv_codes:['MV-1','MV-2','MV-3','MV-4','MV-5 ▼'], mv_rev:[false,false,false,false,true],
+    dv_q:['I would feel guilty about what I had done.','I would feel regret over having created this video.','I would feel that what I did was wrong.','This action would weigh on my conscience for a long time.','I would blame myself for having created this content.','I would not feel personally responsible for what happened.'],
+    dv_codes:['DV-1','DV-2','DV-3','DV-4','DV-5','DV-6 ▼'], dv_rev:[false,false,false,false,false,true],
+  },
+  zh:{
+    conditions:'实验条件', aa_h:'高AI自主性（40秒）', aa_l:'低AI自主性（10秒）', mp_h:'高道德压力（万圣节）', mp_l:'低道德压力（游乐园）',
+    c1_desc:'万圣节羞辱视频 · 高AI自主性（40秒）', c2_desc:'游乐园回忆 · 高AI自主性（40秒）', c3_desc:'万圣节羞辱视频 · 低AI自主性（10秒）', c4_desc:'游乐园回忆 · 低AI自主性（10秒）',
+    note:'<strong>2×2被试间设计</strong>\nIV1: AI自主性（加载时间操控）\n  高AI自主性: 每轮40秒\n  低AI自主性: 每轮10秒\nIV2: 道德压力（情境内容）\nMV: 心理所有感（7点）\nDV: 内疚感（7点）\nn=120（约30/条件）',
+    tab_chat:'💬 对话模拟', tab_survey:'📋 调查问卷',
+    agent_status:'视频制作AI助手', aa_tag_high:'40秒 · 高AI自主性', aa_tag_low:'10秒 · 低AI自主性',
+    start_hint:'请选择条件后点击开始模拟',
+    btn_start:'▶ 开始模拟', btn_reset:'↺ 重置', btn_replay:'↺ 重新播放',
+    send:'发送', no_video:'视频准备中', video_done:'视频完成 🎉',
+    loading_label_high:'AI正在处理大量数据', loading_label_low:'处理中',
+    loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
+    hint_1:'第1步 / 共3步 — 请输入您的请求并发送', hint_2:'第2步 / 共3步 — 请补充详细信息', hint_3:'第3步 / 共3步 — 请输入最终请求',
+    ph_h_1:'例：我想制作一个朋友在万圣节派对上出丑的视频。', ph_h_2:'例：请让朋友的表情清楚地呈现出来。', ph_h_3:'例：请加上搞笑字幕。',
+    ph_l_1:'例：我想用游乐园旅行中拍的视频制作一段回忆视频。', ph_l_2:'例：请配上欢快的音乐剪辑。', ph_l_3:'例：一定要包含过山车的镜头。',
+    ai_h_1:'已收到您的请求。正在分析最佳剪辑方向。', ai_h_2:'分析完成。正在计算详细剪辑选项。', ai_h_3:'已确认最终请求。正在生成视频。',
+    ai_l_1:'已收到，马上处理。', ai_l_2:'已收到补充请求。', ai_l_3:'已确认最终请求，正在生成视频。',
+    result_h:'万圣节羞辱视频制作完成', result_l:'游乐园回忆视频制作完成',
+    result_sub_high:'共3轮 · 每轮处理40秒（高AI自主性）', result_sub_low:'共3轮 · 每轮处理10秒（低AI自主性）',
+    sys_start:'模拟已开始。',
+    survey_title:'调查问卷（正式版本）', survey_sub:'请在阅读情境后回答以下问题，使用7点量表作答。',
+    scenario_label:'📄 情境', iv1_section:'Q4. AI自主性感知检验（IV1）', iv1_sub:'根据您刚阅读的情境，请对以下关于AI的陈述表示同意程度。', iv1_ref:'Sundar (2020)',
+    mc_section:'Q5. 操控确认', mc_sub:'请仅根据您在情境中所读到的内容作答。', mc_ref:'MC-1: AI自主性 / MC-2: 参与度 / MC-3~4: 道德压力',
+    mv_section:'Q6. 心理所有感（MV）', mv_sub:'请思考情境中AI生成的视频，对以下陈述表示同意程度。', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
+    dv_section:'Q7. 内疚感（DV）', dv_sub:'请将自己代入情境中的当事人，评估以下情感的感受强度。', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
+    scale_lo:'完全不同意', scale_hi:'完全同意', submit:'提交问卷', submit_done:'提交完成！（原型）', rev:'反向计分',
+    scenario_c1:'上周万圣节派对上，您的朋友独自穿着戏服出现，经历了一段令人尴尬的时刻。未经朋友同意，您想用VideoAI制作一段记录该时刻的短视频，并分享到群聊中。',
+    scenario_c2:'您想用最近与朋友一起去游乐园时拍摄的视频制作一段回忆视频。朋友们都同意了，您计划使用VideoAI制作一段精彩集锦。',
+    scenario_c3:'上周万圣节派对上，您的朋友独自穿着戏服出现，经历了一段令人尴尬的时刻。未经朋友同意，您想用VideoAI制作一段记录该时刻的短视频，并分享到群聊中。',
+    scenario_c4:'您想用最近与朋友一起去游乐园时拍摄的视频制作一段回忆视频。朋友们都同意了，您计划使用VideoAI制作一段精彩集锦。',
+    iv1_q:['在视频制作过程中，AI处理我的请求花费了很长时间。','AI似乎在为视频的每个步骤做大量复杂的处理工作。','AI几乎即时响应了我的输入。','AI似乎在幕后努力工作以满足我的请求。'],
+    iv1_codes:['IV-1','IV-2','IV-3 ▼','IV-4'], iv1_rev:[false,false,true,false],
+    mc_q:['在视频制作过程中，AI处理我的请求花费了很长时间。','在视频制作过程中，我做出了有意义的输入和决定。','情境中描述的行为可能会使相关人员感到尴尬或受到伤害。','情境中的内容是在未经当事人明确同意的情况下制作的。'],
+    mc_codes:['MC-1','MC-2','MC-3','MC-4'], mc_rev:[false,false,false,false],
+    mv_q:['这个AI生成的视频感觉是我的。','我对这个AI生成的内容有一种所有感。','这个视频让我感觉与我个人息息相关。','我感到对这个视频及其潜在后果负有责任。','我觉得这个视频与我没有任何关系。'],
+    mv_codes:['MV-1','MV-2','MV-3','MV-4','MV-5 ▼'], mv_rev:[false,false,false,false,true],
+    dv_q:['我会为自己的行为感到内疚。','我会后悔制作了这个视频。','我会觉得自己的行为是错误的。','这个行为会在我的良心上压着很久。','我会因为制作了这个内容而自责。','我不会觉得自己对这个情境中发生的事情负有个人责任。'],
+    dv_codes:['DV-1','DV-2','DV-3','DV-4','DV-5','DV-6 ▼'], dv_rev:[false,false,false,false,false,true],
+  },
+};
+
+// ─── state ───────────────────────────────────────────────
+var lang = 'ko';
+var cond = 'c1';
+var playing = false;
+var pendingResolve = null;
+
+function Lx(k){ return T[lang][k] || k; }
+function isHigh(){ return COND_META[cond].aa === 'high'; }
+function isMP(){ return COND_META[cond].mp === 'h'; }
+function mpk(){ return isMP() ? 'h' : 'l'; }
+
+// ─── lang ─────────────────────────────────────────────────
+function setLang(l){
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang===l); });
+  var fmap = {ko:"'Noto Sans KR',sans-serif", en:"'Noto Sans',sans-serif", zh:"'Noto Sans SC',sans-serif"};
+  document.body.style.fontFamily = fmap[l];
+  applyI18n(); resetSim();
+}
+
+function applyI18n(){
+  document.getElementById('lb-conditions').textContent = Lx('conditions');
+  var bmap={'b-aah-1':'aa_h','b-aah-2':'aa_h','b-aal-3':'aa_l','b-aal-4':'aa_l','b-mph-1':'mp_h','b-mpl-2':'mp_l','b-mph-3':'mp_h','b-mpl-4':'mp_l'};
+  Object.keys(bmap).forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=Lx(bmap[id]); });
+  ['c1','c2','c3','c4'].forEach(function(c){ var el=document.getElementById('lb-'+c+'-desc'); if(el) el.textContent=Lx(c+'_desc'); });
+  document.getElementById('lb-note').innerHTML = Lx('note').replace(/\n/g,'<br>');
+  document.getElementById('tab-chat').textContent = Lx('tab_chat');
+  document.getElementById('tab-survey').textContent = Lx('tab_survey');
+  document.getElementById('lb-agent-status').textContent = Lx('agent_status');
+  document.getElementById('lb-start-hint').textContent = Lx('start_hint');
+  document.getElementById('play-btn').textContent = Lx('btn_start');
+  document.getElementById('reset-btn').textContent = Lx('btn_reset');
+  document.getElementById('send-btn').textContent = Lx('send');
+  updateTag(); renderSurvey();
+}
+
+function updateTag(){
+  var hi = isHigh();
+  var tag = document.getElementById('aa-loading-tag');
+  tag.textContent = hi ? Lx('aa_tag_high') : Lx('aa_tag_low');
+  tag.className = 'aa-tag ' + (hi?'high':'low');
+  document.getElementById('condition-tag').textContent = cond.toUpperCase();
+  document.getElementById('footer-info').textContent = cond.toUpperCase()+' · '+(hi?'High AA 40s':'Low AA 10s')+' × '+(isMP()?'High MP':'Low MP');
+}
+
+// ─── condition / tab ─────────────────────────────────────
+function selectCondition(c){
+  if(playing) return;
+  cond = c;
+  document.querySelectorAll('.condition-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.cond===c); });
+  updateTag(); renderSurvey(); resetSim();
+}
+
+function switchTab(tab){
+  document.getElementById('tab-chat').classList.toggle('active', tab==='chat');
+  document.getElementById('tab-survey').classList.toggle('active', tab==='survey');
+  document.getElementById('chat-view').style.display = tab==='chat' ? 'flex' : 'none';
+  document.getElementById('survey-section').className = 'survey-section'+(tab==='survey'?' active':'');
+}
+
+// ─── helpers ─────────────────────────────────────────────
+function scroll(){ var el=document.getElementById('chat-messages'); el.scrollTop=el.scrollHeight; }
+
+function addMsg(role, html){
+  var msgs = document.getElementById('chat-messages');
+  var w = document.createElement('div');
+  if(role==='sys'){ w.className='msg-row system-row'; w.innerHTML='<div class="system-label">'+html+'</div>'; }
+  else if(role==='user'){ w.className='msg-row user'; w.innerHTML='<div class="bubble user">'+html+'</div>'; }
+  else { w.className='msg-row ai'; w.innerHTML='<div class="avatar-sm">&#10022;</div><div class="bubble ai">'+html+'</div>'; }
+  msgs.appendChild(w);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ w.classList.add('show'); }); });
+  scroll();
+}
+
+function addStepLabel(text){
+  var msgs = document.getElementById('chat-messages');
+  var w = document.createElement('div');
+  w.className = 'msg-row system-row';
+  w.innerHTML = '<div class="system-label" style="background:var(--accent-light);color:var(--accent);font-weight:600;">'+text+'</div>';
+  msgs.appendChild(w);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ w.classList.add('show'); }); });
+  scroll();
+}
+
+function pause(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+
+// ─── loading bar ─────────────────────────────────────────
+function showLoading(ms){
+  return new Promise(function(resolve){
+    var hi = isHigh();
+    var totalSec = ms/1000;
+    var procMsgs = PROC[lang][hi?'high':'low'];
+    var msgs = document.getElementById('chat-messages');
+
+    var block = document.createElement('div');
+    block.className = 'loading-block';
+    block.innerHTML =
+      '<div class="avatar-sm">&#10022;</div>'+
+      '<div class="loading-card">'+
+        '<div class="loading-title">'+Lx(hi?'loading_label_high':'loading_label_low')+'</div>'+
+        '<div class="loading-bar-track"><div class="loading-bar-fill" id="_lf"></div></div>'+
+        '<div class="loading-timer">'+
+          '<span class="loading-elapsed" id="_le">0.0s</span>'+
+          '<span class="loading-total">'+Lx(hi?'loading_total_high':'loading_total_low')+'</span>'+
+        '</div>'+
+        '<div class="loading-proc"><div class="proc-dot"></div><span id="_lp">'+procMsgs[0]+'</span></div>'+
+      '</div>';
+    msgs.appendChild(block);
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ block.classList.add('show'); }); });
+    scroll();
+
+    var fill=document.getElementById('_lf'), elEl=document.getElementById('_le'), procEl=document.getElementById('_lp');
+    var start=Date.now(), pIdx=0;
+    var ticker=setInterval(function(){
+      var passed=Date.now()-start;
+      var pct=Math.min(passed/ms*100,100);
+      var sec=Math.min(passed/1000,totalSec);
+      fill.style.width=pct+'%';
+      elEl.textContent=sec.toFixed(1)+'s';
+      var want=Math.min(Math.floor(pct/100*procMsgs.length), procMsgs.length-1);
+      if(want>pIdx){ pIdx=want; procEl.textContent=procMsgs[pIdx]; }
+      if(passed>=ms){
+        clearInterval(ticker);
+        fill.style.width='100%'; elEl.textContent=totalSec.toFixed(1)+'s';
+        setTimeout(function(){
+          block.style.transition='opacity .4s'; block.style.opacity='0';
+          setTimeout(function(){ if(block.parentNode) block.parentNode.removeChild(block); resolve(); },400);
+        },200);
+      }
+    },80);
+  });
+}
+
+// ─── input ───────────────────────────────────────────────
+function waitInput(turn){
+  return new Promise(function(resolve){
+    var mp=mpk();
+    document.getElementById('input-hint').textContent = Lx('hint_'+(turn+1));
+    var box=document.getElementById('input-box');
+    box.placeholder=Lx('ph_'+mp+'_'+(turn+1));
+    box.value=''; box.disabled=false;
+    document.getElementById('send-btn').disabled=false;
+    document.getElementById('input-area').style.display='flex';
+    box.focus();
+    pendingResolve=function(txt){ pendingResolve=null; box.disabled=true; document.getElementById('send-btn').disabled=true; document.getElementById('input-area').style.display='none'; resolve(txt); };
+  });
+}
+
+function doSend(){
+  if(!pendingResolve) return;
+  var txt=document.getElementById('input-box').value.trim();
+  if(!txt) return;
+  pendingResolve(txt);
+}
+
+// ─── reset ───────────────────────────────────────────────
+function resetSim(){
+  playing=false; pendingResolve=null;
+  document.getElementById('input-area').style.display='none';
+  var box=document.getElementById('input-box'); box.value=''; box.disabled=true;
+  document.getElementById('send-btn').disabled=true;
+  var pb=document.getElementById('play-btn'); pb.disabled=false; pb.textContent=Lx('btn_start'); pb.dataset.mode='start';
+  document.getElementById('chat-messages').innerHTML='<div class="msg-row system-row show"><div class="system-label">'+Lx('start_hint')+'</div></div>';
+  updateTag();
+}
+
+// ─── simulation ──────────────────────────────────────────
+async function startSim(){
+  if(playing) return;
+  playing=true;
+  document.getElementById('play-btn').disabled=true;
+  document.getElementById('chat-messages').innerHTML='';
+  var mp=mpk();
+
+  addMsg('sys', Lx('sys_start'));
+  await pause(400);
+
+  for(var t=0;t<3;t++){
+    addStepLabel(Lx('hint_'+(t+1)));
+    await pause(200);
+    var userText = await waitInput(t);
+    addMsg('user', userText);
+    await pause(300);
+    await showLoading(isHigh() ? LOAD_MS.high : LOAD_MS.low);
+    addMsg('ai', Lx('ai_'+mp+'_'+(t+1)));
+    await pause(500);
+  }
+
+  await pause(200);
+  var url=VIDEO_URLS[cond];
+  var media=(url&&url.trim())
+    ? '<video src="'+url+'" controls playsinline style="width:100%;border-radius:8px;margin-top:10px;max-height:220px;background:#000;"></video>'
+    : '<span style="display:inline-block;margin-top:10px;padding:7px 14px;background:#aaa;color:#fff;border-radius:8px;font-size:12px;">'+Lx('no_video')+'</span>';
+  var rrow=document.createElement('div'); rrow.className='msg-row ai';
+  rrow.innerHTML='<div class="avatar-sm">&#10022;</div><div class="result-card"><div class="rc-label">'+Lx('video_done')+'</div><div class="rc-title">'+Lx('result_'+mp)+'</div><div class="rc-body">'+Lx('result_sub_'+(isHigh()?'high':'low'))+'</div>'+media+'</div>';
+  document.getElementById('chat-messages').appendChild(rrow);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ rrow.classList.add('show'); }); });
+  scroll();
+
+  playing=false;
+  var pb=document.getElementById('play-btn'); pb.disabled=false; pb.textContent=Lx('btn_replay'); pb.dataset.mode='replay';
+}
+
+// ─── survey ──────────────────────────────────────────────
+function renderSurvey(){
+  var Lv=T[lang];
+  function row(prefix,j){
+    var opts=''; for(var v=1;v<=7;v++) opts+='<label class="likert-opt"><input type="radio" name="'+prefix+j+'" value="'+v+'"><div class="likert-circle">'+v+'</div></label>';
+    return '<div class="likert-wrap"><span class="likert-end">'+Lv.scale_lo+'</span><div class="likert-options">'+opts+'</div><span class="likert-end r">'+Lv.scale_hi+'</span></div>';
+  }
+  function items(qs,codes,revs,prefix){
+    return qs.map(function(q,j){ var rv=revs[j]?'<span class="item-reverse">&#9660; '+Lv.rev+'</span>':''; return '<div class="survey-item"><div class="survey-q"><span class="q-num">'+codes[j]+'</span> '+q+' '+rv+'</div>'+row(prefix,j)+'</div>'; }).join('');
+  }
+  var hi=isHigh(), mp=isMP();
+  var aaNote=hi
+    ?({ko:'※ High AA 조건: 매 턴마다 AI가 40초간 데이터를 처리했습니다.',en:'※ High AA condition: The AI took 40 seconds to process each turn.',zh:'※ 高AI自主性：每轮AI处理数据耗时40秒。'})[lang]
+    :({ko:'※ Low AA 조건: 매 턴마다 AI가 10초 내에 응답했습니다.',en:'※ Low AA condition: The AI responded within 10 seconds each turn.',zh:'※ 低AI自主性：每轮AI在10秒内完成响应。'})[lang];
+
+  document.getElementById('survey-section').innerHTML=
+    '<div class="survey-header"><h2>'+Lv.survey_title+'</h2><p>'+Lv.survey_sub+'</p></div>'+
+    '<div class="survey-block"><div class="survey-block-title">'+Lv.scenario_label+' — '+cond.toUpperCase()+'</div>'+
+    '<div class="scenario-box"><div class="scenario-box-label">'+cond.toUpperCase()+' · '+(hi?Lv.aa_h:Lv.aa_l)+' · '+(mp?Lv.mp_h:Lv.mp_l)+'</div>'+Lv['scenario_'+cond]+'</div>'+
+    '<div class="note-box">'+aaNote+'</div></div>'+
+    '<div class="survey-block"><div class="survey-block-title">'+Lv.iv1_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.iv1_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.iv1_ref+'</span></p>'+items(Lv.iv1_q,Lv.iv1_codes,Lv.iv1_rev,'iv1_')+'</div>'+
+    '<div class="survey-block"><div class="survey-block-title">'+Lv.mc_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.mc_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.mc_ref+'</span></p>'+items(Lv.mc_q,Lv.mc_codes,Lv.mc_rev,'mc_')+'</div>'+
+    '<div class="survey-block"><div class="survey-block-title">'+Lv.mv_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.mv_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.mv_ref+'</span></p>'+items(Lv.mv_q,Lv.mv_codes,Lv.mv_rev,'mv_')+'</div>'+
+    '<div class="survey-block"><div class="survey-block-title">'+Lv.dv_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.dv_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.dv_ref+'</span></p>'+items(Lv.dv_q,Lv.dv_codes,Lv.dv_rev,'dv_')+'</div>'+
+    '<button class="survey-submit" id="ssb">'+Lv.submit+'</button>';
+  document.getElementById('ssb').addEventListener('click',function(){ alert(Lv.submit_done); });
+}
+
+// ─── events ──────────────────────────────────────────────
+document.querySelectorAll('.lang-btn').forEach(function(b){ b.addEventListener('click',function(){ setLang(b.dataset.lang); }); });
+document.querySelectorAll('.condition-btn').forEach(function(b){ b.addEventListener('click',function(){ selectCondition(b.dataset.cond); }); });
+document.getElementById('tab-chat').addEventListener('click',function(){ switchTab('chat'); });
+document.getElementById('tab-survey').addEventListener('click',function(){ switchTab('survey'); });
+document.getElementById('play-btn').addEventListener('click',function(){
+  if(document.getElementById('play-btn').dataset.mode==='replay'){ resetSim(); } else { startSim(); }
+});
+document.getElementById('reset-btn').addEventListener('click',resetSim);
+document.getElementById('send-btn').addEventListener('click',doSend);
+document.getElementById('input-box').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); doSend(); } });
+
+// ─── init ────────────────────────────────────────────────
+applyI18n();
+selectCondition('c1');
+</script>
+</body>
+</html>
