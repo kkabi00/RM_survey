@@ -607,7 +607,9 @@ function setLang(l){
   document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang===l); });
   var fmap = {ko:"'Noto Sans KR',sans-serif", en:"'Noto Sans',sans-serif", zh:"'Noto Sans SC',sans-serif"};
   document.body.style.fontFamily = fmap[l];
-  applyI18n(); resetSim();
+  applyI18n();
+  resetSim();
+  renderSurvey();
 }
 
 function applyI18n(){
