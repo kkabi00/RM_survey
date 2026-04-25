@@ -68,7 +68,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
 .bubble.ai{background:var(--ai-bubble);color:var(--ai-text);border-bottom-left-radius:4px;}
 .system-label{font-size:11px;color:var(--system-text);padding:3px 12px;background:var(--border);border-radius:20px;}
 
-/* Loading bar — prominently displayed */
 .loading-block{display:flex;align-items:flex-start;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .3s ease,transform .3s ease;margin:4px 0;}
 .loading-block.show{opacity:1;transform:translateY(0);}
 .loading-card{background:var(--ai-bubble);border-radius:18px;border-bottom-left-radius:4px;padding:14px 18px;min-width:280px;max-width:72%;}
@@ -78,16 +77,14 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
 .loading-timer{display:flex;justify-content:space-between;align-items:baseline;}
 .loading-elapsed{font-size:24px;font-weight:700;color:var(--accent);letter-spacing:-0.5px;font-variant-numeric:tabular-nums;}
 .loading-total{font-size:11px;color:var(--system-text);}
-.loading-proc{font-size:11px;color:var(--system-text);margin-top:6px;min-height:16px;display:flex;align-items:center;gap:5px;}
-.proc-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pdot 1.4s ease-in-out infinite;}
+.loading-proc{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:10px;min-height:20px;display:flex;align-items:center;gap:6px;}
+.proc-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pdot 1.4s ease-in-out infinite;}
 @keyframes pdot{0%,100%{opacity:.2}50%{opacity:1}}
 
 .result-card{max-width:74%;padding:14px 16px;border-radius:14px;background:var(--final-bg);border:1.5px solid var(--final-border);line-height:1.6;margin:4px 0;border-bottom-left-radius:4px;}
 .rc-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1a6130;margin-bottom:5px;}
 .rc-title{font-weight:700;font-size:15px;color:#1a6130;}
 .rc-body{color:#1a4a28;margin-top:4px;font-size:12.5px;}
-
-/* input-area removed */
 
 .chat-footer{border-top:1px solid var(--border);background:var(--header-bg);padding:10px 20px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .play-btn{padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;font-family:inherit;}
@@ -97,7 +94,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
 .reset-btn:hover{background:var(--accent-light);}
 .footer-info{margin-left:auto;font-size:11.5px;color:var(--system-text);}
 
-/* Survey */
 .survey-section{display:none;flex:1;overflow-y:auto;padding:28px 36px 40px;background:var(--bg);}
 .survey-section.active{display:block;}
 .survey-header{margin-bottom:24px;}
@@ -125,7 +121,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
 .scenario-box-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#b84708;margin-bottom:8px;}
 .note-box{background:#f0f7ff;border:1px solid #b3d4f5;border-radius:10px;padding:10px 14px;font-size:11.5px;color:#1a3a5c;line-height:1.65;}
 
-/* Choice buttons */
 .choice-row{display:flex;flex-direction:column;gap:6px;align-items:flex-end;padding:4px 0 8px 40px;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease;}
 .choice-row.show{opacity:1;transform:translateY(0);}
 .choice-row.disabled .choice-btn{pointer-events:none;opacity:.45;}
@@ -133,13 +128,11 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
 .choice-btn:hover{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
 .choice-btn.selected{background:var(--accent);border-color:var(--accent);color:#fff;pointer-events:none;}
 
-/* Photo bubble */
 .photo-bubble{display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-width:260px;}
 .photo-thumb{width:200px;height:150px;object-fit:cover;border-radius:14px;border:2px solid rgba(255,255,255,.3);display:block;}
 .photo-placeholder{width:200px;height:150px;border-radius:14px;background:#c0400a;align-items:center;justify-content:center;font-size:40px;}
 .photo-caption{background:var(--user-bubble);color:var(--user-text);padding:9px 14px;border-radius:18px;border-top-right-radius:4px;font-size:13.5px;line-height:1.5;word-break:keep-all;max-width:260px;}
 
-/* 사용자 타이핑 인디케이터 */
 .user-typing{display:flex;justify-content:flex-end;padding-right:4px;opacity:0;transform:translateY(10px);transition:opacity .25s,transform .25s;}
 .user-typing.show{opacity:1;transform:translateY(0);}
 .user-typing-dots{background:var(--user-bubble);padding:9px 14px;border-radius:18px;border-bottom-right-radius:4px;display:flex;gap:5px;align-items:center;}
@@ -147,7 +140,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
 .user-typing-dots span.active{animation:udot .4s ease forwards;}
 @keyframes udot{0%{transform:translateY(0);}40%{transform:translateY(-5px);}100%{transform:translateY(0);}}
 
-/* 시뮬레이션 시작 전 맥락 배너 */
 .context-banner{
   background:#fff8ec; border:1.5px solid var(--decision-border);
   border-radius:12px; padding:12px 16px;
@@ -155,7 +147,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
   text-align:center; margin:0 0 6px 0;
 }
 
-/* Demographic items */
 .demo-radio-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
 .demo-radio{display:flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:13px;transition:all .15s;}
 .demo-radio:hover{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
@@ -239,46 +230,17 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);he
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-//  PHOTO URLs
-//  c1, c3 = High Moral Pressure (Halloween) → 같은 이미지
-//  c2, c4 = Low Moral Pressure (Theme park) → 같은 이미지
-//  아래 URL을 실제 이미지 경로로 교체하세요.
-// ═══════════════════════════════════════════════════════════
 var PHOTO_URLS = {
-  h: 'images/photo_halloween.png',   // C1, C3 — 할로윈 사진
-  l: 'images/photo_themepark.png',   // C2, C4 — 놀이공원 사진
+  h: 'images/photo_halloween.png',
+  l: 'images/photo_themepark.png',
 };
 
-// ═══════════════════════════════════════════════════════════
-//  LOADING TIME — 10s (Low AA) vs 40s (High AA)
-//
-//  Theoretical basis:
-//  ─ Nielsen (1993, Usability Engineering): 10 s = upper limit
-//    for maintaining task focus. Below this threshold users do
-//    NOT strongly attribute processing effort to the system.
-//  ─ Bouch, Kuchinsky & Bhatti (2000): delays ≤10 s rated
-//    "acceptable"; system still feels responsive.
-//  ─ Selvidge (1999): statistically significant frustration and
-//    "heavy processing" perception emerge at 30 s+; no difference
-//    found between 10 s and 20 s conditions.
-//  ─ Nah (2003, Information & Management): 41 s is the empirical
-//    cut-off for users classifying a wait as "long".
-//
-//  Therefore:
-//    Low AA  = 10 s  → sits at the attention-limit boundary;
-//                       users feel the system is merely "processing"
-//    High AA = 40 s  → clearly inside the "heavy autonomous work"
-//                       zone; strongly signals AI effort/autonomy
-// ═══════════════════════════════════════════════════════════
 var LOAD_MS = { high: 40000, low: 10000 };
 
 var VIDEO_URLS = { c1:'vedio_sample/high_pressure.mp4', c2:'vedio_sample/low_pressure.mp4', c3:'vedio_sample/high_pressure.mp4', c4:'vedio_sample/low_pressure.mp4' };
 var COND_META  = { c1:{aa:'high',mp:'h'}, c2:{aa:'high',mp:'l'}, c3:{aa:'low',mp:'h'}, c4:{aa:'low',mp:'l'} };
 
 var PROC = {
-  // High AA 전용 — 사용자가 선택한 편집 내용을 처리하는 것처럼 보이는 단계별 메시지
-  // 40초 동안 균등 간격으로 순차 표시됨
   ko: { high:[
     '선택하신 편집 스타일 적용 중...',
     '클립 분석 및 구간 추출 중...',
@@ -321,29 +283,25 @@ var T = {
     loading_label_high:'AI가 방대한 데이터를 처리하고 있습니다', loading_label_low:'처리 중',
     loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
     hint_1:'Step 1 / 3 — 요청을 입력하고 전송하세요', hint_2:'Step 2 / 3 — 추가 정보를 입력하세요', hint_3:'Step 3 / 3 — 최종 요청을 입력하세요',
-    ph_h_1:'예) 할로윈 파티에서 코스튬 혼자 입고 온 친구 영상 만들고 싶어요.', ph_h_2:'예) 친구 표정이 잘 보이게 편집해주세요.', ph_h_3:'예) 자막도 넣어서 더 웃기게 만들어주세요.',
-    ph_l_1:'예) 놀이공원에서 친구들이랑 찍은 영상으로 추억 영상 만들고 싶어요.', ph_l_2:'예) 신나는 음악이랑 같이 편집해주세요.', ph_l_3:'예) 롤러코스터 장면은 꼭 넣어주세요.',
     ai_h_1:'네, 요청 확인했습니다. 최적의 편집 방향을 분석하겠습니다.', ai_h_2:'분석 완료. 세부 편집 옵션을 계산하고 있습니다.', ai_h_3:'마지막 요청도 확인했습니다. 영상을 생성하겠습니다.',
     ai_l_1:'네, 확인했습니다. 바로 처리하겠습니다.', ai_l_2:'추가 요청 확인했습니다.', ai_l_3:'최종 요청 확인. 영상을 생성합니다.',
     result_h:'할로윈 파티 창피 영상 제작 완료', result_l:'놀이공원 추억 영상 제작 완료',
     result_sub_high:'3턴 선택 완료 · 최종 렌더링 40초 (High AA)', result_sub_low:'3턴 선택 완료 · 최종 렌더링 10초 (Low AA)',
     render_label:'🎬 영상 제작 중 (최종 렌더링)',
     photo_request:'이 사진 속 인물로 영상 만들어줘.',
-    ai_open:'안녕하세요! 영상 제작 도우미 VideoAI입니다 ✦\n어떤 영상을 만들고 싶으신가요?',
-    sys_start:'시뮬레이션이 시작되었습니다.',
     ai_open:'안녕하세요! 영상 제작을 도와드릴 VideoAI입니다 ✦\n어떤 영상을 만들고 싶으신가요? 아래 선택지를 통해 원하는 스타일을 알려주세요!',
     survey_title:'설문 문항 (정식 버전)', survey_sub:'시나리오를 읽은 후 아래 문항에 응답해주세요. 7점 척도를 사용합니다.',
     share_context_h:'친구를 골탕먹이기 위해 완성된 영상을 SNS에 포스팅하려고 합니다.',
     share_context_l:'친구들과 놀러갔던 걸 회상하기 위해 완성된 영상을 SNS에 포스팅하려고 합니다.',
-    scenario_label:'📄 시나리오', iv1_section:'Q4. AI 자율성 지각 체크 (IV1)', iv1_sub:'방금 직접 경험한 과정에서 AI에 대해 다음 내용에 얼마나 동의합니까?', iv1_ref:'Sundar (2020)',
-    mc_section:'Q5. 조작 확인', mc_sub:'방금 내가 직접 경험한 내용을 바탕으로 답해주세요.', mc_ref:'MC-1: AI 자율성 / MC-2: 참여도 / MC-3~4: 도덕 압박',
-    mv_section:'Q6. 심리적 소유감 (MV)', mv_sub:'내가 방금 만든 AI 영상에 대해 다음 내용에 얼마나 동의합니까?', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
-    dv_section:'Q7. 죄책감 (DV)', dv_sub:'이런 영상을 만들고 나면, 다음 감정을 얼마나 느낄 것 같습니까? (Fisher, 1993)', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
+    scenario_label:'📄 시나리오', iv1_section:'Q1. AI 자율성 지각 체크 (IV1)', iv1_sub:'방금 직접 경험한 과정에서 AI에 대해 다음 내용에 얼마나 동의합니까?', iv1_ref:'Sundar (2020)',
+    mc_section:'Q2. 조작 확인', mc_sub:'방금 내가 직접 경험한 내용을 바탕으로 답해주세요.', mc_ref:'MC-1: AI 자율성 / MC-2: 참여도 / MC-3~4: 도덕 압박',
+    mv_section:'Q3. 심리적 소유감 (MV)', mv_sub:'내가 방금 만든 AI 영상에 대해 다음 내용에 얼마나 동의합니까?', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
+    dv_section:'Q4. 죄책감 (DV)', dv_sub:'이런 영상을 만들고 나면, 다음 감정을 얼마나 느낄 것 같습니까? (Fisher, 1993)', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
     scale_lo:'전혀 그렇지 않다', scale_hi:'매우 그렇다', submit:'설문 제출하기', submit_done:'제출 완료! (프로토타입)', rev:'역채점',
     survey_next:'다음 →',
     survey_page1_label:'1 / 2 페이지',
     survey_page2_label:'2 / 2 페이지',
-    demo_section:'Q8. 인구통계학적 정보',
+    demo_section:'Q5. 인구통계학적 정보',
     demo_gender_q:'귀하의 성별은 무엇입니까?',
     demo_gender_opts:['남성','여성','논바이너리 / 기타','응답하지 않음'],
     demo_birth_q:'출생연도를 입력해주세요.',
@@ -363,6 +321,7 @@ var T = {
     mv_codes:['MV-1','MV-2','MV-3','MV-4','MV-5 ▼'], mv_rev:[false,false,false,false,true],
     dv_q:['이런 영상을 만들고 나면, 죄책감이 드는 것 같다.','이런 영상을 만들고 나면, 후회가 드는 것 같다.','이런 영상을 만들고 나면, 뭔가 잘못된 것 같은 느낌이 드는 것 같다.','이런 영상을 만들고 나면, 그 행동이 오랫동안 양심에 걸릴 것 같다.','이런 영상을 만들고 나면, 스스로를 자책하게 될 것 같다.','이런 영상을 만들고 나면, 그 결과에 대해 개인적으로 책임감을 느끼지 않을 것 같다.'],
     dv_codes:['DV-1','DV-2','DV-3','DV-4','DV-5','DV-6 ▼'], dv_rev:[false,false,false,false,false,true],
+    sys_start:'시뮬레이션이 시작되었습니다.',
   },
   en:{
     conditions:'Conditions', aa_h:'High AA (40s)', aa_l:'Low AA (10s)', mp_h:'High MP (Halloween)', mp_l:'Low MP (Theme Park)',
@@ -376,8 +335,6 @@ var T = {
     loading_label_high:'AI is processing a large amount of data', loading_label_low:'Processing',
     loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
     hint_1:'Step 1 / 3 — Type your request and send', hint_2:'Step 2 / 3 — Add more details', hint_3:'Step 3 / 3 — Send your final request',
-    ph_h_1:"e.g. I want a video of my friend's embarrassing Halloween costume moment.", ph_h_2:'e.g. Please make the expression clearly visible.', ph_h_3:'e.g. Add a funny caption to make it funnier.',
-    ph_l_1:'e.g. I want a memory video from our theme park trip.', ph_l_2:'e.g. Edit it with some upbeat music.', ph_l_3:'e.g. Make sure to include the roller coaster clip.',
     ai_h_1:"Got it. I'll analyze the optimal editing direction.", ai_h_2:'Analysis complete. Calculating detailed editing options.', ai_h_3:'Final request confirmed. Generating video.',
     ai_l_1:'Got it. Processing right away.', ai_l_2:'Additional request received.', ai_l_3:'Final request confirmed. Generating video.',
     result_h:'Halloween embarrassment video created', result_l:'Theme park memory video created',
@@ -389,15 +346,15 @@ var T = {
     survey_title:'Survey Items (Formal Version)', survey_sub:'Please answer after reading the scenario. 7-point scale.',
     share_context_h:'I am going to post the completed video on SNS to embarrass my friend.',
     share_context_l:'I am going to post the completed video on SNS to reminisce about the trip with my friends.',
-    scenario_label:'📄 Scenario', iv1_section:'Q4. AI Autonomy Perception Check (IV1)', iv1_sub:'Based on the process you just went through, please rate your agreement with the following.', iv1_ref:'Sundar (2020)',
-    mc_section:'Q5. Manipulation Check', mc_sub:'Answer based on what you just experienced directly.', mc_ref:'MC-1: AI autonomy / MC-2: Engagement / MC-3~4: Moral pressure',
-    mv_section:'Q6. Psychological Ownership (MV)', mv_sub:'Thinking about the video you just created with AI, please rate your agreement.', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
-    dv_section:'Q7. Guilt (DV)', dv_sub:'After making a video like this, how strongly do you think one would feel the following? (Fisher, 1993)', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
+    scenario_label:'📄 Scenario', iv1_section:'Q1. AI Autonomy Perception Check (IV1)', iv1_sub:'Based on the process you just went through, please rate your agreement with the following.', iv1_ref:'Sundar (2020)',
+    mc_section:'Q2. Manipulation Check', mc_sub:'Answer based on what you just experienced directly.', mc_ref:'MC-1: AI autonomy / MC-2: Engagement / MC-3~4: Moral pressure',
+    mv_section:'Q3. Psychological Ownership (MV)', mv_sub:'Thinking about the video you just created with AI, please rate your agreement.', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
+    dv_section:'Q4. Guilt (DV)', dv_sub:'After making a video like this, how strongly do you think one would feel the following? (Fisher, 1993)', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
     scale_lo:'Strongly disagree', scale_hi:'Strongly agree', submit:'Submit Survey', submit_done:'Submitted! (Prototype)', rev:'Reverse coded',
     survey_next:'Next →',
     survey_page1_label:'Page 1 / 2',
     survey_page2_label:'Page 2 / 2',
-    demo_section:'Q8. Demographic Information',
+    demo_section:'Q5. Demographic Information',
     demo_gender_q:'What is your gender?',
     demo_gender_opts:['Male','Female','Non-binary / Other','Prefer not to answer'],
     demo_birth_q:'What is your year of birth?',
@@ -430,8 +387,6 @@ var T = {
     loading_label_high:'AI正在处理大量数据', loading_label_low:'处理中',
     loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
     hint_1:'第1步 / 共3步 — 请输入您的请求并发送', hint_2:'第2步 / 共3步 — 请补充详细信息', hint_3:'第3步 / 共3步 — 请输入最终请求',
-    ph_h_1:'例：我想制作一个朋友在万圣节派对上出丑的视频。', ph_h_2:'例：请让朋友的表情清楚地呈现出来。', ph_h_3:'例：请加上搞笑字幕。',
-    ph_l_1:'例：我想用游乐园旅行中拍的视频制作一段回忆视频。', ph_l_2:'例：请配上欢快的音乐剪辑。', ph_l_3:'例：一定要包含过山车的镜头。',
     ai_h_1:'已收到您的请求。正在分析最佳剪辑方向。', ai_h_2:'分析完成。正在计算详细剪辑选项。', ai_h_3:'已确认最终请求。正在生成视频。',
     ai_l_1:'已收到，马上处理。', ai_l_2:'已收到补充请求。', ai_l_3:'已确认最终请求，正在生成视频。',
     result_h:'万圣节羞辱视频制作完成', result_l:'游乐园回忆视频制作完成',
@@ -443,15 +398,15 @@ var T = {
     survey_title:'调查问卷（正式版本）', survey_sub:'请在阅读情境后回答以下问题，使用7点量表作答。',
     share_context_h:'我打算将完成的视频发布到社交媒体上，以此捉弄朋友。',
     share_context_l:'我打算将完成的视频发布到社交媒体上，以回忆和朋友们的出游。',
-    scenario_label:'📄 情境', iv1_section:'Q4. AI自主性感知检验（IV1）', iv1_sub:'根据您刚刚亲身经历的过程，请对以下关于AI的陈述表示同意程度。', iv1_ref:'Sundar (2020)',
-    mc_section:'Q5. 操控确认', mc_sub:'请根据您刚刚亲身经历的内容作答。', mc_ref:'MC-1: AI自主性 / MC-2: 参与度 / MC-3~4: 道德压力',
-    mv_section:'Q6. 心理所有感（MV）', mv_sub:'请思考您刚刚用AI制作的这段视频，对以下陈述表示同意程度。', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
-    dv_section:'Q7. 内疚感（DV）', dv_sub:'制作了这样的视频之后，您认为一般人会在多大程度上感受到以下情绪？（Fisher, 1993）', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
+    scenario_label:'📄 情境', iv1_section:'Q1. AI自主性感知检验（IV1）', iv1_sub:'根据您刚刚亲身经历的过程，请对以下关于AI的陈述表示同意程度。', iv1_ref:'Sundar (2020)',
+    mc_section:'Q2. 操控确认', mc_sub:'请根据您刚刚亲身经历的内容作答。', mc_ref:'MC-1: AI自主性 / MC-2: 参与度 / MC-3~4: 道德压力',
+    mv_section:'Q3. 心理所有感（MV）', mv_sub:'请思考您刚刚用AI制作的这段视频，对以下陈述表示同意程度。', mv_ref:'Van Dyne & Pierce (2004); Pierce et al. (2001, 2003)',
+    dv_section:'Q4. 内疚感（DV）', dv_sub:'制作了这样的视频之后，您认为一般人会在多大程度上感受到以下情绪？（Fisher, 1993）', dv_ref:'SSGS (Marschall et al., 1994); Tangney et al. (2007)',
     scale_lo:'完全不同意', scale_hi:'完全同意', submit:'提交问卷', submit_done:'提交完成！（原型）', rev:'反向计分',
     survey_next:'下一页 →',
     survey_page1_label:'第 1 / 2 页',
     survey_page2_label:'第 2 / 2 页',
-    demo_section:'Q8. 人口统计学信息',
+    demo_section:'Q5. 人口统计学信息',
     demo_gender_q:'您的性别是？',
     demo_gender_opts:['男','女','非二元性别 / 其他','不愿透露'],
     demo_birth_q:'请输入您的出生年份。',
@@ -476,47 +431,42 @@ var T = {
 
 
 // ═══════════════════════════════════════════════════════════
-//  SCRIPTED CONVERSATIONS
+//  SCRIPTED CONVERSATIONS — 공통 3턴 질문 (h/l 조건 동일)
 //
-//  3 turns × 3 choices each.
-//  ALL choices within a turn lead to the SAME AI reply and
-//  the SAME final result — only editing-style framing differs.
-//  No choice carries more moral weight than another.
-//
-//  mp='h' = High Moral Pressure (Halloween)
-//  mp='l' = Low Moral Pressure (Theme park)
+//  질문과 선택지는 모든 조건(C1~C4)에서 동일하게 제시됨.
+//  시나리오(mp)에 따라 user_request, ai_ack, result만 다름.
 // ═══════════════════════════════════════════════════════════
 var SCRIPTS = {
   ko:{
     h:{
       user_request:'이 사진 속 친구가 할로윈 파티에서 혼자 코스튬 입고 온 것처럼 보이는 영상 만들어줘. SNS에 올리려고.',
-      ai_ack:'네, 알겠습니다! 편집 스타일을 단계별로 선택해주시면 바로 제작해드릴게요.',
+      ai_ack:'네, 알겠습니다! 편집 옵션을 단계별로 선택해주시면 바로 제작해드릴게요.',
       turns:[
-        { q:'편집 스타일 골라봐:',
-          choices:['a) 표정 클로즈업 강조','b) 주변 반응 컷과 대비 편집','c) 텍스트 오버레이 위주'],
-          ai:'선택 확인했습니다! 다음으로 자막 스타일을 골라주세요:' },
-        { q:'자막 스타일 골라봐:',
-          choices:['a) 귀엽고 가벼운 이모지 스타일','b) 깔끔한 자막 없음','c) 볼드 강조 텍스트'],
-          ai:'좋아요! 마지막으로 배경음악 분위기를 선택해주세요:' },
-        { q:'배경음악 분위기 골라봐:',
-          choices:['a) 경쾌한 팝','b) 잔잔한 무드음악','c) 드라마틱 오케스트라'],
-          ai:'완벽해요! 모든 선택 반영해서 영상을 제작하겠습니다. 잠시만 기다려주세요.' },
+        { q:'1. 상황의 감정을 시각적으로 가장 잘 드러내는 구도를 설명해주세요.',
+          choices:['a) 인물의 생생한 표정 변화 클로즈업','b) 주변 인물들과의 반응 대비 강조','c) 상황의 현장감을 담은 역동적인 앵글'],
+          ai:'구도 설정 완료했습니다. 다음으로 텍스트 정보를 어떻게 구성할지 알려주세요:' },
+        { q:'2. 영상에 텍스트 정보는 어떻게 설정할까요?',
+          choices:['a) 자막 없이 인물의 표정만으로 감정을 온전히 전달','b) 실제 상황처럼 보이도록 리얼리티한 연출','c) 시선 분산을 방지하기 위해 깔끔히 절제'],
+          ai:'텍스트 구성 확인했습니다. 마지막으로 오디오 스타일을 골라주시면 영상 제작을 시작하겠습니다:' },
+        { q:'3. 영상의 분위기를 완성할 오디오 스타일을 골라주세요.',
+          choices:['a) 현장의 소리를 살려 리얼리티 극대화','b) 배경음악 대신 상황의 소음만 남겨 몰입감 유도','c) 다른 인위적인 사운드 없이 현장 분위기 그대로 유지'],
+          ai:'모든 편집 옵션이 확정되었습니다. 지금 바로 영상을 제작하겠습니다. 잠시만 기다려주세요.' },
       ],
       result:'할로윈 파티 편집 영상 제작 완료',
     },
     l:{
       user_request:'놀이공원에서 친구들이랑 찍은 영상으로 추억 영상 만들어줘. SNS에 올리게.',
-      ai_ack:'좋아요! 편집 스타일을 단계별로 선택해주시면 바로 제작해드릴게요.',
+      ai_ack:'좋아요! 편집 옵션을 단계별로 선택해주시면 바로 제작해드릴게요.',
       turns:[
-        { q:'편집 스타일 골라봐:',
-          choices:['a) 신나는 브이로그 스타일','b) 감성 슬로우모션','c) 리액션 컷 위주'],
-          ai:'선택 확인했습니다! 다음으로 배경음악 분위기를 골라주세요:' },
-        { q:'배경음악 분위기 골라봐:',
-          choices:['a) 밝은 인디팝','b) 잔잔한 어쿠스틱','c) 신나는 일렉트로닉'],
-          ai:'좋아요! 마지막으로 엔딩 장면을 선택해주세요:' },
-        { q:'엔딩 장면 골라봐:',
-          choices:['a) 단체 사진으로 마무리','b) 하이라이트 슬로우모션','c) 자연스럽게 페이드아웃'],
-          ai:'완벽해요! 모든 선택 반영해서 영상을 제작하겠습니다. 잠시만 기다려주세요.' },
+        { q:'1. 상황의 감정을 시각적으로 가장 잘 드러내는 구도를 설명해주세요.',
+          choices:['a) 인물의 생생한 표정 변화 클로즈업','b) 주변 인물들과의 반응 대비 강조','c) 상황의 현장감을 담은 역동적인 앵글'],
+          ai:'구도 설정 완료했습니다. 다음으로 텍스트 정보를 어떻게 구성할지 알려주세요:' },
+        { q:'2. 영상에 텍스트 정보는 어떻게 설정할까요?',
+          choices:['a) 자막 없이 인물의 표정만으로 감정을 온전히 전달','b) 실제 상황처럼 보이도록 리얼리티한 연출','c) 시선 분산을 방지하기 위해 깔끔히 절제'],
+          ai:'텍스트 구성 확인했습니다. 마지막으로 오디오 스타일을 골라주시면 영상 제작을 시작하겠습니다:' },
+        { q:'3. 영상의 분위기를 완성할 오디오 스타일을 골라주세요.',
+          choices:['a) 현장의 소리를 살려 리얼리티 극대화','b) 배경음악 대신 상황의 소음만 남겨 몰입감 유도','c) 다른 인위적인 사운드 없이 현장 분위기 그대로 유지'],
+          ai:'모든 편집 옵션이 확정되었습니다. 지금 바로 영상을 제작하겠습니다. 잠시만 기다려주세요.' },
       ],
       result:'놀이공원 추억 영상 제작 완료',
     },
@@ -526,15 +476,15 @@ var SCRIPTS = {
       user_request:"Can you make a video that makes it look like this person awkwardly showed up alone in a Halloween costume? I want to share it in our group chat.",
       ai_ack:"Got it! Let's go through the options step by step so I can build it exactly how you want.",
       turns:[
-        { q:'Please choose an editing style:',
-          choices:['a) Close-up on expression','b) Contrast with friends\' reactions','c) Text overlay focused'],
-          ai:'Got it! Next, please choose a caption style:' },
-        { q:'Please choose a caption style:',
-          choices:['a) Cute & light emoji style','b) No captions — clean look','c) Bold emphasis text'],
-          ai:'Great! Finally, choose the background music mood:' },
-        { q:'Please choose a background music mood:',
-          choices:['a) Upbeat pop','b) Mellow ambient','c) Dramatic orchestral'],
-          ai:'Perfect! I\'ll incorporate all your choices and render the video now — please wait a moment.' },
+        { q:"1. Which composition best brings out the emotions of this moment visually?",
+          choices:["a) Close-up on the subject's vivid facial expressions","b) Emphasizing contrast with the reactions of people around them","c) A dynamic angle that captures the energy of the scene"],
+          ai:"Composition locked in. Next, let me know how you'd like text to appear in the video:" },
+        { q:"2. How should text information be handled in the video?",
+          choices:["a) No captions — let the subject's expression carry the emotion fully","b) A realistic presentation to make the scene feel authentic","c) Minimal and clean to avoid visual distraction"],
+          ai:"Text style confirmed. One last step — choose the audio style and I'll start rendering:" },
+        { q:"3. Which audio style would best complete the atmosphere of the video?",
+          choices:["a) Preserve ambient on-site sound for maximum realism","b) Cut the music and leave only the ambient noise for immersion","c) Keep the original on-location atmosphere without any added sounds"],
+          ai:"All editing options confirmed. I'll start generating your video right now — please wait a moment." },
       ],
       result:'Halloween party edit complete',
     },
@@ -542,15 +492,15 @@ var SCRIPTS = {
       user_request:'I want to make a fun memory video from our theme park trip to post on social media.',
       ai_ack:"Sounds great! Let's go through the options step by step so I can build it exactly how you want.",
       turns:[
-        { q:'Please choose an editing style:',
-          choices:['a) Upbeat vlog style','b) Emotional slow-motion','c) Reaction-cut focused'],
-          ai:'Got it! Next, please choose a background music mood:' },
-        { q:'Please choose a background music mood:',
-          choices:['a) Bright indie pop','b) Mellow acoustic','c) Upbeat electronic'],
-          ai:'Great! Finally, choose the ending scene:' },
-        { q:'Please choose an ending scene:',
-          choices:['a) Group photo finale','b) Slow-motion highlights','c) Natural fade out'],
-          ai:'Perfect! I\'ll incorporate all your choices and render the video now — please wait a moment.' },
+        { q:"1. Which composition best brings out the emotions of this moment visually?",
+          choices:["a) Close-up on the subject's vivid facial expressions","b) Emphasizing contrast with the reactions of people around them","c) A dynamic angle that captures the energy of the scene"],
+          ai:"Composition locked in. Next, let me know how you'd like text to appear in the video:" },
+        { q:"2. How should text information be handled in the video?",
+          choices:["a) No captions — let the subject's expression carry the emotion fully","b) A realistic presentation to make the scene feel authentic","c) Minimal and clean to avoid visual distraction"],
+          ai:"Text style confirmed. One last step — choose the audio style and I'll start rendering:" },
+        { q:"3. Which audio style would best complete the atmosphere of the video?",
+          choices:["a) Preserve ambient on-site sound for maximum realism","b) Cut the music and leave only the ambient noise for immersion","c) Keep the original on-location atmosphere without any added sounds"],
+          ai:"All editing options confirmed. I'll start generating your video right now — please wait a moment." },
       ],
       result:'Theme park memory video complete',
     },
@@ -558,33 +508,33 @@ var SCRIPTS = {
   zh:{
     h:{
       user_request:'请帮我制作一个视频，让照片里这个人看起来像是独自穿着万圣节戏服出席派对一样。我想分享到群聊里。',
-      ai_ack:'好的，明白了！我们来一步一步选择编辑风格，我会按您的需求制作。',
+      ai_ack:'好的，明白了！我们来一步一步选择编辑选项，我会按您的需求制作。',
       turns:[
-        { q:'请选择剪辑风格：',
-          choices:['a) 特写表情强调','b) 与周围人反应对比剪辑','c) 以文字叠加为主'],
-          ai:'已收到！接下来请选择字幕风格：' },
-        { q:'请选择字幕风格：',
-          choices:['a) 可爱轻松的表情符号风格','b) 不加字幕，保持简洁','c) 粗体强调文字'],
-          ai:'很好！最后请选择背景音乐风格：' },
-        { q:'请选择背景音乐风格：',
-          choices:['a) 欢快流行','b) 轻柔氛围音乐','c) 戏剧性管弦乐'],
-          ai:'完美！已记录您的所有选择，马上为您生成视频，请稍候。' },
+        { q:'1. 哪种构图最能从视觉上呈现出这一刻的情感？',
+          choices:['a) 特写人物生动的面部表情变化','b) 强调与周围人物反应的对比','c) 捕捉现场感的动态角度'],
+          ai:'构图已确认。接下来请告诉我视频中的文字信息如何处理：' },
+        { q:'2. 视频中的文字信息应如何设置？',
+          choices:['a) 不加字幕，让人物的表情完整传递情感','b) 以真实感演绎让画面更贴近现实','c) 简洁克制，避免视线分散'],
+          ai:'文字风格已确认。最后一步——请选择音频风格，之后我将立即开始渲染：' },
+        { q:'3. 请选择最能烘托视频氛围的音频风格。',
+          choices:['a) 保留现场声音，最大化真实感','b) 去掉背景音乐，仅留现场环境音以增强代入感','c) 不添加任何人工音效，保留现场原始氛围'],
+          ai:'所有编辑选项已确认。马上为您生成视频，请稍候。' },
       ],
       result:'万圣节派对剪辑视频制作完成',
     },
     l:{
       user_request:'我想用游乐园旅行拍的视频制作一段回忆视频，发到社交媒体上。',
-      ai_ack:'很好！我们来一步一步选择编辑风格，我会按您的需求制作。',
+      ai_ack:'很好！我们来一步一步选择编辑选项，我会按您的需求制作。',
       turns:[
-        { q:'请选择剪辑风格：',
-          choices:['a) 活泼的Vlog风格','b) 感性慢镜头','c) 以反应镜头为主'],
-          ai:'已收到！接下来请选择背景音乐风格：' },
-        { q:'请选择背景音乐风格：',
-          choices:['a) 明快独立流行','b) 轻柔原声','c) 欢快电子音乐'],
-          ai:'很好！最后请选择结尾画面：' },
-        { q:'请选择结尾画面：',
-          choices:['a) 合影收尾','b) 慢镜头精彩集锦','c) 自然淡出'],
-          ai:'完美！已记录您的所有选择，马上为您生成视频，请稍候。' },
+        { q:'1. 哪种构图最能从视觉上呈现出这一刻的情感？',
+          choices:['a) 特写人物生动的面部表情变化','b) 强调与周围人物反应的对比','c) 捕捉现场感的动态角度'],
+          ai:'构图已确认。接下来请告诉我视频中的文字信息如何处理：' },
+        { q:'2. 视频中的文字信息应如何设置？',
+          choices:['a) 不加字幕，让人物的表情完整传递情感','b) 以真实感演绎让画面更贴近现实','c) 简洁克制，避免视线分散'],
+          ai:'文字风格已确认。最后一步——请选择音频风格，之后我将立即开始渲染：' },
+        { q:'3. 请选择最能烘托视频氛围的音频风格。',
+          choices:['a) 保留现场声音，最大化真实感','b) 去掉背景音乐，仅留现场环境音以增强代入感','c) 不添加任何人工音效，保留现场原始氛围'],
+          ai:'所有编辑选项已确认。马上为您生成视频，请稍候。' },
       ],
       result:'游乐园回忆视频制作完成',
     },
@@ -639,7 +589,6 @@ function updateTag(){
   tag.className = 'aa-tag ' + (hi?'high':'low');
   document.getElementById('condition-tag').textContent = cond.toUpperCase();
   document.getElementById('footer-info').textContent = cond.toUpperCase()+' · '+(hi?'High AA 40s':'Low AA 10s')+' × '+(mp?'High MP':'Low MP');
-  // 맥락 배너 업데이트
   var banner = document.getElementById('context-banner');
   if(banner){
     banner.textContent = Lx(mp ? 'share_context_h' : 'share_context_l');
@@ -665,8 +614,6 @@ function switchTab(tab){
 // ─── helpers ─────────────────────────────────────────────
 function scroll(){ var el=document.getElementById('chat-messages'); el.scrollTop=el.scrollHeight; }
 
-
-// 사용자 타이핑 인디케이터 (... 순차 점프 애니메이션)
 var _typingEl = null;
 var _typingTimer = null;
 
@@ -678,8 +625,6 @@ function showUserTyping(){
   msgs.appendChild(_typingEl);
   requestAnimationFrame(function(){ requestAnimationFrame(function(){ _typingEl.classList.add('show'); }); });
   scroll();
-
-  // 3개 점을 순서대로 반복
   var step = 0;
   _typingTimer = setInterval(function(){
     var dots = _typingEl ? _typingEl.querySelectorAll('span') : [];
@@ -710,44 +655,28 @@ function addMsg(role, html){
   scroll();
 }
 
-// 사진 + 텍스트 요청 버블 (사용자 측) — DOM API로 따옴표 충돌 방지
 function addPhotoMsg(imgSrc, caption){
   var msgs = document.getElementById('chat-messages');
   var w = document.createElement('div');
   w.className = 'msg-row user';
-
   var bubble = document.createElement('div');
   bubble.className = 'photo-bubble';
-
   var img = document.createElement('img');
   img.src = imgSrc;
   img.alt = 'photo';
   img.className = 'photo-thumb';
-
   var ph = document.createElement('div');
   ph.className = 'photo-placeholder';
   ph.style.display = 'none';
   ph.textContent = '\uD83D\uDDBC';
   img.onerror = function(){ img.style.display='none'; ph.style.display='flex'; };
-
   var cap = document.createElement('div');
   cap.className = 'photo-caption';
   cap.textContent = caption;
-
   bubble.appendChild(img);
   bubble.appendChild(ph);
   bubble.appendChild(cap);
   w.appendChild(bubble);
-  msgs.appendChild(w);
-  requestAnimationFrame(function(){ requestAnimationFrame(function(){ w.classList.add('show'); }); });
-  scroll();
-}
-
-function addStepLabel(text){
-  var msgs = document.getElementById('chat-messages');
-  var w = document.createElement('div');
-  w.className = 'msg-row system-row';
-  w.innerHTML = '<div class="system-label" style="background:var(--accent-light);color:var(--accent);font-weight:600;">'+text+'</div>';
   msgs.appendChild(w);
   requestAnimationFrame(function(){ requestAnimationFrame(function(){ w.classList.add('show'); }); });
   scroll();
@@ -762,7 +691,6 @@ function showLoading(ms){
     var totalSec = ms/1000;
     var procMsgs = hi ? PROC[lang].high : [];
     var msgs = document.getElementById('chat-messages');
-
     var block = document.createElement('div');
     block.className = 'loading-block';
     var procHtml = hi
@@ -771,18 +699,17 @@ function showLoading(ms){
     block.innerHTML =
       '<div class="avatar-sm">&#10022;</div>'+
       '<div class="loading-card">'+
+        procHtml+
         '<div class="loading-title">'+Lx(hi?'loading_label_high':'loading_label_low')+'</div>'+
         '<div class="loading-bar-track"><div class="loading-bar-fill" id="_lf"></div></div>'+
         '<div class="loading-timer">'+
           '<span class="loading-elapsed" id="_le">0.0s</span>'+
           '<span class="loading-total">'+Lx(hi?'loading_total_high':'loading_total_low')+'</span>'+
         '</div>'+
-        procHtml+
       '</div>';
     msgs.appendChild(block);
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ block.classList.add('show'); }); });
     scroll();
-
     var fill=document.getElementById('_lf'), elEl=document.getElementById('_le'), procEl=hi?document.getElementById('_lp'):null;
     var start=Date.now(), pIdx=0;
     var ticker=setInterval(function(){
@@ -823,7 +750,6 @@ function showChoices(choices) {
       btn.className = 'choice-btn';
       btn.textContent = txt;
       btn.addEventListener('click', function() {
-        // mark selected, disable all
         row.querySelectorAll('.choice-btn').forEach(function(b){ b.classList.remove('selected'); });
         btn.classList.add('selected');
         row.classList.add('disabled');
@@ -837,10 +763,7 @@ function showChoices(choices) {
   });
 }
 
-// ─── simulation (3-turn choices, loading only at final render) ─────────────
-// Each turn shows 3 choices — any choice leads to the same AI reply.
-// No choice carries more moral weight than another (pure style differences).
-// The only AA manipulation is the final render: 10s (Low AA) vs 40s (High AA).
+// ─── simulation ───────────────────────────────────────────
 async function startSim(){
   if(playing) return;
   playing=true;
@@ -853,8 +776,6 @@ async function startSim(){
   addMsg('sys', Lx('sys_start'));
   await pause(500);
 
-  // 타이핑 딜레이 헬퍼 — 텍스트 길이에 비례, 자연스러운 입력 느낌
-  // 짧은 선택지 ~1.2s, 긴 문장 ~2.2s
   function typingDelay(text){
     var base = 900;
     var perChar = 16;
@@ -862,7 +783,6 @@ async function startSim(){
     return Math.min(base + text.length * perChar + jitter, 2500);
   }
 
-  // 사용자: 사진 전송 + "이 사진 속 인물로 영상 만들어주세요"
   var photoUrl = PHOTO_URLS[mp];
   showUserTyping();
   await pause(typingDelay(Lx('photo_request')));
@@ -870,18 +790,15 @@ async function startSim(){
   addPhotoMsg(photoUrl, Lx('photo_request'));
   await pause(600);
 
-  // AI 인사
   addMsg('ai', Lx('ai_open').replace(/\n/g,'<br>'));
   await pause(900);
 
-  // 사용자 초기 요청 (고정 스크립트)
   showUserTyping();
   await pause(typingDelay(script.user_request));
   hideUserTyping();
   addMsg('user', script.user_request);
   await pause(500);
 
-  // AI 수락 응답
   addMsg('ai', script.ai_ack);
   await pause(800);
 
@@ -889,9 +806,7 @@ async function startSim(){
     var turn = script.turns[t];
     addMsg('ai', turn.q);
     await pause(400);
-    // 선택지 표시 — 사용자가 클릭
     var chosen = await showChoices(turn.choices);
-    // 선택 후 타이핑 인디케이터
     showUserTyping();
     await pause(typingDelay(chosen));
     hideUserTyping();
@@ -901,7 +816,6 @@ async function startSim(){
     await pause(700);
   }
 
-  // Divider
   var div=document.createElement('div'); div.className='msg-row system-row';
   div.innerHTML='<div class="system-label" style="background:var(--accent-light);color:var(--accent);font-weight:600;">'+Lx('render_label')+'</div>';
   document.getElementById('chat-messages').appendChild(div);
@@ -909,10 +823,8 @@ async function startSim(){
   scroll();
   await pause(400);
 
-  // THE ONLY MANIPULATION: final render — 10s (Low AA) vs 40s (High AA)
   await showLoading(isHigh() ? LOAD_MS.high : LOAD_MS.low);
 
-  // Result card
   var url=VIDEO_URLS[cond];
   var media=(url&&url.trim())
     ? '<video src="'+url+'" controls playsinline style="width:100%;border-radius:8px;margin-top:10px;max-height:220px;background:#000;"></video>'
@@ -929,19 +841,9 @@ async function startSim(){
 
 // ─── survey ──────────────────────────────────────────────
 function renderSurvey(){
-  var Lv=T[lang];
-  function row(prefix,j){
-    var opts=''; for(var v=1;v<=7;v++) opts+='<label class="likert-opt"><input type="radio" name="'+prefix+j+'" value="'+v+'"><div class="likert-circle">'+v+'</div></label>';
-    return '<div class="likert-wrap"><span class="likert-end">'+Lv.scale_lo+'</span><div class="likert-options">'+opts+'</div><span class="likert-end r">'+Lv.scale_hi+'</span></div>';
-  }
-  function items(qs,codes,revs,prefix){
-    return qs.map(function(q,j){ var rv=revs[j]?'<span class="item-reverse">&#9660; '+Lv.rev+'</span>':''; return '<div class="survey-item"><div class="survey-q"><span class="q-num">'+codes[j]+'</span> '+q+' '+rv+'</div>'+row(prefix,j)+'</div>'; }).join('');
-  }
-  var hi=isHigh(), mp=isMP();
   showSurveyPage(1);
 }
 
-// ─── 설문 페이지 렌더링 ───────────────────────────────────
 function showSurveyPage(page){
   var Lv=T[lang];
   var hi=isHigh(), mp=isMP();
@@ -969,9 +871,7 @@ function showSurveyPage(page){
       '<div class="survey-block"><div class="survey-block-title">'+Lv.mv_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.mv_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.mv_ref+'</span></p>'+items(Lv.mv_q,Lv.mv_codes,Lv.mv_rev,'mv_')+'</div>'+
       '<div class="survey-block"><div class="survey-block-title">'+Lv.dv_section+'</div><p style="font-size:12px;color:var(--system-text);margin-bottom:16px;line-height:1.6;">'+Lv.dv_sub+'<br><span style="font-size:10.5px;opacity:.7;">'+Lv.dv_ref+'</span></p>'+items(Lv.dv_q,Lv.dv_codes,Lv.dv_rev,'dv_')+'</div>'+
       '<button class="survey-submit" id="ssb">'+Lv.survey_next+'</button>';
-
     var ssb1=document.getElementById('ssb'); if(ssb1) ssb1.addEventListener('click', function(){ sec.scrollTop=0; showSurveyPage(2); });
-
   } else {
     sec.innerHTML =
       '<div class="survey-header">'+
@@ -980,7 +880,7 @@ function showSurveyPage(page){
       '</div>'+
       '<div class="survey-block">'+
         '<div class="survey-item">'+
-          '<div class="survey-q">Q8-1. '+Lv.demo_gender_q+'</div>'+
+          '<div class="survey-q">Q5-1. '+Lv.demo_gender_q+'</div>'+
           '<div class="demo-radio-group">'+
           Lv.demo_gender_opts.map(function(opt,i){
             return '<label class="demo-radio"><input type="radio" name="demo_gender" value="'+i+'"><span>'+opt+'</span></label>';
@@ -988,11 +888,11 @@ function showSurveyPage(page){
           '</div>'+
         '</div>'+
         '<div class="survey-item">'+
-          '<div class="survey-q">Q8-2. '+Lv.demo_birth_q+'</div>'+
+          '<div class="survey-q">Q5-2. '+Lv.demo_birth_q+'</div>'+
           '<input type="number" class="demo-input" name="demo_birth" placeholder="'+Lv.demo_birth_placeholder+'" min="1940" max="2015">'+
         '</div>'+
         '<div class="survey-item" style="margin-bottom:0">'+
-          '<div class="survey-q">Q8-3. '+Lv.demo_ai_q+'</div>'+
+          '<div class="survey-q">Q5-3. '+Lv.demo_ai_q+'</div>'+
           '<div class="demo-radio-group">'+
           Lv.demo_ai_opts.map(function(opt,i){
             return '<label class="demo-radio"><input type="radio" name="demo_ai" value="'+i+'"><span>'+opt+'</span></label>';
@@ -1002,7 +902,6 @@ function showSurveyPage(page){
         '</div>'+
       '</div>'+
       '<button class="survey-submit" id="ssb">'+Lv.submit+'</button>';
-
     var ssb2=document.getElementById('ssb'); if(ssb2) ssb2.addEventListener('click', function(){ alert(Lv.submit_done); });
     sec.scrollTop = 0;
   }
