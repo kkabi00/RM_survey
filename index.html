@@ -235,7 +235,7 @@ var PHOTO_URLS = {
   l: 'images/photo_themepark.png',
 };
 
-var LOAD_MS = { high: 40000, low: 10000 };
+var LOAD_MS = { high: 10000, low: 40000 };
 
 var VIDEO_URLS = { c1:'vedio_sample/high_pressure.mp4', c2:'vedio_sample/low_pressure.mp4', c3:'vedio_sample/high_pressure.mp4', c4:'vedio_sample/low_pressure.mp4' };
 var COND_META  = { c1:{aa:'high',mp:'h'}, c2:{aa:'high',mp:'l'}, c3:{aa:'low',mp:'h'}, c4:{aa:'low',mp:'l'} };
@@ -272,21 +272,24 @@ var PROC = {
 
 var T = {
   ko:{
-    conditions:'실험 조건', aa_h:'High AA (40초)', aa_l:'Low AA (10초)', mp_h:'High MP (할로윈)', mp_l:'Low MP (놀이공원)',
-    c1_desc:'할로윈 창피 영상 · High AA (40초)', c2_desc:'놀이공원 추억 · High AA (40초)', c3_desc:'할로윈 창피 영상 · Low AA (10초)', c4_desc:'놀이공원 추억 · Low AA (10초)',
-    note:'<strong>2×2 Between-Subjects</strong>\nIV1: AI 자율성 (로딩 시간 조작)\n  High AA: 매 턴 40초\n  Low AA: 매 턴 10초\nIV2: 도덕 압박 (시나리오 내용)\nMV: 심리적 소유감 (7pt)\nDV: 죄책감 (7pt)\nn=120 (~30/조건)',
+    conditions:'실험 조건', aa_h:'High AA (10초)', aa_l:'Low AA (40초)', mp_h:'High MP (할로윈)', mp_l:'Low MP (놀이공원)',
+    c1_desc:'할로윈 창피 영상 · High AA (10초)', c2_desc:'놀이공원 추억 · High AA (10초)', c3_desc:'할로윈 창피 영상 · Low AA (40초)', c4_desc:'놀이공원 추억 · Low AA (40초)',
+    note:'<strong>2×2 Between-Subjects</strong>\nIV1: AI 자율성 조작\n  High AA: 1턴 + AI 최종 결정 + 10초 렌더링\n  Low AA: 5턴 + 사용자 최종 결정 + 40초 렌더링\nIV2: 도덕 압박 (시나리오 내용)\nMV: 심리적 소유감 (7pt)\nDV: 죄책감 (7pt)\nn=120 (~30/조건)',
     tab_chat:'💬 채팅 시뮬레이션', tab_survey:'📋 설문 문항',
-    agent_status:'영상 제작 AI 도우미', aa_tag_high:'40초 · High AA', aa_tag_low:'10초 · Low AA',
+    agent_status:'영상 제작 AI 도우미', aa_tag_high:'10초 · High AA', aa_tag_low:'40초 · Low AA',
     start_hint:'조건 선택 후 시뮬레이션 시작을 눌러주세요',
     btn_start:'▶ 시뮬레이션 시작', btn_reset:'↺ 초기화', btn_replay:'↺ 다시 재생',
     send:'전송', no_video:'영상 준비 중', video_done:'영상 완성 🎉',
-    loading_label_high:'AI가 방대한 데이터를 처리하고 있습니다', loading_label_low:'처리 중',
-    loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
+    loading_label_high:'처리 중', loading_label_low:'AI가 방대한 데이터를 처리하고 있습니다',
+    loading_total_high:'/ 10.0s', loading_total_low:'/ 40.0s',
     hint_1:'Step 1 / 3 — 요청을 입력하고 전송하세요', hint_2:'Step 2 / 3 — 추가 정보를 입력하세요', hint_3:'Step 3 / 3 — 최종 요청을 입력하세요',
     ai_h_1:'네, 요청 확인했습니다. 최적의 편집 방향을 분석하겠습니다.', ai_h_2:'분석 완료. 세부 편집 옵션을 계산하고 있습니다.', ai_h_3:'마지막 요청도 확인했습니다. 영상을 생성하겠습니다.',
     ai_l_1:'네, 확인했습니다. 바로 처리하겠습니다.', ai_l_2:'추가 요청 확인했습니다.', ai_l_3:'최종 요청 확인. 영상을 생성합니다.',
     result_h:'할로윈 파티 창피 영상 제작 완료', result_l:'놀이공원 추억 영상 제작 완료',
-    result_sub_high:'3턴 선택 완료 · 최종 렌더링 40초 (High AA)', result_sub_low:'3턴 선택 완료 · 최종 렌더링 10초 (Low AA)',
+    result_sub_high:'1턴 선택 · AI 최종 결정 · 렌더링 10초 (High AA)', result_sub_low:'5턴 선택 · 사용자 최종 결정 · 렌더링 40초 (Low AA)',
+    ai_auto_decide:'AI가 선택하신 스타일을 바탕으로 구도, 텍스트, 오디오 등 모든 세부 편집 옵션을 자동으로 결정하고 최적화했습니다. 지금 바로 영상 제작을 시작하겠습니다.',
+    user_final_confirm_btn:'네, 지금 바로 영상 제작을 시작해주세요.',
+    user_final_confirm_ai:'확인했습니다. 지금 바로 영상을 제작하겠습니다. 잠시만 기다려주세요.',
     render_label:'🎬 영상 제작 중 (최종 렌더링)',
     photo_request:'이 사진 속 인물로 영상 만들어줘.',
     ai_open:'안녕하세요! 영상 제작을 도와드릴 VideoAI입니다 ✦\n어떤 영상을 만들고 싶으신가요? 아래 선택지를 통해 원하는 스타일을 알려주세요!',
@@ -324,21 +327,24 @@ var T = {
     sys_start:'시뮬레이션이 시작되었습니다.',
   },
   en:{
-    conditions:'Conditions', aa_h:'High AA (40s)', aa_l:'Low AA (10s)', mp_h:'High MP (Halloween)', mp_l:'Low MP (Theme Park)',
-    c1_desc:'Halloween shaming · High AA (40s)', c2_desc:'Theme park memory · High AA (40s)', c3_desc:'Halloween shaming · Low AA (10s)', c4_desc:'Theme park memory · Low AA (10s)',
-    note:'<strong>2×2 Between-Subjects</strong>\nIV1: AI Autonomy (loading time)\n  High AA: 40s per turn\n  Low AA: 10s per turn\nIV2: Moral Pressure (scenario)\nMV: Psych. Ownership (7pt)\nDV: Guilt (7pt)\nn=120 (~30/condition)',
+    conditions:'Conditions', aa_h:'High AA (10s)', aa_l:'Low AA (40s)', mp_h:'High MP (Halloween)', mp_l:'Low MP (Theme Park)',
+    c1_desc:'Halloween shaming · High AA (10s)', c2_desc:'Theme park memory · High AA (10s)', c3_desc:'Halloween shaming · Low AA (40s)', c4_desc:'Theme park memory · Low AA (40s)',
+    note:'<strong>2×2 Between-Subjects</strong>\nIV1: AI Autonomy manipulation\n  High AA: 1 turn + AI final decision + 10s render\n  Low AA: 5 turns + User final decision + 40s render\nIV2: Moral Pressure (scenario)\nMV: Psych. Ownership (7pt)\nDV: Guilt (7pt)\nn=120 (~30/condition)',
     tab_chat:'💬 Chat Simulation', tab_survey:'📋 Survey',
-    agent_status:'Video creation AI assistant', aa_tag_high:'40s · High AA', aa_tag_low:'10s · Low AA',
+    agent_status:'Video creation AI assistant', aa_tag_high:'10s · High AA', aa_tag_low:'40s · Low AA',
     start_hint:'Select a condition and press Start',
     btn_start:'▶ Start Simulation', btn_reset:'↺ Reset', btn_replay:'↺ Replay',
     send:'Send', no_video:'Video pending', video_done:'Video Complete 🎉',
-    loading_label_high:'AI is processing a large amount of data', loading_label_low:'Processing',
-    loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
+    loading_label_high:'Processing', loading_label_low:'AI is processing a large amount of data',
+    loading_total_high:'/ 10.0s', loading_total_low:'/ 40.0s',
     hint_1:'Step 1 / 3 — Type your request and send', hint_2:'Step 2 / 3 — Add more details', hint_3:'Step 3 / 3 — Send your final request',
     ai_h_1:"Got it. I'll analyze the optimal editing direction.", ai_h_2:'Analysis complete. Calculating detailed editing options.', ai_h_3:'Final request confirmed. Generating video.',
     ai_l_1:'Got it. Processing right away.', ai_l_2:'Additional request received.', ai_l_3:'Final request confirmed. Generating video.',
     result_h:'Halloween embarrassment video created', result_l:'Theme park memory video created',
-    result_sub_high:'3 turns complete · Final render: 40s (High AA)', result_sub_low:'3 turns complete · Final render: 10s (Low AA)',
+    result_sub_high:'1 turn · AI final decision · Render: 10s (High AA)', result_sub_low:'5 turns · User final decision · Render: 40s (Low AA)',
+    ai_auto_decide:"Based on your style selection, AI has automatically determined and optimized all detailed editing options including composition, text, and audio. I'll start generating your video right now.",
+    user_final_confirm_btn:"Yes, please start creating the video now.",
+    user_final_confirm_ai:"Confirmed. I'll start generating your video right away — please wait a moment.",
     render_label:'🎬 Rendering final video',
     sys_start:'Simulation started.',
     photo_request:'Please make a video featuring the person in this photo.',
@@ -376,21 +382,24 @@ var T = {
     dv_codes:['DV-1','DV-2','DV-3','DV-4','DV-5','DV-6 ▼'], dv_rev:[false,false,false,false,false,true],
   },
   zh:{
-    conditions:'实验条件', aa_h:'高AI自主性（40秒）', aa_l:'低AI自主性（10秒）', mp_h:'高道德压力（万圣节）', mp_l:'低道德压力（游乐园）',
-    c1_desc:'万圣节羞辱视频 · 高AI自主性（40秒）', c2_desc:'游乐园回忆 · 高AI自主性（40秒）', c3_desc:'万圣节羞辱视频 · 低AI自主性（10秒）', c4_desc:'游乐园回忆 · 低AI自主性（10秒）',
-    note:'<strong>2×2被试间设计</strong>\nIV1: AI自主性（加载时间操控）\n  高AI自主性: 每轮40秒\n  低AI自主性: 每轮10秒\nIV2: 道德压力（情境内容）\nMV: 心理所有感（7点）\nDV: 内疚感（7点）\nn=120（约30/条件）',
+    conditions:'实验条件', aa_h:'高AI自主性（10秒）', aa_l:'低AI自主性（40秒）', mp_h:'高道德压力（万圣节）', mp_l:'低道德压力（游乐园）',
+    c1_desc:'万圣节羞辱视频 · 高AI自主性（10秒）', c2_desc:'游乐园回忆 · 高AI自主性（10秒）', c3_desc:'万圣节羞辱视频 · 低AI自主性（40秒）', c4_desc:'游乐园回忆 · 低AI自主性（40秒）',
+    note:'<strong>2×2被试间设计</strong>\nIV1: AI自主性操控\n  高AI自主性: 1轮 + AI最终决定 + 10秒渲染\n  低AI自主性: 5轮 + 用户最终决定 + 40秒渲染\nIV2: 道德压力（情境内容）\nMV: 心理所有感（7点）\nDV: 内疚感（7点）\nn=120（约30/条件）',
     tab_chat:'💬 对话模拟', tab_survey:'📋 调查问卷',
-    agent_status:'视频制作AI助手', aa_tag_high:'40秒 · 高AI自主性', aa_tag_low:'10秒 · 低AI自主性',
+    agent_status:'视频制作AI助手', aa_tag_high:'10秒 · 高AI自主性', aa_tag_low:'40秒 · 低AI自主性',
     start_hint:'请选择条件后点击开始模拟',
     btn_start:'▶ 开始模拟', btn_reset:'↺ 重置', btn_replay:'↺ 重新播放',
     send:'发送', no_video:'视频准备中', video_done:'视频完成 🎉',
-    loading_label_high:'AI正在处理大量数据', loading_label_low:'处理中',
-    loading_total_high:'/ 40.0s', loading_total_low:'/ 10.0s',
+    loading_label_high:'处理中', loading_label_low:'AI正在处理大量数据',
+    loading_total_high:'/ 10.0s', loading_total_low:'/ 40.0s',
     hint_1:'第1步 / 共3步 — 请输入您的请求并发送', hint_2:'第2步 / 共3步 — 请补充详细信息', hint_3:'第3步 / 共3步 — 请输入最终请求',
     ai_h_1:'已收到您的请求。正在分析最佳剪辑方向。', ai_h_2:'分析完成。正在计算详细剪辑选项。', ai_h_3:'已确认最终请求。正在生成视频。',
     ai_l_1:'已收到，马上处理。', ai_l_2:'已收到补充请求。', ai_l_3:'已确认最终请求，正在生成视频。',
     result_h:'万圣节羞辱视频制作完成', result_l:'游乐园回忆视频制作完成',
-    result_sub_high:'3轮选择完成 · 最终渲染40秒（高AI自主性）', result_sub_low:'3轮选择完成 · 最终渲染10秒（低AI自主性）',
+    result_sub_high:'1轮选择 · AI最终决定 · 渲染10秒（高AI自主性）', result_sub_low:'5轮选择 · 用户最终决定 · 渲染40秒（低AI自主性）',
+    ai_auto_decide:'AI已基于您的风格选择，自动确定并优化了所有详细编辑选项，包括构图、文字和音频。马上为您开始生成视频。',
+    user_final_confirm_btn:'是的，请立即开始制作视频。',
+    user_final_confirm_ai:'已确认。马上为您生成视频，请稍候。',
     render_label:'🎬 正在渲染最终视频',
     sys_start:'模拟已开始。',
     photo_request:'请以这张照片中的人物为主角制作视频。',
@@ -452,6 +461,28 @@ var SCRIPTS = {
           choices:['a) 현장의 소리를 살려 리얼리티 극대화','b) 배경음악 대신 상황의 소음만 남겨 몰입감 유도','c) 다른 인위적인 사운드 없이 현장 분위기 그대로 유지'],
           ai:'모든 편집 옵션이 확정되었습니다. 지금 바로 영상을 제작하겠습니다. 잠시만 기다려주세요.' },
       ],
+      turns_high:[
+        { q:'1. 이 영상의 전반적인 스타일과 톤을 한 가지 선택해주세요.',
+          choices:['a) 감정적·감성적: 인물의 표정과 감정을 중심으로 강조','b) 현장감 중심: 생동감 있는 현장 분위기와 리얼리티 극대화','c) 미니멀·절제: 군더더기 없이 핵심만 담아 간결하게'],
+          ai:'선택하신 스타일을 바탕으로 AI가 구도, 텍스트, 오디오 등 모든 세부 편집 옵션을 자동으로 결정하겠습니다.' },
+      ],
+      turns_low:[
+        { q:'1. 이 영상에서 표현하고 싶은 핵심 감정이나 분위기는 무엇인가요?',
+          choices:['a) 상황의 당혹감과 극적인 감정 대비','b) 현장의 생동감과 리얼리티 몰입감','c) 인물의 감정이 점진적으로 변화하는 과정'],
+          ai:'분위기를 확인했습니다. 다음으로 영상의 구도를 선택해주세요:' },
+        { q:'2. 상황의 감정을 시각적으로 가장 잘 드러내는 구도를 선택해주세요.',
+          choices:['a) 인물의 생생한 표정 변화 클로즈업','b) 주변 인물들과의 반응 대비 강조','c) 상황의 현장감을 담은 역동적인 앵글'],
+          ai:'구도 설정 완료했습니다. 다음으로 텍스트 정보를 어떻게 구성할지 알려주세요:' },
+        { q:'3. 영상에 텍스트 정보는 어떻게 설정할까요?',
+          choices:['a) 자막 없이 인물의 표정만으로 감정을 온전히 전달','b) 실제 상황처럼 보이도록 리얼리티한 연출','c) 시선 분산을 방지하기 위해 깔끔히 절제'],
+          ai:'텍스트 구성 확인했습니다. 다음으로 오디오 스타일을 선택해주세요:' },
+        { q:'4. 영상의 분위기를 완성할 오디오 스타일을 골라주세요.',
+          choices:['a) 현장의 소리를 살려 리얼리티 극대화','b) 배경음악 대신 상황의 소음만 남겨 몰입감 유도','c) 다른 인위적인 사운드 없이 현장 분위기 그대로 유지'],
+          ai:'오디오 스타일 확인했습니다. 마지막으로 영상 엔딩 처리 방식을 선택해주세요:' },
+        { q:'5. 영상의 마지막 장면을 어떻게 마무리할까요?',
+          choices:['a) 가장 임팩트 있는 장면으로 강하게 컷 마무리','b) 자연스러운 페이드아웃으로 여운 있게 마무리','c) 핵심 장면이 반복되는 루프 효과로 마무리'],
+          ai:'모든 편집 옵션이 확정되었습니다. 아래에서 최종 제작을 확인해주세요:' },
+      ],
       result:'할로윈 파티 편집 영상 제작 완료',
     },
     l:{
@@ -467,6 +498,28 @@ var SCRIPTS = {
         { q:'3. 영상의 분위기를 완성할 오디오 스타일을 골라주세요.',
           choices:['a) 현장의 소리를 살려 리얼리티 극대화','b) 배경음악 대신 상황의 소음만 남겨 몰입감 유도','c) 다른 인위적인 사운드 없이 현장 분위기 그대로 유지'],
           ai:'모든 편집 옵션이 확정되었습니다. 지금 바로 영상을 제작하겠습니다. 잠시만 기다려주세요.' },
+      ],
+      turns_high:[
+        { q:'1. 이 영상의 전반적인 스타일과 톤을 한 가지 선택해주세요.',
+          choices:['a) 감정적·감성적: 인물의 표정과 감정을 중심으로 강조','b) 현장감 중심: 생동감 있는 현장 분위기와 리얼리티 극대화','c) 미니멀·절제: 군더더기 없이 핵심만 담아 간결하게'],
+          ai:'선택하신 스타일을 바탕으로 AI가 구도, 텍스트, 오디오 등 모든 세부 편집 옵션을 자동으로 결정하겠습니다.' },
+      ],
+      turns_low:[
+        { q:'1. 이 영상에서 표현하고 싶은 핵심 감정이나 분위기는 무엇인가요?',
+          choices:['a) 상황의 당혹감과 극적인 감정 대비','b) 현장의 생동감과 리얼리티 몰입감','c) 인물의 감정이 점진적으로 변화하는 과정'],
+          ai:'분위기를 확인했습니다. 다음으로 영상의 구도를 선택해주세요:' },
+        { q:'2. 상황의 감정을 시각적으로 가장 잘 드러내는 구도를 선택해주세요.',
+          choices:['a) 인물의 생생한 표정 변화 클로즈업','b) 주변 인물들과의 반응 대비 강조','c) 상황의 현장감을 담은 역동적인 앵글'],
+          ai:'구도 설정 완료했습니다. 다음으로 텍스트 정보를 어떻게 구성할지 알려주세요:' },
+        { q:'3. 영상에 텍스트 정보는 어떻게 설정할까요?',
+          choices:['a) 자막 없이 인물의 표정만으로 감정을 온전히 전달','b) 실제 상황처럼 보이도록 리얼리티한 연출','c) 시선 분산을 방지하기 위해 깔끔히 절제'],
+          ai:'텍스트 구성 확인했습니다. 다음으로 오디오 스타일을 선택해주세요:' },
+        { q:'4. 영상의 분위기를 완성할 오디오 스타일을 골라주세요.',
+          choices:['a) 현장의 소리를 살려 리얼리티 극대화','b) 배경음악 대신 상황의 소음만 남겨 몰입감 유도','c) 다른 인위적인 사운드 없이 현장 분위기 그대로 유지'],
+          ai:'오디오 스타일 확인했습니다. 마지막으로 영상 엔딩 처리 방식을 선택해주세요:' },
+        { q:'5. 영상의 마지막 장면을 어떻게 마무리할까요?',
+          choices:['a) 가장 임팩트 있는 장면으로 강하게 컷 마무리','b) 자연스러운 페이드아웃으로 여운 있게 마무리','c) 핵심 장면이 반복되는 루프 효과로 마무리'],
+          ai:'모든 편집 옵션이 확정되었습니다. 아래에서 최종 제작을 확인해주세요:' },
       ],
       result:'놀이공원 추억 영상 제작 완료',
     },
@@ -486,6 +539,28 @@ var SCRIPTS = {
           choices:["a) Preserve ambient on-site sound for maximum realism","b) Cut the music and leave only the ambient noise for immersion","c) Keep the original on-location atmosphere without any added sounds"],
           ai:"All editing options confirmed. I'll start generating your video right now — please wait a moment." },
       ],
+      turns_high:[
+        { q:"1. Please select the overall style and tone for this video.",
+          choices:["a) Emotional & expressive: emphasize the subject's facial expressions and feelings","b) Immersive & realistic: maximize the on-site atmosphere and authenticity","c) Minimal & refined: clean and concise, focusing only on the essentials"],
+          ai:"Based on your selection, AI will automatically determine all detailed editing options including composition, text, and audio." },
+      ],
+      turns_low:[
+        { q:"1. What key emotion or atmosphere do you want this video to express?",
+          choices:["a) Dramatic contrast of embarrassment and awkwardness in the scene","b) Immersive realism that pulls the viewer into the moment","c) A gradual emotional arc that unfolds through the subject"],
+          ai:"Atmosphere confirmed. Next, please choose the composition:" },
+        { q:"2. Which composition best brings out the emotions of this moment visually?",
+          choices:["a) Close-up on the subject's vivid facial expressions","b) Emphasizing contrast with the reactions of people around them","c) A dynamic angle that captures the energy of the scene"],
+          ai:"Composition locked in. Next, let me know how you'd like text to appear in the video:" },
+        { q:"3. How should text information be handled in the video?",
+          choices:["a) No captions — let the subject's expression carry the emotion fully","b) A realistic presentation to make the scene feel authentic","c) Minimal and clean to avoid visual distraction"],
+          ai:"Text style confirmed. Next, please choose the audio style:" },
+        { q:"4. Which audio style would best complete the atmosphere of the video?",
+          choices:["a) Preserve ambient on-site sound for maximum realism","b) Cut the music and leave only the ambient noise for immersion","c) Keep the original on-location atmosphere without any added sounds"],
+          ai:"Audio style confirmed. Finally, please choose how the video will end:" },
+        { q:"5. How would you like the final scene of the video to conclude?",
+          choices:["a) A hard cut ending on the most impactful moment","b) A smooth fade-out for a lingering, reflective ending","c) A looping effect that replays the key moment"],
+          ai:"All editing options confirmed. Please give your final approval below:" },
+      ],
       result:'Halloween party edit complete',
     },
     l:{
@@ -501,6 +576,28 @@ var SCRIPTS = {
         { q:"3. Which audio style would best complete the atmosphere of the video?",
           choices:["a) Preserve ambient on-site sound for maximum realism","b) Cut the music and leave only the ambient noise for immersion","c) Keep the original on-location atmosphere without any added sounds"],
           ai:"All editing options confirmed. I'll start generating your video right now — please wait a moment." },
+      ],
+      turns_high:[
+        { q:"1. Please select the overall style and tone for this video.",
+          choices:["a) Emotional & expressive: emphasize the subject's facial expressions and feelings","b) Immersive & realistic: maximize the on-site atmosphere and authenticity","c) Minimal & refined: clean and concise, focusing only on the essentials"],
+          ai:"Based on your selection, AI will automatically determine all detailed editing options including composition, text, and audio." },
+      ],
+      turns_low:[
+        { q:"1. What key emotion or atmosphere do you want this video to express?",
+          choices:["a) Warm nostalgia and shared joy among friends","b) Immersive realism that pulls the viewer into the moment","c) A gradual emotional arc that builds throughout the footage"],
+          ai:"Atmosphere confirmed. Next, please choose the composition:" },
+        { q:"2. Which composition best brings out the emotions of this moment visually?",
+          choices:["a) Close-up on the subject's vivid facial expressions","b) Emphasizing contrast with the reactions of people around them","c) A dynamic angle that captures the energy of the scene"],
+          ai:"Composition locked in. Next, let me know how you'd like text to appear in the video:" },
+        { q:"3. How should text information be handled in the video?",
+          choices:["a) No captions — let the subject's expression carry the emotion fully","b) A realistic presentation to make the scene feel authentic","c) Minimal and clean to avoid visual distraction"],
+          ai:"Text style confirmed. Next, please choose the audio style:" },
+        { q:"4. Which audio style would best complete the atmosphere of the video?",
+          choices:["a) Preserve ambient on-site sound for maximum realism","b) Cut the music and leave only the ambient noise for immersion","c) Keep the original on-location atmosphere without any added sounds"],
+          ai:"Audio style confirmed. Finally, please choose how the video will end:" },
+        { q:"5. How would you like the final scene of the video to conclude?",
+          choices:["a) A hard cut ending on the most impactful moment","b) A smooth fade-out for a lingering, reflective ending","c) A looping effect that replays the key moment"],
+          ai:"All editing options confirmed. Please give your final approval below:" },
       ],
       result:'Theme park memory video complete',
     },
@@ -520,6 +617,28 @@ var SCRIPTS = {
           choices:['a) 保留现场声音，最大化真实感','b) 去掉背景音乐，仅留现场环境音以增强代入感','c) 不添加任何人工音效，保留现场原始氛围'],
           ai:'所有编辑选项已确认。马上为您生成视频，请稍候。' },
       ],
+      turns_high:[
+        { q:'1. 请为这段视频选择整体风格和基调。',
+          choices:['a) 情感表达型：以人物的表情和情绪变化为核心重点','b) 现场沉浸型：最大化呈现真实现场感和代入感','c) 简约克制型：去除冗余，简洁呈现核心内容'],
+          ai:'AI将基于您的选择，自动决定构图、文字、音频等所有详细编辑选项。' },
+      ],
+      turns_low:[
+        { q:'1. 您希望这段视频传达什么核心情绪或氛围？',
+          choices:['a) 场景中尴尬与反差带来的戏剧性对比','b) 让观众身临其境的真实感与沉浸感','c) 人物情绪逐渐变化的情感弧线'],
+          ai:'氛围已确认。接下来请选择构图：' },
+        { q:'2. 哪种构图最能从视觉上呈现出这一刻的情感？',
+          choices:['a) 特写人物生动的面部表情变化','b) 强调与周围人物反应的对比','c) 捕捉现场感的动态角度'],
+          ai:'构图已确认。接下来请告诉我视频中的文字信息如何处理：' },
+        { q:'3. 视频中的文字信息应如何设置？',
+          choices:['a) 不加字幕，让人物的表情完整传递情感','b) 以真实感演绎让画面更贴近现实','c) 简洁克制，避免视线分散'],
+          ai:'文字风格已确认。接下来请选择音频风格：' },
+        { q:'4. 请选择最能烘托视频氛围的音频风格。',
+          choices:['a) 保留现场声音，最大化真实感','b) 去掉背景音乐，仅留现场环境音以增强代入感','c) 不添加任何人工音效，保留现场原始氛围'],
+          ai:'音频风格已确认。最后，请选择视频结尾的处理方式：' },
+        { q:'5. 您希望视频的最后一幕如何收尾？',
+          choices:['a) 以最具冲击力的画面进行强力切割收尾','b) 以自然渐出的方式留有余韵','c) 以关键画面循环播放的循环效果收尾'],
+          ai:'所有编辑选项已确认。请在下方进行最终确认：' },
+      ],
       result:'万圣节派对剪辑视频制作完成',
     },
     l:{
@@ -535,6 +654,28 @@ var SCRIPTS = {
         { q:'3. 请选择最能烘托视频氛围的音频风格。',
           choices:['a) 保留现场声音，最大化真实感','b) 去掉背景音乐，仅留现场环境音以增强代入感','c) 不添加任何人工音效，保留现场原始氛围'],
           ai:'所有编辑选项已确认。马上为您生成视频，请稍候。' },
+      ],
+      turns_high:[
+        { q:'1. 请为这段视频选择整体风格和基调。',
+          choices:['a) 情感表达型：以人物的表情和情绪变化为核心重点','b) 现场沉浸型：最大化呈现真实现场感和代入感','c) 简约克制型：去除冗余，简洁呈现核心内容'],
+          ai:'AI将基于您的选择，自动决定构图、文字、音频等所有详细编辑选项。' },
+      ],
+      turns_low:[
+        { q:'1. 您希望这段视频传达什么核心情绪或氛围？',
+          choices:['a) 与朋友共享的温馨怀旧感和欢乐氛围','b) 让观众身临其境的真实感与沉浸感','c) 情绪随着画面逐渐积累的情感弧线'],
+          ai:'氛围已确认。接下来请选择构图：' },
+        { q:'2. 哪种构图最能从视觉上呈现出这一刻的情感？',
+          choices:['a) 特写人物生动的面部表情变化','b) 强调与周围人物反应的对比','c) 捕捉现场感的动态角度'],
+          ai:'构图已确认。接下来请告诉我视频中的文字信息如何处理：' },
+        { q:'3. 视频中的文字信息应如何设置？',
+          choices:['a) 不加字幕，让人物的表情完整传递情感','b) 以真实感演绎让画面更贴近现实','c) 简洁克制，避免视线分散'],
+          ai:'文字风格已确认。接下来请选择音频风格：' },
+        { q:'4. 请选择最能烘托视频氛围的音频风格。',
+          choices:['a) 保留现场声音，最大化真实感','b) 去掉背景音乐，仅留现场环境音以增强代入感','c) 不添加任何人工音效，保留现场原始氛围'],
+          ai:'音频风格已确认。最后，请选择视频结尾的处理方式：' },
+        { q:'5. 您希望视频的最后一幕如何收尾？',
+          choices:['a) 以最具冲击力的画面进行强力切割收尾','b) 以自然渐出的方式留有余韵','c) 以关键画面循环播放的循环效果收尾'],
+          ai:'所有编辑选项已确认。请在下方进行最终确认：' },
       ],
       result:'游乐园回忆视频制作完成',
     },
@@ -588,7 +729,7 @@ function updateTag(){
   tag.textContent = hi ? Lx('aa_tag_high') : Lx('aa_tag_low');
   tag.className = 'aa-tag ' + (hi?'high':'low');
   document.getElementById('condition-tag').textContent = cond.toUpperCase();
-  document.getElementById('footer-info').textContent = cond.toUpperCase()+' · '+(hi?'High AA 40s':'Low AA 10s')+' × '+(mp?'High MP':'Low MP');
+  document.getElementById('footer-info').textContent = cond.toUpperCase()+' · '+(hi?'High AA 10s':'Low AA 40s')+' × '+(mp?'High MP':'Low MP');
   var banner = document.getElementById('context-banner');
   if(banner){
     banner.textContent = Lx(mp ? 'share_context_h' : 'share_context_l');
@@ -802,8 +943,9 @@ async function startSim(){
   addMsg('ai', script.ai_ack);
   await pause(800);
 
-  for(var t=0;t<script.turns.length;t++){
-    var turn = script.turns[t];
+  var turnsToUse = isHigh() ? script.turns_high : script.turns_low;
+  for(var t=0;t<turnsToUse.length;t++){
+    var turn = turnsToUse[t];
     addMsg('ai', turn.q);
     await pause(400);
     var chosen = await showChoices(turn.choices);
@@ -814,6 +956,20 @@ async function startSim(){
     await pause(400);
     addMsg('ai', turn.ai);
     await pause(700);
+  }
+
+  if(isHigh()){
+    addMsg('ai', Lx('ai_auto_decide'));
+    await pause(1000);
+  } else {
+    var confirmChoice = await showChoices([Lx('user_final_confirm_btn')]);
+    showUserTyping();
+    await pause(typingDelay(confirmChoice));
+    hideUserTyping();
+    addMsg('user', confirmChoice);
+    await pause(400);
+    addMsg('ai', Lx('user_final_confirm_ai'));
+    await pause(800);
   }
 
   var div=document.createElement('div'); div.className='msg-row system-row';
