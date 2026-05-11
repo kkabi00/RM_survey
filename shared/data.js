@@ -20,8 +20,8 @@ window.EXP_DATA = {
       "aiIntro": "연애 예능 예고편처럼 만들 수 있어요. 소개 장면과 선택 장면을 조합하겠습니다.",
       "highOutcome": "Amily가 연애 프로그램 속에서 아무에게도 선택받지 못하고, 어색한 분위기 속에서 혼자 남는 것처럼 보이는 AI 패러디 영상이 생성되었습니다.",
       "lowOutcome": "Amily가 연애 프로그램 속에서 여러 사람들에게 호감을 얻고 선택받는 것처럼 보이는 AI 패러디 영상이 생성되었습니다.",
-      "videoHigh": "../../../../videos/high guilt senario 1.mp4",
-      "videoLow": "../../../../videos/low guilt senario 1.mp4",
+      "videoHigh": "../../../videos/high guilt senario 1.mp4",
+      "videoLow": "../../../videos/low guilt senario 1.mp4",
       "article": {
         "high": {
           "kicker": "Digital Culture",
@@ -97,8 +97,8 @@ window.EXP_DATA = {
       "aiIntro": "댄스 챌린지 숏폼처럼 만들 수 있어요. 동작, 음악, 카메라 구도를 조합하겠습니다.",
       "highOutcome": "Amily가 댄스 챌린지를 하는 것처럼 보이지만, 의상·카메라 구도·주변 반응이 더 자극적으로 강조된 AI 패러디 영상이 생성되었습니다.",
       "lowOutcome": "Amily가 밝은 분위기에서 댄스 챌린지를 열심히 따라 하는 것처럼 보이는 AI 패러디 영상이 생성되었습니다.",
-      "videoHigh": "../../../../videos/high guilt senario 2.mp4",
-      "videoLow": "../../../../videos/low guilt senario 2.mp4",
+      "videoHigh": "../../../videos/high guilt senario 2.mp4",
+      "videoLow": "../../../videos/low guilt senario 2.mp4",
       "article": {
         "high": {
           "kicker": "Online Culture",
