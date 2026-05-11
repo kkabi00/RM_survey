@@ -41,6 +41,22 @@
 <script src="shared/data.js"></script><script>
 let s='dating', c='c1';
 const fast=new URLSearchParams(location.search).get('fast')==='1';
+
+/*
+// 조건 자동 배정 초안: 팀원 공유 준비 전까지는 수동 조건 선택을 유지합니다.
+// Google Sheet의 현재 응답 수를 가져온 뒤, 응답 수가 가장 적은 조건군 중 하나를 무작위 배정합니다.
+async function assignConditionFromResponseCounts(scenario){
+  const res=await fetch(`${GOOGLE_SHEETS_WEB_APP_URL}?mode=counts&scenario=${encodeURIComponent(scenario)}`);
+  const counts=await res.json(); // 예: {c1:3,c2:4,c3:3,c4:5}
+  const min=Math.min(...Object.values(counts));
+  const candidates=Object.keys(counts).filter(key=>counts[key]===min);
+  return candidates[Math.floor(Math.random()*candidates.length)];
+}
+
+// 사용 예시:
+// c = await assignConditionFromResponseCounts(s);
+*/
+
 document.querySelectorAll('[data-s]').forEach(btn=>btn.onclick=()=>{s=btn.dataset.s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')});
 document.querySelectorAll('[data-c]').forEach(btn=>btn.onclick=()=>{c=btn.dataset.c;document.querySelectorAll('[data-c]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')});
 document.getElementById('startBtn').onclick=()=>{

@@ -10,6 +10,8 @@ const FAST = qs('fast','') === '1';
 const D = window.EXP_DATA;
 const S = D.scenarios[SCENARIO];
 const C = D.conds[COND];
+// Google Apps Script를 웹앱으로 배포한 뒤, /google_apps_script.gs의 배포 URL을 여기에 넣습니다.
+const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxJ98zps4BeLoPp5jcDyQMNWK4EgmszSn0Ri-pBdco0I0uKcucpYX4jIIpql84m2scl/exec';
 function enc(v){return encodeURIComponent(v)}
 function pathTo(app){
   return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}&nick=${enc(NICK)}${FAST?'&fast=1':''}`;
@@ -28,6 +30,24 @@ function scrollBottom(){
 }
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+async function postSurveyToGoogleSheet(payload){
+  if(!GOOGLE_SHEETS_WEB_APP_URL) return {ok:false, reason:'missing-url'};
+  await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(payload)
+  });
+  return {ok:true};
+}
+function downloadCsvFile(csv, filename){
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 function setMeta(){
   document.querySelectorAll('[data-scenario-label]').forEach(e=>e.textContent=S.label);

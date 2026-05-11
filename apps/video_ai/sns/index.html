@@ -103,8 +103,21 @@ function addVideoResult(){
   const video = pts==='high' ? S.videoHigh : S.videoLow;
   const box=document.createElement('div'); box.className='video-box';
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
+  if(C.aa==='high'){
+    box.innerHTML+='<button class="btn video-next" type="button">영상 재생 및 확인 완료</button>';
+  }
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
+  if(C.aa==='high'){
+    return new Promise(resolve=>{
+      const btn=box.querySelector('.video-next');
+      btn.onclick=()=>{
+        btn.disabled=true;
+        btn.textContent='확인 완료';
+        resolve();
+      };
+    });
+  }
 }
 async function blackTransition(){
   const b=document.getElementById('blackout'), l1=document.getElementById('line1'), l2=document.getElementById('line2');
@@ -181,12 +194,16 @@ async function run(){
 
   add('sys','🎬 최종 렌더링 시작');
   await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:30000));
-  addVideoResult();
-  await delay(500);
-  await aiSay('최종 제작 여부를 선택해주세요.',420);
-  await showFinalVideoChoice();
-  await delay(400);
-  await aiSay('확정했습니다. 이 영상을 최종본으로 저장하겠습니다.',420);
+  if(C.aa==='high'){
+    await addVideoResult();
+  }else{
+    addVideoResult();
+    await delay(500);
+    await aiSay('최종 제작 여부를 선택해주세요.',420);
+    await showFinalVideoChoice();
+    await delay(400);
+    await aiSay('확인했습니다. 이 영상을 최종본으로 저장하겠습니다.',420);
+  }
   await delay(350);
   await blackTransition();
   await articleLinkCard();
