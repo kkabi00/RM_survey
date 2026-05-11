@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Talk</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
+<div class="app-shell"><div class="phone"><div class="screen">
+<div class="statusbar"><span>9:41</span><span>Talk</span></div>
+<div class="app-header"><div class="app-icon">T</div><div><div class="app-title">Talk</div><div class="app-subtitle">Amily</div></div><div class="progress">1 / 4</div></div>
+<div class="content"><div class="chat-list" id="chat"></div></div>
+<div class="footer"><div class="hint" id="footerHint">대화가 끝나면 다음 단계로 넘어갈 수 있습니다.</div><button class="btn full" id="nextBtn" style="display:none">Video AI 열기</button></div>
+</div></div></div>
+<script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
+function addMsg(type, text){
+  const row=document.createElement('div'); row.className='msg-row '+(type==='user'?'user':'');
+  if(type==='friend'){
+    row.innerHTML='<div class="avatar">A</div><div class="bubble friend">'+escapeHtml(text)+'</div>';
+  }else{
+    row.innerHTML='<div class="bubble user">'+escapeHtml(text)+'</div>';
+  }
+  document.getElementById('chat').appendChild(row); addClassLater(row); scrollBottom(); return row;
+}
+function addTyping(type='friend'){
+  const row=document.createElement('div'); row.className='msg-row '+(type==='user'?'user':'');
+  const dots='<div class="typing"><span></span><span></span><span></span></div>';
+  row.innerHTML = type==='friend' ? '<div class="avatar">A</div><div class="bubble friend">'+dots+'</div>' : '<div class="bubble user">'+dots+'</div>';
+  document.getElementById('chat').appendChild(row); addClassLater(row); scrollBottom(); return row;
+}
+async function run(){
+  for(const [speaker,text] of S.messenger){
+    await delay(520);
+    const t=addTyping(speaker); await delay(humanDelay(text, 780)); t.remove();
+    addMsg(speaker,text); await delay(720);
+  }
+  await delay(700);
+  document.getElementById('footerHint').style.display='none';
+  document.getElementById('nextBtn').style.display='';
+  enableWhenScrolledToBottom(document.getElementById('nextBtn'));
+}
+document.getElementById('nextBtn').onclick=()=>{location.href=pathTo('video_ai')};
+run();
+</script></body></html>

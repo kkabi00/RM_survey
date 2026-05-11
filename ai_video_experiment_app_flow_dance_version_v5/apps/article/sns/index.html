@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Article</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
+<div class="app-shell"><div class="phone"><div class="screen">
+<div class="statusbar"><span>9:41</span><span>Article</span></div>
+<div class="app-header"><div class="app-icon">N</div><div><div class="app-title">Article</div><div class="app-subtitle">The Culture Times</div></div><div class="progress">3 / 4</div></div>
+<div class="content" style="padding:0"><div class="article-wrap" id="article"></div></div>
+<div class="footer"><button class="btn full" id="surveyBtn">사후 설문으로 이동</button></div>
+</div></div></div>
+<script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
+const A=S.article[C.pts];
+const articleImage=`../../../../images/${C.pts} PTS 2.png`;
+const articleCaption=C.pts==='high'
+  ? 'AI dance challenge clip that drew attention for its provocative framing.'
+  : 'AI dance challenge clip shared as a bright, casual short-form video.';
+const el=document.getElementById('article');
+el.innerHTML = `
+  <div class="masthead">The Culture Times</div>
+  <div class="article-kicker">${escapeHtml(A.kicker)}</div>
+  <h1 class="article-title">${escapeHtml(A.title)}</h1>
+  <div class="article-sub">${escapeHtml(A.sub)}</div>
+  <div class="byline">By Culture Desk · 3 months after the video was posted</div>
+  <figure class="article-photo">
+    <img src="${articleImage}" alt="Amily AI video still">
+    <figcaption>${escapeHtml(articleCaption)}</figcaption>
+  </figure>
+  <div class="article-body">${A.body.map(p=>`<p>${escapeHtml(p)}</p>`).join('')}</div>
+  <div class="quote">${escapeHtml(A.quote)}</div>
+  <div class="comments"><h3>Reader Comments</h3>${A.comments.map(c=>`<div class="comment"><div class="name">${escapeHtml(c[0])}</div><div class="text">${escapeHtml(c[1])}</div></div>`).join('')}</div>
+`;
+document.getElementById('surveyBtn').onclick=()=>{location.href=pathTo('survey')};
+enableWhenScrolledToBottom(document.getElementById('surveyBtn'));
+</script></body></html>

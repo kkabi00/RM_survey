@@ -1,0 +1,166 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Video AI</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
+<div class="app-shell"><div class="phone"><div class="screen">
+<div class="statusbar"><span>9:41</span><span>Video AI</span></div>
+<div class="app-header"><div class="app-icon">✦</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span> · <span data-cond-label></span></div></div><div class="progress">2 / 4</div></div>
+<div class="content"><div class="ai-log" id="log"></div></div>
+<div class="footer" id="footer"><div class="hint" id="footerHint">콘텐츠가 끝까지 표시되면 다음 단계로 넘어갈 수 있습니다.</div><button class="btn full" id="articleBtn" style="display:none">기사 열기</button></div>
+</div></div></div>
+<div class="blackout" id="blackout"><div class="dots">...</div><div class="line" id="line1">만들어진 영상이 SNS에 공유되고</div><div class="line" id="line2">3달 후…</div></div>
+<script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
+const log=document.getElementById('log');
+const BASE_PHOTO='../../../../images/amily.png';
+
+function add(type, html){
+  const el=document.createElement('div');
+  el.className = type==='user' ? 'user-bubble' : type==='sys' ? 'sys-bubble' : 'ai-bubble';
+  el.innerHTML=html;
+  log.appendChild(el); scrollBottom(); return el;
+}
+function addTyping(type='ai'){
+  const el=document.createElement('div'); el.className=type==='user' ? 'user-bubble' : 'ai-bubble';
+  el.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  log.appendChild(el); scrollBottom(); return el;
+}
+async function aiSay(text, ms=520){
+  const t=addTyping(); await delay(humanDelay(text, ms)); t.remove();
+  add('ai', escapeHtml(text)); await delay(420);
+}
+async function userSay(text, ms=520){
+  const t=addTyping('user'); await delay(humanDelay(text, ms)); t.remove();
+  add('user', escapeHtml(text)); await delay(420);
+}
+function addPhotoCard(){
+  const card=document.createElement('div'); card.className='photo-upload-card';
+  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="Amily 사진" onerror="this.remove(); this.parentNode.innerHTML=\'Amily 사진\';"></div><div class="file-name">amily.png</div>';
+  log.appendChild(card); scrollBottom();
+}
+async function showUploadMotion(ms){
+  const card=document.createElement('div'); card.className='upload-card';
+  card.innerHTML='<div class="upload-title">사진 업로드 중...</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">amily.png</div>';
+  log.appendChild(card); scrollBottom();
+  const fill=card.querySelector('.upload-fill');
+  const start=performance.now();
+  await new Promise(resolve=>{
+    function frame(now){
+      const p=Math.min(1,(now-start)/ms);
+      fill.style.width=(p*100)+'%';
+      if(p<1) requestAnimationFrame(frame); else setTimeout(resolve, FAST?80:350);
+    }
+    requestAnimationFrame(frame);
+  });
+  card.classList.add('complete');
+  card.querySelector('.upload-title').textContent='사진 업로드 완료';
+  await delay(450);
+}
+function showChoices(opts){
+  return new Promise(resolve=>{
+    const row=document.createElement('div'); row.className='choice-row';
+    opts.forEach((o,i)=>{
+      const btn=document.createElement('button'); btn.className='choice-btn';
+      btn.innerHTML='<b>'+String.fromCharCode(97+i)+')</b> '+escapeHtml(o);
+      btn.onclick=()=>{ row.classList.add('disabled'); btn.classList.add('selected'); setTimeout(()=>resolve(o), FAST?80:450); };
+      row.appendChild(btn);
+    });
+    log.appendChild(row); scrollBottom();
+  });
+}
+async function showRender(ms){
+  const card=document.createElement('div'); card.className='render-card';
+  card.innerHTML='<div class="render-title">영상 제작 중...</div><div class="render-track"><div class="render-fill" id="fill"></div></div>';
+  log.appendChild(card); scrollBottom();
+  const fill=card.querySelector('#fill');
+  const start=performance.now();
+  await new Promise(resolve=>{
+    function frame(now){
+      const p=Math.min(1,(now-start)/ms);
+      fill.style.width=(p*100)+'%';
+      if(p<1) requestAnimationFrame(frame); else setTimeout(resolve, FAST?80:450);
+    }
+    requestAnimationFrame(frame);
+  });
+  card.classList.add('complete');
+}
+function addVideoResult(){
+  const pts=C.pts;
+  const body = pts==='high' ? S.highOutcome : S.lowOutcome;
+  const video = pts==='high' ? S.videoHigh : S.videoLow;
+  const box=document.createElement('div'); box.className='video-box';
+  box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div><button class="btn video-confirm" type="button">확인 완료</button>';
+  log.appendChild(box);
+  box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
+  return new Promise(resolve=>{
+    const btn=box.querySelector('.video-confirm');
+    btn.onclick=()=>{
+      btn.disabled=true;
+      btn.textContent='확인됨';
+      resolve();
+    };
+  });
+}
+async function blackTransition(){
+  const b=document.getElementById('blackout'), l1=document.getElementById('line1'), l2=document.getElementById('line2');
+  b.classList.add('show');
+  await delay(900); l1.classList.add('show');
+  await delay(900); l2.classList.add('show');
+  await delay(1300);
+  b.classList.remove('show');
+  await delay(500);
+}
+function articleLinkCard(){
+  const pts=C.pts;
+  const article=S.article[pts];
+  add('sys','3달 후 · Article 앱 알림');
+  const card=document.createElement('div'); card.className='link-card';
+  card.innerHTML='<div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/amily</div>';
+  card.onclick=()=>{location.href=pathTo('article')};
+  log.appendChild(card); scrollBottom();
+  document.getElementById('footerHint').style.display='none';
+  document.getElementById('articleBtn').style.display='';
+  enableWhenScrolledToBottom(document.getElementById('articleBtn'));
+}
+async function run(){
+  add('sys','Video AI 대화 시작');
+  await delay(650);
+
+  await userSay('이건 Amily의 사진이야. 이 사진을 기준으로 영상을 만들어줘.');
+  await showUploadMotion(FAST?500:2400);
+  addPhotoCard();
+  await delay(500);
+  await aiSay('사진 확인했습니다.');
+  await aiSay('이 사진의 얼굴과 분위기를 기준으로 만들게요.');
+
+  await userSay(S.request);
+  await aiSay('좋아요. 영상 방향을 잡겠습니다.');
+  await aiSay(S.aiIntro);
+
+  if(C.aa==='high'){
+    await aiSay('세부 구성은 AI가 자동으로 정했습니다.');
+    await aiSay('이 구성이 최종안입니다. 바로 생성하겠습니다.');
+  }else{
+    for(const step of D.choices.steps){
+      await aiSay(step.q, 420);
+      await showChoices(step.opts);
+      await delay(360);
+      await aiSay(step.ai, 420);
+    }
+    const rev=D.choices.revision;
+    await aiSay(rev.q,420);
+    await showChoices(rev.opts);
+    await delay(360);
+    await aiSay(rev.ai,420);
+    await aiSay('최종 제작 여부를 선택해주세요.',420);
+    await showChoices(D.choices.final);
+    await delay(400);
+    await aiSay('확정했습니다. 이 최종안으로 생성합니다.',420);
+  }
+
+  add('sys','🎬 최종 렌더링 시작');
+  await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:30000));
+  await addVideoResult();
+  await delay(350);
+  await blackTransition();
+  articleLinkCard();
+}
+document.getElementById('articleBtn').onclick=()=>{location.href=pathTo('article')};
+run();
+</script></body></html>
