@@ -3,21 +3,24 @@ function qs(name, fallback=''){
   const u = new URLSearchParams(location.search);
   return u.get(name) || fallback;
 }
+const LANG = ['ko','en','zh'].includes(qs('lang','ko')) ? qs('lang','ko') : 'ko';
 const SCENARIO = qs('s','sns');
 const COND = qs('c','c1');
-const NICK = qs('nick','참가자 닉네임');
+const NICK = qs('nick', window.EXP_UI?.participantNickname || '참가자 닉네임');
 const FAST = qs('fast','') === '1';
 const D = window.EXP_DATA;
+const UI = window.EXP_UI || {};
+document.documentElement.lang = LANG;
 const S = D.scenarios[SCENARIO];
 const C = D.conds[COND];
 // Google Apps Script를 웹앱으로 배포한 뒤, /google_apps_script.gs의 배포 URL을 여기에 넣습니다.
 const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxF-iP-hX1SbjinZX6BO_bHEjXCwejwLxQe4uqs67hLgMutPg3yv5DRGUOvPvd17YP1/exec';
 function enc(v){return encodeURIComponent(v)}
 function pathTo(app){
-  return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}&nick=${enc(NICK)}${FAST?'&fast=1':''}`;
+  return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}&nick=${enc(NICK)}&lang=${enc(LANG)}${FAST?'&fast=1':''}`;
 }
 function rootPath(app,scenario=SCENARIO,cond=COND){
-  return `apps/${app}/${scenario}/index.html?s=${enc(scenario)}&c=${enc(cond)}&nick=${enc(NICK)}${FAST?'&fast=1':''}`;
+  return `apps/${app}/${scenario}/index.html?s=${enc(scenario)}&c=${enc(cond)}&nick=${enc(NICK)}&lang=${enc(LANG)}${FAST?'&fast=1':''}`;
 }
 function delay(ms){ return new Promise(r => setTimeout(r, FAST ? Math.min(ms,120) : ms)); }
 function humanDelay(text, base=420){ return FAST ? 80 : Math.min(1600, base + String(text).length * 28); }

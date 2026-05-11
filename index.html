@@ -3,30 +3,38 @@
 <div class="statusbar"><span>9:41</span><span>AI Video Study</span></div>
 <div class="content">
   <div class="card">
-    <span class="badge">Research Prototype</span>
-    <h1 class="start-title">AI 영상 제작 시뮬레이션</h1>
-    <p class="small">이 실험은 AI 영상 제작 상황에서 사람들이 제작 과정과 결과를 어떻게 느끼는지 알아보기 위한 것입니다.</p>
+    <span class="badge" id="startBadge">Research Prototype</span>
+    <h1 class="start-title" id="startTitle">AI 영상 제작 시뮬레이션</h1>
+    <p class="small" id="startDescription">이 실험은 AI 영상 제작 상황에서 사람들이 제작 과정과 결과를 어떻게 받아들이는지 알아보기 위한 것입니다.</p>
     <div class="guide-list">
-      <div><b>1</b><span>Amily와 대화를 확인합니다.</span></div>
-      <div><b>2</b><span>Video AI에서 영상을 제작하고 최종 선택합니다.</span></div>
-      <div><b>3</b><span>3달 후 전달된 기사 링크를 확인합니다.</span></div>
-      <div><b>4</b><span>사후 설문에 응답합니다.</span></div>
+      <div><b>1</b><span id="guide1"></span></div>
+      <div><b>2</b><span id="guide2"></span></div>
+      <div><b>3</b><span id="guide3"></span></div>
+      <div><b>4</b><span id="guide4"></span></div>
     </div>
   </div>
   <div class="card">
-    <label class="field-label" for="nickInput">참가자 닉네임</label>
-    <input class="text-input" id="nickInput" type="text" maxlength="20" placeholder="예: 민지">
-    <p class="small">입력한 닉네임은 실험 속 메시지에서 참가자를 부르는 용도로만 사용됩니다.</p>
-  </div>
-  <div class="card">
-    <h2 class="card-title">시나리오 선택</h2>
+    <h2 class="card-title" id="languageTitle">언어 선택</h2>
     <div class="cond-row">
-      <button class="option-card active" data-s="dating"><strong>연애 리얼리티 패러디</strong><span>AI 데이팅 쇼 클립</span></button>
-      <button class="option-card" data-s="sns"><strong>SNS 댄스 챌린지</strong><span>AI 댄스 숏폼</span></button>
+      <button class="option-card active" data-lang="ko"><strong>한국어</strong><span>Korean</span></button>
+      <button class="option-card" data-lang="en"><strong>English</strong><span>English</span></button>
+      <button class="option-card" data-lang="zh"><strong>中文</strong><span>Chinese</span></button>
     </div>
   </div>
   <div class="card">
-    <h2 class="card-title">조건 선택</h2>
+    <label class="field-label" for="nickInput" id="nicknameLabel">참가자 닉네임</label>
+    <input class="text-input" id="nickInput" type="text" maxlength="20">
+    <p class="small" id="nicknameHelp"></p>
+  </div>
+  <div class="card">
+    <h2 class="card-title" id="scenarioTitle">시나리오 선택</h2>
+    <div class="cond-row">
+      <button class="option-card active" data-s="dating"><strong id="datingStrong"></strong><span id="datingSub"></span></button>
+      <button class="option-card" data-s="sns"><strong id="snsStrong"></strong><span id="snsSub"></span></button>
+    </div>
+  </div>
+  <div class="card">
+    <h2 class="card-title" id="conditionTitle">조건 선택</h2>
     <div class="cond-row">
       <button class="option-card active" data-c="c1"><strong>C1</strong><span>High AA · High PTS</span></button>
       <button class="option-card" data-c="c2"><strong>C2</strong><span>High AA · Low PTS</span></button>
@@ -34,40 +42,59 @@
       <button class="option-card" data-c="c4"><strong>C4</strong><span>Low AA · Low PTS</span></button>
     </div>
   </div>
-  <div class="card small">테스트용 빠른 재생이 필요하면 시작 전 주소 끝에 <b>?fast=1</b>을 붙이면 됩니다.</div>
+  <div class="card small" id="fastHelp"></div>
 </div>
 <div class="footer"><button class="btn full" id="startBtn">실험 시작하기</button></div>
 </div></div></div>
 <script src="shared/data.js"></script><script>
 let s='dating', c='c1';
-const fast=new URLSearchParams(location.search).get('fast')==='1';
-
-/*
-// 조건 자동 배정 초안: 팀원 공유 준비 전까지는 수동 조건 선택을 유지합니다.
-// Google Sheet의 현재 응답 수를 가져온 뒤, 응답 수가 가장 적은 조건군 중 하나를 무작위 배정합니다.
-async function assignConditionFromResponseCounts(scenario){
-  const res=await fetch(`${GOOGLE_SHEETS_WEB_APP_URL}?mode=counts&scenario=${encodeURIComponent(scenario)}`);
-  const counts=await res.json(); // 예: {c1:3,c2:4,c3:3,c4:5}
-  const min=Math.min(...Object.values(counts));
-  const candidates=Object.keys(counts).filter(key=>counts[key]===min);
-  return candidates[Math.floor(Math.random()*candidates.length)];
+const params=new URLSearchParams(location.search);
+const fast=params.get('fast')==='1';
+const lang=window.EXP_LANG || 'ko';
+const ui=window.EXP_UI;
+document.documentElement.lang=lang;
+function applyLanguage(){
+  startBadge.textContent=ui.start.badge;
+  startTitle.textContent=ui.start.title;
+  startDescription.textContent=ui.start.description;
+  guide1.textContent=ui.start.guide[0];
+  guide2.textContent=ui.start.guide[1];
+  guide3.textContent=ui.start.guide[2];
+  guide4.textContent=ui.start.guide[3];
+  languageTitle.textContent=ui.start.languageTitle;
+  nicknameLabel.textContent=ui.start.nicknameLabel;
+  nickInput.placeholder=ui.start.nicknamePlaceholder;
+  nicknameHelp.textContent=ui.start.nicknameHelp;
+  scenarioTitle.textContent=ui.start.scenarioTitle;
+  datingStrong.textContent=ui.start.scenarioDatingStrong;
+  datingSub.textContent=ui.start.scenarioDatingSub;
+  snsStrong.textContent=ui.start.scenarioSnsStrong;
+  snsSub.textContent=ui.start.scenarioSnsSub;
+  conditionTitle.textContent=ui.start.conditionTitle;
+  fastHelp.innerHTML=ui.start.fastHelp;
+  startBtn.textContent=ui.start.startButton;
 }
-
-// 사용 예시:
-// c = await assignConditionFromResponseCounts(s);
-*/
-
 document.querySelectorAll('[data-s]').forEach(btn=>btn.onclick=()=>{s=btn.dataset.s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')});
 document.querySelectorAll('[data-c]').forEach(btn=>btn.onclick=()=>{c=btn.dataset.c;document.querySelectorAll('[data-c]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')});
+document.querySelectorAll('[data-lang]').forEach(btn=>{
+  btn.classList.toggle('active',btn.dataset.lang===lang);
+  btn.onclick=()=>{
+    const next=new URLSearchParams(location.search);
+    next.set('lang',btn.dataset.lang);
+    if(fast) next.set('fast','1');
+    location.href=`index.html?${next.toString()}`;
+  };
+});
+applyLanguage();
 document.getElementById('startBtn').onclick=()=>{
   const nick=document.getElementById('nickInput').value.trim();
   if(!nick){
-    alert('참가자 닉네임을 입력해주세요.');
+    alert(ui.start.missingNickname);
     document.getElementById('nickInput').focus();
     return;
   }
-  const params=new URLSearchParams({s,c,nick});
-  if(fast) params.set('fast','1');
-  location.href=`apps/messenger/${s}/index.html?${params.toString()}`;
+  const next=new URLSearchParams({s,c,nick,lang});
+  if(fast) next.set('fast','1');
+  location.href=`apps/messenger/${s}/index.html?${next.toString()}`;
 };
 </script></body></html>

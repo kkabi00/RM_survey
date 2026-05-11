@@ -2,15 +2,15 @@
 <div class="survey-page">
   <div class="survey-top">
     <div>
-      <span class="badge">Post-survey</span>
-      <h1>사후 설문</h1>
+      <span class="badge" id="surveyBadge">Post-survey</span>
+      <h1 id="surveyTitle">사후 설문</h1>
       <div class="survey-meta"><span data-scenario-label></span> · <span data-cond-label></span></div>
     </div>
-    <div class="small" style="max-width:360px">실험 관련 문항은 1 = 전혀 아니다, 7 = 매우 그렇다 기준입니다. 각 화면의 문항에 응답한 뒤 다음으로 넘어가 주세요.</div>
+    <div class="small" id="surveyIntro" style="max-width:360px"></div>
   </div>
   <div class="survey-step" id="surveyStep"></div>
   <div id="survey"></div>
-  <div class="survey-actions"><button class="btn" id="nextBtn">다음</button></div>
+  <div class="survey-actions"><button class="btn" id="nextBtn"></button></div>
 </div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const sections=[
@@ -83,10 +83,18 @@ const demographics=[
   {id:'D-11', q:'SNS 숏폼 콘텐츠를 얼마나 자주 시청합니까?', hint:'예: TikTok, YouTube Shorts, Instagram Reels 등. 횟수: 앱을 연 횟수 O, 영상 스크롤 개수 X', opts:['거의 보지 않음 (월 1회 미만)','가끔 봄 (월 1-3회)','보통 수준으로 봄 (주 1-4회)','자주 봄 (하루 1-2회)','매우 자주 봄 (하루 3-10회)','거의 습관적으로 봄 (하루 11회 이상)']},
   {id:'D-12', q:'본인이 직접 SNS 콘텐츠를 제작하거나 업로드하는 빈도는 어느 정도입니까?', hint:'예: 사진, 짧은 영상, 릴스, 쇼츠, 틱톡, 스토리, 게시글 등', opts:['전혀 없음 (0회)','가끔 있음 (월 1회 미만)','보통 수준 (월 1-3회)','자주 있음 (주 1-2회)','매우 자주 있음 (주 3-6회)','거의 매일 (주 7회 이상)']}
 ];
+if(window.EXP_SURVEY){
+  sections.splice(0, sections.length, ...window.EXP_SURVEY.sections);
+  demographics.splice(0, demographics.length, ...window.EXP_SURVEY.demographics);
+}
+document.getElementById('surveyBadge').textContent=UI.survey.badge;
+document.getElementById('surveyTitle').textContent=UI.survey.title;
+document.getElementById('surveyIntro').textContent=UI.survey.intro;
+document.getElementById('nextBtn').textContent=UI.survey.next;
 function likert(name){
-  let html='<div class="likert"><span class="end">전혀<br>아니다</span>';
+  let html='<div class="likert"><span class="end">'+UI.survey.left+'</span>';
   for(let i=1;i<=7;i++) html+=`<label><input type="radio" name="${name}" value="${i}"><span class="circle">${i}</span></label>`;
-  return html+'<span class="end r">매우<br>그렇다</span></div>';
+  return html+'<span class="end r">'+UI.survey.right+'</span></div>';
 }
 const questionMeta=[];
 let q=1;
@@ -107,10 +115,10 @@ function renderSection(){
     const n=start+i;
     html += `<div class="survey-item"><div class="survey-q">Q${n}. ${escapeHtml(item)}</div>${likert('Q'+n)}</div>`;
   });
-  html += '</div><div class="saved" id="saved">응답이 저장되었습니다.</div>';
+  html += '</div><div class="saved" id="saved">'+escapeHtml(UI.survey.saved)+'</div>';
   surveyEl.innerHTML=html;
   surveyStep.textContent=`${sectionIndex+1} / ${sections.length}`;
-  nextBtn.textContent='다음';
+  nextBtn.textContent=UI.survey.next;
   Object.entries(responses).forEach(([name,value])=>{
     const input=document.querySelector(`input[name="${name}"][value="${value}"]`);
     if(input) input.checked=true;
@@ -118,14 +126,14 @@ function renderSection(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function demoOptions(item){
-  return `<select class="demo-select" name="${item.id}"><option value="">선택해주세요</option>${item.opts.map(opt=>`<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('')}</select>`;
+  return `<select class="demo-select" name="${item.id}"><option value="">${escapeHtml(UI.survey.select)}</option>${item.opts.map(opt=>`<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('')}</select>`;
 }
 function renderDemographics(){
   demographicsMode=true;
-  surveyStep.textContent='배경 정보';
-  document.querySelector('.survey-top .badge').textContent='Background';
-  document.querySelector('.survey-top h1').textContent='인구통계학 및 배경 정보';
-  document.querySelector('.survey-top .small').textContent='아래 문항은 분석을 위한 배경 정보입니다. 응답하고 싶지 않음 선택지가 있는 문항은 해당 선택지를 고를 수 있습니다.';
+  surveyStep.textContent=UI.survey.backgroundStep;
+  document.querySelector('.survey-top .badge').textContent=UI.survey.backgroundBadge;
+  document.querySelector('.survey-top h1').textContent=UI.survey.backgroundTitle;
+  document.querySelector('.survey-top .small').textContent=UI.survey.backgroundIntro;
   let html='<div class="demographics-panel">';
   demographics.forEach(item=>{
     html += `<div class="demo-item"><div class="demo-q"><b>${item.id}</b><span>${escapeHtml(item.q)}</span></div>`;
@@ -137,9 +145,9 @@ function renderDemographics(){
     }
     html += '</div>';
   });
-  html += '</div><div class="followup-panel"><label class="field-label" for="resultEmail">연구 결과가 궁금하시다면 (약 5개월 이상 소요 가능) 이메일을 남겨주세요:</label><input class="text-input" id="resultEmail" type="email" placeholder="email@example.com"></div><div class="saved" id="saved">참여해주셔서 감사합니다.</div>';
+  html += '</div><div class="followup-panel"><label class="field-label" for="resultEmail">'+escapeHtml(UI.survey.emailLabel)+'</label><input class="text-input" id="resultEmail" type="email" placeholder="email@example.com"></div><div class="saved" id="saved">'+escapeHtml(UI.survey.thanks)+'</div>';
   surveyEl.innerHTML=html;
-  nextBtn.textContent='응답 제출하기';
+  nextBtn.textContent=UI.survey.submit;
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function collectCurrent(){
@@ -158,21 +166,21 @@ function currentComplete(){
 function demographicsComplete(){
   const year=document.getElementById('D-1-year').value.trim();
   if(!/^(19|20)\d{2}$/.test(year)){
-    alert('D-1 출생연도를 YYYY 형식으로 입력해주세요.');
+    alert(UI.survey.invalidYear);
     return false;
   }
   demoResponses['D-1']=year;
   for(const item of demographics.filter(d=>d.type!=='year')){
     const selected=document.querySelector(`select[name="${item.id}"]`);
     if(!selected || !selected.value){
-      alert(`${item.id} 문항에 응답해주세요.`);
+      alert(UI.survey.missingDemo.replace('{id}',item.id));
       return false;
     }
     demoResponses[item.id]=selected.value;
   }
   const email=document.getElementById('resultEmail').value.trim();
   if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    alert('이메일 형식을 확인해주세요.');
+    alert(UI.survey.invalidEmail);
     return false;
   }
   demoResponses['result_email']=email;
@@ -184,15 +192,16 @@ async function saveSurvey(){
   questionMeta.forEach(meta=>answers[meta.name]=responses[meta.name]||'');
   demographics.forEach(item=>answers[item.id]=demoResponses[item.id]||'');
   answers.result_email=demoResponses.result_email||'';
-  const header=['submitted_at','scenario','scenario_label','condition','condition_label','nickname'].concat(Object.keys(answers));
+  const header=['submitted_at','language','scenario','scenario_label','condition','condition_label','nickname'].concat(Object.keys(answers));
   const submittedAt=new Date().toISOString();
-  const wideRow=[submittedAt,SCENARIO,S.label,COND,C.name,NICK].concat(Object.keys(answers).map(key=>answers[key]));
+  const wideRow=[submittedAt,LANG,SCENARIO,S.label,COND,C.name,NICK].concat(Object.keys(answers).map(key=>answers[key]));
   const csv=[header,wideRow].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const saved=document.getElementById('saved');
   nextBtn.disabled=true;
-  nextBtn.textContent='제출 중...';
+  nextBtn.textContent=UI.survey.submitting;
   const payload={
     submittedAt,
+    language:LANG,
     scenario:SCENARIO,
     scenarioLabel:S.label,
     condition:COND,
@@ -207,19 +216,19 @@ async function saveSurvey(){
   try{
     const result=await postSurveyToGoogleSheet(payload);
     if(result.ok){
-      saved.textContent='참여해주셔서 감사합니다.';
+      saved.textContent=UI.survey.thanks;
     }else{
       downloadCsvFile(csv, `response_${SCENARIO}_${COND}.csv`);
-      saved.textContent='참여해주셔서 감사합니다. Google Sheet 저장 URL이 설정되지 않아 CSV 파일로 다운로드했습니다.';
+      saved.textContent=UI.survey.csvFallback;
     }
   }catch(err){
     downloadCsvFile(csv, `response_${SCENARIO}_${COND}.csv`);
-    saved.textContent='참여해주셔서 감사합니다. Google Sheet 저장에 실패해 CSV 백업 파일을 다운로드했습니다.';
+    saved.textContent=UI.survey.csvError;
   }
   saved.style.display='block';
   submitted=true;
   nextBtn.disabled=true;
-  nextBtn.textContent='제출 완료';
+  nextBtn.textContent=UI.survey.submitted;
 }
 nextBtn.onclick=()=>{
   if(demographicsMode){
@@ -227,7 +236,7 @@ nextBtn.onclick=()=>{
     return;
   }
   if(!currentComplete()){
-    alert('현재 화면의 모든 문항에 응답한 뒤 다음으로 넘어가 주세요.');
+    alert(UI.survey.missingCurrent);
     return;
   }
   if(sectionIndex<sections.length-1){

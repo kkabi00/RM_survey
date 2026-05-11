@@ -3,12 +3,16 @@
 <div class="statusbar"><span>9:41</span><span>Video AI</span></div>
 <div class="app-header"><div class="app-icon">✦</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span> · <span data-cond-label></span></div></div><div class="progress">2 / 4</div></div>
 <div class="content"><div class="ai-log" id="log"></div></div>
-<div class="footer" id="footer"><div class="hint" id="footerHint">콘텐츠가 끝까지 표시되면 다음 단계로 넘어갈 수 있습니다.</div><button class="btn full" id="articleBtn" style="display:none">기사 열기</button></div>
+<div class="footer" id="footer"><div class="hint" id="footerHint"></div><button class="btn full" id="articleBtn" style="display:none"></button></div>
 </div></div></div>
-<div class="blackout" id="blackout"><div class="dots">...</div><div class="line" id="line1">만들어진 영상이 SNS에 공유되고</div><div class="line" id="line2">3달 후…</div></div>
+<div class="blackout" id="blackout"><div class="dots">...</div><div class="line" id="line1"></div><div class="line" id="line2"></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const log=document.getElementById('log');
 const BASE_PHOTO='../../../images/amily.png';
+document.getElementById('footerHint').textContent=UI.video.footerHint;
+document.getElementById('articleBtn').textContent=UI.video.articleButton;
+document.getElementById('line1').textContent=UI.video.sharedLine;
+document.getElementById('line2').textContent=UI.video.afterLine;
 
 function add(type, html){
   const el=document.createElement('div');
@@ -31,12 +35,12 @@ async function userSay(text, ms=520){
 }
 function addPhotoCard(){
   const card=document.createElement('div'); card.className='photo-upload-card';
-  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="Amily 사진" onerror="this.remove(); this.parentNode.innerHTML=\'Amily 사진\';"></div><div class="file-name">amily.png</div>';
+  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">amily.png</div>';
   log.appendChild(card); scrollBottom();
 }
 async function showUploadMotion(ms){
   const card=document.createElement('div'); card.className='upload-card';
-  card.innerHTML='<div class="upload-title">사진 업로드 중...</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">amily.png</div>';
+  card.innerHTML='<div class="upload-title">'+escapeHtml(UI.video.uploading)+'</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">amily.png</div>';
   log.appendChild(card); scrollBottom();
   const fill=card.querySelector('.upload-fill');
   const start=performance.now();
@@ -49,7 +53,7 @@ async function showUploadMotion(ms){
     requestAnimationFrame(frame);
   });
   card.classList.add('complete');
-  card.querySelector('.upload-title').textContent='사진 업로드 완료';
+  card.querySelector('.upload-title').textContent=UI.video.uploaded;
   await delay(450);
 }
 function showChoices(opts){
@@ -66,7 +70,7 @@ function showChoices(opts){
 }
 function showFinalVideoChoice(){
   return new Promise(resolve=>{
-    const text='이 영상으로 최종 선택할게.';
+    const text=UI.video.finalChoice;
     const row=document.createElement('div'); row.className='choice-row';
     const btn=document.createElement('button'); btn.className='choice-btn';
     btn.textContent=text;
@@ -83,7 +87,7 @@ function showFinalVideoChoice(){
 }
 async function showRender(ms){
   const card=document.createElement('div'); card.className='render-card';
-  card.innerHTML='<div class="render-title">영상 제작 중...</div><div class="render-track"><div class="render-fill" id="fill"></div></div>';
+  card.innerHTML='<div class="render-title">'+escapeHtml(UI.video.rendering)+'</div><div class="render-track"><div class="render-fill" id="fill"></div></div>';
   log.appendChild(card); scrollBottom();
   const fill=card.querySelector('#fill');
   const start=performance.now();
@@ -104,7 +108,7 @@ function addVideoResult(){
   const box=document.createElement('div'); box.className='video-box';
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
   if(C.aa==='high'){
-    box.innerHTML+='<button class="btn video-next" type="button">영상 재생 및 확인 완료</button>';
+    box.innerHTML+='<button class="btn video-next" type="button">'+escapeHtml(UI.video.videoDone)+'</button>';
   }
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
@@ -113,7 +117,7 @@ function addVideoResult(){
       const btn=box.querySelector('.video-next');
       btn.onclick=()=>{
         btn.disabled=true;
-        btn.textContent='확인 완료';
+        btn.textContent=UI.video.done;
         resolve();
       };
     });
@@ -146,37 +150,38 @@ async function amilySayArticle(html, delayText){
 async function articleLinkCard(){
   const pts=C.pts;
   const article=S.article[pts];
-  const nickname=qs('nick','참가자 닉네임');
+  const nickname=qs('nick',UI.participantNickname);
   log.innerHTML='';
   document.querySelector('.statusbar span:last-child').textContent='Talk';
   document.querySelector('.app-icon').textContent='A';
   document.querySelector('.app-title').textContent='Talk';
   document.querySelector('.app-subtitle').textContent='Amily';
   document.querySelector('.progress').textContent='3 / 4';
-  await amilySayArticle('<div class="article-text">대박 대박!! '+escapeHtml(nickname)+'!</div>', '대박 대박!! '+nickname+'!');
-  const msg=await amilySayArticle('<div class="article-text">나 기사났어!! 대박!</div><div class="link-card"><div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/amily</div></div>', '나 기사났어!! 대박!');
+  const greeting=UI.video.articleGreeting.replace('{nick}',nickname);
+  await amilySayArticle('<div class="article-text">'+escapeHtml(greeting)+'</div>', greeting);
+  const msg=await amilySayArticle('<div class="article-text">'+escapeHtml(UI.video.articleNews)+'</div><div class="link-card"><div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/amily</div></div>', UI.video.articleNews);
   msg.querySelector('.link-card').onclick=()=>{location.href=pathTo('article')};
-  add('sys','Amily가 보낸 기사 링크를 눌러 다음 단계로 이동해주세요.');
-  document.getElementById('footerHint').textContent='Amily가 보낸 기사 링크를 눌러 다음 단계로 이동해주세요.';
+  add('sys',escapeHtml(UI.video.articleInstruction));
+  document.getElementById('footerHint').textContent=UI.video.articleInstruction;
 }
 async function run(){
-  add('sys','Video AI 대화 시작');
+  add('sys',escapeHtml(UI.video.start));
   await delay(650);
 
-  await userSay('이건 Amily의 사진이야. 이 사진을 기준으로 영상을 만들어줘.');
+  await userSay(UI.video.photoRequest);
   await showUploadMotion(FAST?500:2400);
   addPhotoCard();
   await delay(500);
-  await aiSay('사진 확인했습니다.');
-  await aiSay('이 사진의 얼굴과 분위기를 기준으로 만들게요.');
+  await aiSay(UI.video.photoChecked);
+  await aiSay(UI.video.photoBase);
 
   await userSay(S.request);
-  await aiSay('좋아요. 영상 방향을 잡겠습니다.');
+  await aiSay(UI.video.direction);
   await aiSay(S.aiIntro);
 
   if(C.aa==='high'){
-    await aiSay('세부 구성은 AI가 자동으로 정했습니다.');
-    await aiSay('이 구성이 최종안입니다. 바로 생성하겠습니다.');
+    await aiSay(UI.video.auto1);
+    await aiSay(UI.video.auto2);
   }else{
     for(const step of D.choices.steps){
       await aiSay(step.q, 420);
@@ -189,20 +194,20 @@ async function run(){
     await showChoices(rev.opts);
     await delay(360);
     await aiSay(rev.ai,420);
-    await aiSay('이 구성으로 영상을 생성하겠습니다.',420);
+    await aiSay(UI.video.generate,420);
   }
 
-  add('sys','🎬 최종 렌더링 시작');
+  add('sys','🎬 '+escapeHtml(UI.video.renderStart));
   await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:30000));
   if(C.aa==='high'){
     await addVideoResult();
   }else{
     addVideoResult();
     await delay(500);
-    await aiSay('최종 제작 여부를 선택해주세요.',420);
+    await aiSay(UI.video.chooseFinal,420);
     await showFinalVideoChoice();
     await delay(400);
-    await aiSay('확인했습니다. 이 영상을 최종본으로 저장하겠습니다.',420);
+    await aiSay(UI.video.savedFinal,420);
   }
   await delay(350);
   await blackTransition();

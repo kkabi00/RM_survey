@@ -3,9 +3,11 @@
 <div class="statusbar"><span>9:41</span><span>Talk</span></div>
 <div class="app-header"><div class="app-icon">T</div><div><div class="app-title">Talk</div><div class="app-subtitle">Amily</div></div><div class="progress">1 / 4</div></div>
 <div class="content"><div class="chat-list" id="chat"></div></div>
-<div class="footer"><div class="hint" id="footerHint">대화가 끝나면 다음 단계로 넘어갈 수 있습니다.</div><button class="btn full" id="nextBtn" style="display:none">Video AI 열기</button></div>
+<div class="footer"><div class="hint" id="footerHint"></div><button class="btn full" id="nextBtn" style="display:none"></button></div>
 </div></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
+document.getElementById('footerHint').textContent=UI.talk.footerHint;
+document.getElementById('nextBtn').textContent=UI.talk.nextButton;
 function addMsg(type, text){
   const row=document.createElement('div'); row.className='msg-row '+(type==='user'?'user':'');
   if(type==='friend'){

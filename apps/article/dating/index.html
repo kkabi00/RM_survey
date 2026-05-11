@@ -3,29 +3,28 @@
 <div class="statusbar"><span>9:41</span><span>Article</span></div>
 <div class="app-header"><div class="app-icon">N</div><div><div class="app-title">Article</div><div class="app-subtitle">The Culture Times</div></div><div class="progress">3 / 4</div></div>
 <div class="content" style="padding:0"><div class="article-wrap" id="article"></div></div>
-<div class="footer"><button class="btn full" id="surveyBtn">사후 설문으로 이동</button></div>
+<div class="footer"><button class="btn full" id="surveyBtn"></button></div>
 </div></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const A=S.article[C.pts];
 const articleImage=`../../../images/${C.pts} PTS 1.png`;
-const articleCaption=C.pts==='high'
-  ? 'AI dating-show clip remembered for its awkward final-selection scene.'
-  : 'AI dating-show clip shared as a friendly reality-show style moment.';
+const articleCaption=C.pts==='high' ? UI.article.captionDatingHigh : UI.article.captionDatingLow;
 const el=document.getElementById('article');
 el.innerHTML = `
   <div class="masthead">The Culture Times</div>
   <div class="article-kicker">${escapeHtml(A.kicker)}</div>
   <h1 class="article-title">${escapeHtml(A.title)}</h1>
   <div class="article-sub">${escapeHtml(A.sub)}</div>
-  <div class="byline">By Culture Desk · 3 months after the video was posted</div>
+  <div class="byline">${escapeHtml(UI.article.byline)}</div>
   <figure class="article-photo">
     <img src="${articleImage}" alt="Amily AI video still">
     <figcaption>${escapeHtml(articleCaption)}</figcaption>
   </figure>
   <div class="article-body">${A.body.map(p=>`<p>${escapeHtml(p)}</p>`).join('')}</div>
   <div class="quote">${escapeHtml(A.quote)}</div>
-  <div class="comments"><h3>Reader Comments</h3>${A.comments.map(c=>`<div class="comment"><div class="name">${escapeHtml(c[0])}</div><div class="text">${escapeHtml(c[1])}</div></div>`).join('')}</div>
+  <div class="comments"><h3>${escapeHtml(UI.article.comments)}</h3>${A.comments.map(c=>`<div class="comment"><div class="name">${escapeHtml(c[0])}</div><div class="text">${escapeHtml(c[1])}</div></div>`).join('')}</div>
 `;
+document.getElementById('surveyBtn').textContent=UI.article.surveyButton;
 document.getElementById('surveyBtn').onclick=()=>{location.href=pathTo('survey')};
 enableWhenScrolledToBottom(document.getElementById('surveyBtn'));
 </script></body></html>
