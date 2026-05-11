@@ -64,6 +64,23 @@ function showChoices(opts){
     log.appendChild(row); scrollBottom();
   });
 }
+function showFinalVideoChoice(){
+  return new Promise(resolve=>{
+    const text='이 영상으로 최종 선택할게.';
+    const row=document.createElement('div'); row.className='choice-row';
+    const btn=document.createElement('button'); btn.className='choice-btn';
+    btn.textContent=text;
+    btn.onclick=async ()=>{
+      row.classList.add('disabled');
+      btn.classList.add('selected');
+      await delay(FAST?80:350);
+      await userSay(text, 420);
+      resolve(text);
+    };
+    row.appendChild(btn);
+    log.appendChild(row); scrollBottom();
+  });
+}
 async function showRender(ms){
   const card=document.createElement('div'); card.className='render-card';
   card.innerHTML='<div class="render-title">영상 제작 중...</div><div class="render-track"><div class="render-fill" id="fill"></div></div>';
@@ -85,17 +102,9 @@ function addVideoResult(){
   const body = pts==='high' ? S.highOutcome : S.lowOutcome;
   const video = pts==='high' ? S.videoHigh : S.videoLow;
   const box=document.createElement('div'); box.className='video-box';
-  box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div><button class="btn video-confirm" type="button">확인 완료</button>';
+  box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
-  return new Promise(resolve=>{
-    const btn=box.querySelector('.video-confirm');
-    btn.onclick=()=>{
-      btn.disabled=true;
-      btn.textContent='확인됨';
-      resolve();
-    };
-  });
 }
 async function blackTransition(){
   const b=document.getElementById('blackout'), l1=document.getElementById('line1'), l2=document.getElementById('line2');
@@ -106,17 +115,36 @@ async function blackTransition(){
   b.classList.remove('show');
   await delay(500);
 }
-function articleLinkCard(){
+function addArticleTyping(){
+  const msg=document.createElement('div'); msg.className='article-message';
+  msg.innerHTML='<div class="avatar">A</div><div class="article-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  log.appendChild(msg); scrollBottom(); return msg;
+}
+function addArticleMessage(html){
+  const msg=document.createElement('div'); msg.className='article-message';
+  msg.innerHTML='<div class="avatar">A</div><div class="article-bubble">'+html+'</div>';
+  log.appendChild(msg); scrollBottom(); return msg;
+}
+async function amilySayArticle(html, delayText){
+  const t=addArticleTyping(); await delay(humanDelay(delayText, 620)); t.remove();
+  const msg=addArticleMessage(html); await delay(520);
+  return msg;
+}
+async function articleLinkCard(){
   const pts=C.pts;
   const article=S.article[pts];
-  add('sys','3달 후 · Article 앱 알림');
-  const card=document.createElement('div'); card.className='link-card';
-  card.innerHTML='<div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/amily</div>';
-  card.onclick=()=>{location.href=pathTo('article')};
-  log.appendChild(card); scrollBottom();
-  document.getElementById('footerHint').style.display='none';
-  document.getElementById('articleBtn').style.display='';
-  enableWhenScrolledToBottom(document.getElementById('articleBtn'));
+  const nickname=qs('nick','참가자 닉네임');
+  log.innerHTML='';
+  document.querySelector('.statusbar span:last-child').textContent='Talk';
+  document.querySelector('.app-icon').textContent='A';
+  document.querySelector('.app-title').textContent='Talk';
+  document.querySelector('.app-subtitle').textContent='Amily';
+  document.querySelector('.progress').textContent='3 / 4';
+  await amilySayArticle('<div class="article-text">대박 대박!! '+escapeHtml(nickname)+'!</div>', '대박 대박!! '+nickname+'!');
+  const msg=await amilySayArticle('<div class="article-text">나 기사났어!! 대박!</div><div class="link-card"><div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/amily</div></div>', '나 기사났어!! 대박!');
+  msg.querySelector('.link-card').onclick=()=>{location.href=pathTo('article')};
+  add('sys','Amily가 보낸 기사 링크를 눌러 다음 단계로 이동해주세요.');
+  document.getElementById('footerHint').textContent='Amily가 보낸 기사 링크를 눌러 다음 단계로 이동해주세요.';
 }
 async function run(){
   add('sys','Video AI 대화 시작');
@@ -148,18 +176,20 @@ async function run(){
     await showChoices(rev.opts);
     await delay(360);
     await aiSay(rev.ai,420);
-    await aiSay('최종 제작 여부를 선택해주세요.',420);
-    await showChoices(D.choices.final);
-    await delay(400);
-    await aiSay('확정했습니다. 이 최종안으로 생성합니다.',420);
+    await aiSay('이 구성으로 영상을 생성하겠습니다.',420);
   }
 
   add('sys','🎬 최종 렌더링 시작');
   await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:30000));
-  await addVideoResult();
+  addVideoResult();
+  await delay(500);
+  await aiSay('최종 제작 여부를 선택해주세요.',420);
+  await showFinalVideoChoice();
+  await delay(400);
+  await aiSay('확정했습니다. 이 영상을 최종본으로 저장하겠습니다.',420);
   await delay(350);
   await blackTransition();
-  articleLinkCard();
+  await articleLinkCard();
 }
 document.getElementById('articleBtn').onclick=()=>{location.href=pathTo('article')};
 run();

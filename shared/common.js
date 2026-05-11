@@ -5,16 +5,17 @@ function qs(name, fallback=''){
 }
 const SCENARIO = qs('s','sns');
 const COND = qs('c','c1');
+const NICK = qs('nick','참가자 닉네임');
 const FAST = qs('fast','') === '1';
 const D = window.EXP_DATA;
 const S = D.scenarios[SCENARIO];
 const C = D.conds[COND];
 function enc(v){return encodeURIComponent(v)}
 function pathTo(app){
-  return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}${FAST?'&fast=1':''}`;
+  return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}&nick=${enc(NICK)}${FAST?'&fast=1':''}`;
 }
 function rootPath(app,scenario=SCENARIO,cond=COND){
-  return `apps/${app}/${scenario}/index.html?s=${enc(scenario)}&c=${enc(cond)}${FAST?'&fast=1':''}`;
+  return `apps/${app}/${scenario}/index.html?s=${enc(scenario)}&c=${enc(cond)}&nick=${enc(NICK)}${FAST?'&fast=1':''}`;
 }
 function delay(ms){ return new Promise(r => setTimeout(r, FAST ? Math.min(ms,120) : ms)); }
 function humanDelay(text, base=420){ return FAST ? 80 : Math.min(1600, base + String(text).length * 28); }
