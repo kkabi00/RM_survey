@@ -180,23 +180,28 @@ function demographicsComplete(){
 }
 async function saveSurvey(){
   if(submitted) return;
-  const rows=[['scenario',SCENARIO],['condition',COND],['condition_label',C.name],['nickname',NICK],[],['question','section','value']];
-  questionMeta.forEach(meta=>rows.push([meta.name, meta.section, responses[meta.name]||'']));
-  demographics.forEach(item=>rows.push([item.id, 'Demographics / Background', demoResponses[item.id]||'']));
-  rows.push(['result_email', 'Follow-up Contact', demoResponses.result_email||'']);
-  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const answers={};
+  questionMeta.forEach(meta=>answers[meta.name]=responses[meta.name]||'');
+  demographics.forEach(item=>answers[item.id]=demoResponses[item.id]||'');
+  answers.result_email=demoResponses.result_email||'';
+  const header=['submitted_at','scenario','scenario_label','condition','condition_label','nickname'].concat(Object.keys(answers));
+  const submittedAt=new Date().toISOString();
+  const wideRow=[submittedAt,SCENARIO,S.label,COND,C.name,NICK].concat(Object.keys(answers).map(key=>answers[key]));
+  const csv=[header,wideRow].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const saved=document.getElementById('saved');
   nextBtn.disabled=true;
   nextBtn.textContent='제출 중...';
   const payload={
-    submittedAt:new Date().toISOString(),
+    submittedAt,
     scenario:SCENARIO,
     scenarioLabel:S.label,
     condition:COND,
     conditionLabel:C.name,
     nickname:NICK,
     followupEmail:demoResponses.result_email||'',
-    rows:rows.filter(row=>row.length===3 && row[0]!=='question'),
+    answers,
+    header,
+    wideRow,
     csv
   };
   try{

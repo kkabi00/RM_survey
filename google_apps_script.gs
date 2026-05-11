@@ -1,11 +1,12 @@
-const SHEET_NAME = 'responses';
+const SHEET_NAME = 'responses_wide';
 
 function doPost(e) {
   const payload = JSON.parse(e.postData.contents || '{}');
   const sheet = getResponseSheet_();
   ensureHeader_(sheet);
 
-  const base = [
+  const answers = payload.answers || rowsToAnswers_(payload.rows || []);
+  const row = [
     payload.submittedAt || new Date().toISOString(),
     payload.scenario || '',
     payload.scenarioLabel || '',
@@ -14,13 +15,10 @@ function doPost(e) {
     payload.nickname || ''
   ];
 
-  (payload.rows || []).forEach(function(row) {
-    sheet.appendRow(base.concat([
-      row[0] || '',
-      row[1] || '',
-      row[2] || ''
-    ]));
+  getAnswerKeys_().forEach(function(key) {
+    row.push(answers[key] || '');
   });
+  sheet.appendRow(row);
 
   return ContentService
     .createTextOutput(JSON.stringify({ok: true}))
@@ -40,12 +38,9 @@ function doGet(e) {
   ensureHeader_(sheet);
   const values = sheet.getDataRange().getValues();
   const counts = {c1: 0, c2: 0, c3: 0, c4: 0};
-  const seen = {};
 
   for (var i = 1; i < values.length; i++) {
-    const key = [values[i][0], values[i][3], values[i][5]].join('|');
-    if (!seen[key] && values[i][1] === scenario && counts.hasOwnProperty(values[i][3])) {
-      seen[key] = true;
+    if (values[i][1] === scenario && counts.hasOwnProperty(values[i][3])) {
       counts[values[i][3]]++;
     }
   }
@@ -68,9 +63,22 @@ function ensureHeader_(sheet) {
     'scenario_label',
     'condition',
     'condition_label',
-    'nickname',
-    'question',
-    'section',
-    'value'
-  ]);
+    'nickname'
+  ].concat(getAnswerKeys_()));
+}
+
+function getAnswerKeys_() {
+  const keys = [];
+  for (var i = 1; i <= 27; i++) keys.push('Q' + i);
+  for (var d = 1; d <= 12; d++) keys.push('D-' + d);
+  keys.push('result_email');
+  return keys;
+}
+
+function rowsToAnswers_(rows) {
+  const answers = {};
+  rows.forEach(function(row) {
+    if (row && row.length >= 3) answers[row[0]] = row[2];
+  });
+  return answers;
 }
