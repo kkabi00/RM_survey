@@ -8,9 +8,8 @@
     <div class="guide-list">
       <div><b>1</b><span id="guide1"></span></div>
       <div><b>2</b><span id="guide2"></span></div>
-      <div><b>3</b><span id="guide3"></span></div>
-      <div><b>4</b><span id="guide4"></span></div>
     </div>
+    <p class="small" id="privacyNote"></p>
   </div>
   <div class="card">
     <h2 class="card-title" id="languageTitle"></h2>
@@ -18,18 +17,6 @@
       <button class="option-card active" data-lang="ko"><strong>한국어</strong><span>Korean</span></button>
       <button class="option-card" data-lang="en"><strong>English</strong><span>English</span></button>
       <button class="option-card" data-lang="zh"><strong>中文</strong><span>Chinese</span></button>
-    </div>
-  </div>
-  <div class="card">
-    <label class="field-label" for="nickInput" id="nicknameLabel">참가자 닉네임</label>
-    <input class="text-input" id="nickInput" type="text" maxlength="20">
-    <p class="small" id="nicknameHelp"></p>
-  </div>
-  <div class="card">
-    <h2 class="card-title" id="scenarioTitle">시나리오 선택</h2>
-    <div class="cond-row">
-      <button class="option-card" data-s="dating"><strong id="datingStrong"></strong><span id="datingSub"></span></button>
-      <button class="option-card active" data-s="sns"><strong id="snsStrong"></strong><span id="snsSub"></span></button>
     </div>
   </div>
   <div class="card">
@@ -45,7 +32,6 @@
 <div class="footer"><button class="btn full" id="startBtn"></button></div>
 </div></div></div>
 <script src="shared/data.js"></script><script>
-let s='sns';
 const params=new URLSearchParams(location.search);
 const fast=params.get('fast')==='1';
 const lang=window.EXP_LANG || 'ko';
@@ -58,24 +44,11 @@ function applyLanguage(){
   startDescription.textContent=ui.start.description;
   guide1.textContent=ui.start.guide[0];
   guide2.textContent=ui.start.guide[1];
-  guide3.textContent=ui.start.guide[2];
-  guide4.textContent=ui.start.guide[3];
+  privacyNote.textContent=ui.start.privacy||'';
   languageTitle.textContent=ui.start.languageTitle;
-  nicknameLabel.textContent=ui.start.nicknameLabel;
-  nickInput.placeholder=ui.start.nicknamePlaceholder;
-  nicknameHelp.textContent=ui.start.nicknameHelp;
-  scenarioTitle.textContent=ui.start.scenarioTitle;
-  datingStrong.textContent=ui.start.scenarioDatingStrong;
-  datingSub.textContent=ui.start.scenarioDatingSub;
-  snsStrong.textContent=ui.start.scenarioSnsStrong;
-  snsSub.textContent=ui.start.scenarioSnsSub;
   conditionTitle.textContent=ui.start.conditionTitle;
   startBtn.textContent=ui.start.startButton;
 }
-document.querySelectorAll('[data-s]').forEach(btn=>{
-  btn.classList.toggle('active',btn.dataset.s===s);
-  btn.onclick=()=>{s=btn.dataset.s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')};
-});
 document.querySelectorAll('[data-c]').forEach(btn=>{
   btn.classList.toggle('active',btn.dataset.c===selectedCondition);
   btn.onclick=()=>{
@@ -96,9 +69,8 @@ document.querySelectorAll('[data-lang]').forEach(btn=>{
 });
 applyLanguage();
 document.getElementById('startBtn').onclick=()=>{
-  const nick=nickInput.value.trim() || (ui.start.missingNickname || 'creator');
-  const next=new URLSearchParams({s,c:selectedCondition,nick,lang});
+  const next=new URLSearchParams({s:'sns',c:selectedCondition,nick:'creator',lang});
   if(fast) next.set('fast','1');
-  location.href=`apps/video_ai/sns/index.html?${next.toString()}`;
+  location.href=`apps/messenger/sns/index.html?${next.toString()}`;
 };
 </script></body></html>
