@@ -3,79 +3,96 @@
 <div class="statusbar"><span>9:41</span><span>AI Video Study</span></div>
 <div class="content">
   <div class="card">
-    <span class="badge" id="startBadge">Research Prototype</span>
-    <h1 class="start-title" id="startTitle">AI 영상 제작 시뮬레이션</h1>
-    <p class="small" id="startDescription">이 실험은 AI 영상 제작 상황에서 사람들이 제작 과정과 결과를 어떻게 받아들이는지 알아보기 위한 것입니다.</p>
+    <h1 class="start-title" id="startTitle"></h1>
+    <p class="small" id="startDescription"></p>
     <div class="guide-list">
       <div><b>1</b><span id="guide1"></span></div>
       <div><b>2</b><span id="guide2"></span></div>
-      <div><b>3</b><span id="guide3"></span></div>
-      <div><b>4</b><span id="guide4"></span></div>
+      <div class="notice"><b>※</b><span id="guide3"></span></div>
     </div>
   </div>
   <div class="card">
-    <h2 class="card-title" id="languageTitle">언어 선택</h2>
-    <div class="cond-row">
+    <h2 class="card-title" id="languageTitle"></h2>
+    <div class="cond-row language-row">
       <button class="option-card active" data-lang="ko"><strong>한국어</strong><span>Korean</span></button>
       <button class="option-card" data-lang="en"><strong>English</strong><span>English</span></button>
       <button class="option-card" data-lang="zh"><strong>中文</strong><span>Chinese</span></button>
     </div>
   </div>
-  <div class="card">
-    <label class="field-label" for="nickInput" id="nicknameLabel">참가자 닉네임</label>
-    <input class="text-input" id="nickInput" type="text" maxlength="20">
-    <p class="small" id="nicknameHelp"></p>
-  </div>
-  <div class="card">
-    <h2 class="card-title" id="scenarioTitle">시나리오 선택</h2>
+  <div class="card test-card">
+    <h2 class="card-title">테스트 조건 선택</h2>
     <div class="cond-row">
-      <button class="option-card active" data-s="dating"><strong id="datingStrong"></strong><span id="datingSub"></span></button>
-      <button class="option-card" data-s="sns"><strong id="snsStrong"></strong><span id="snsSub"></span></button>
+      <button class="option-card active" data-c="auto"><strong>자동</strong><span>응답 수 기준 배정</span></button>
+      <button class="option-card" data-c="c1"><strong>C1</strong><span>High AA x High PTS</span></button>
+      <button class="option-card" data-c="c2"><strong>C2</strong><span>High AA x Low PTS</span></button>
+      <button class="option-card" data-c="c3"><strong>C3</strong><span>Low AA x High PTS</span></button>
+      <button class="option-card" data-c="c4"><strong>C4</strong><span>Low AA x Low PTS</span></button>
     </div>
   </div>
-  <div class="card">
-    <h2 class="card-title" id="conditionTitle">조건 선택</h2>
-    <div class="cond-row">
-      <button class="option-card active" data-c="c1"><strong>C1</strong><span>High AA · High PTS</span></button>
-      <button class="option-card" data-c="c2"><strong>C2</strong><span>High AA · Low PTS</span></button>
-      <button class="option-card" data-c="c3"><strong>C3</strong><span>Low AA · High PTS</span></button>
-      <button class="option-card" data-c="c4"><strong>C4</strong><span>Low AA · Low PTS</span></button>
-    </div>
-  </div>
-  <div class="card small" id="fastHelp"></div>
 </div>
-<div class="footer"><button class="btn full" id="startBtn">실험 시작하기</button></div>
+<div class="footer"><button class="btn full" id="startBtn"></button></div>
 </div></div></div>
 <script src="shared/data.js"></script><script>
-let s='dating', c='c1';
+let s='sns';
 const params=new URLSearchParams(location.search);
+let selectedCondition=params.get('c') || 'auto';
 const fast=params.get('fast')==='1';
 const lang=window.EXP_LANG || 'ko';
 const ui=window.EXP_UI;
+const GOOGLE_SHEETS_WEB_APP_URL='https://script.google.com/macros/s/AKfycbxF-iP-hX1SbjinZX6BO_bHEjXCwejwLxQe4uqs67hLgMutPg3yv5DRGUOvPvd17YP1/exec';
 document.documentElement.lang=lang;
+
 function applyLanguage(){
-  startBadge.textContent=ui.start.badge;
   startTitle.textContent=ui.start.title;
   startDescription.textContent=ui.start.description;
   guide1.textContent=ui.start.guide[0];
   guide2.textContent=ui.start.guide[1];
   guide3.textContent=ui.start.guide[2];
-  guide4.textContent=ui.start.guide[3];
   languageTitle.textContent=ui.start.languageTitle;
-  nicknameLabel.textContent=ui.start.nicknameLabel;
-  nickInput.placeholder=ui.start.nicknamePlaceholder;
-  nicknameHelp.textContent=ui.start.nicknameHelp;
-  scenarioTitle.textContent=ui.start.scenarioTitle;
-  datingStrong.textContent=ui.start.scenarioDatingStrong;
-  datingSub.textContent=ui.start.scenarioDatingSub;
-  snsStrong.textContent=ui.start.scenarioSnsStrong;
-  snsSub.textContent=ui.start.scenarioSnsSub;
-  conditionTitle.textContent=ui.start.conditionTitle;
-  fastHelp.innerHTML=ui.start.fastHelp;
   startBtn.textContent=ui.start.startButton;
 }
-document.querySelectorAll('[data-s]').forEach(btn=>btn.onclick=()=>{s=btn.dataset.s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')});
-document.querySelectorAll('[data-c]').forEach(btn=>btn.onclick=()=>{c=btn.dataset.c;document.querySelectorAll('[data-c]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')});
+function fallbackCondition(){
+  const keys=['c1','c2','c3','c4'];
+  return keys[Math.floor(Math.random()*keys.length)];
+}
+function chooseLeastFilledCondition(counts){
+  const keys=['c1','c2','c3','c4'];
+  const normalized=Object.assign({c1:0,c2:0,c3:0,c4:0}, counts || {});
+  const min=Math.min(...keys.map(k=>Number(normalized[k]) || 0));
+  const candidates=keys.filter(k=>(Number(normalized[k]) || 0)===min);
+  return candidates[Math.floor(Math.random()*candidates.length)];
+}
+function fetchCountsJsonp(){
+  return new Promise((resolve,reject)=>{
+    const callback='conditionCounts_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const script=document.createElement('script');
+    const url=new URL(GOOGLE_SHEETS_WEB_APP_URL);
+    url.searchParams.set('mode','counts');
+    url.searchParams.set('scenario',s);
+    url.searchParams.set('callback',callback);
+    const timer=setTimeout(()=>cleanup(()=>reject(new Error('timeout'))),3500);
+    function cleanup(done){
+      clearTimeout(timer);
+      delete window[callback];
+      script.remove();
+      done();
+    }
+    window[callback]=(counts)=>cleanup(()=>resolve(counts));
+    script.onerror=()=>cleanup(()=>reject(new Error('jsonp failed')));
+    script.src=url.toString();
+    document.body.appendChild(script);
+  });
+}
+async function assignCondition(){
+  try{
+    const counts=await fetchCountsJsonp();
+    return chooseLeastFilledCondition(counts);
+  }catch(err){
+    console.warn(ui.start.assignFailed, err);
+    return fallbackCondition();
+  }
+}
+applyLanguage();
 document.querySelectorAll('[data-lang]').forEach(btn=>{
   btn.classList.toggle('active',btn.dataset.lang===lang);
   btn.onclick=()=>{
@@ -85,14 +102,19 @@ document.querySelectorAll('[data-lang]').forEach(btn=>{
     location.href=`index.html?${next.toString()}`;
   };
 });
-applyLanguage();
-document.getElementById('startBtn').onclick=()=>{
-  const nick=document.getElementById('nickInput').value.trim();
-  if(!nick){
-    alert(ui.start.missingNickname);
-    document.getElementById('nickInput').focus();
-    return;
-  }
+document.querySelectorAll('[data-c]').forEach(btn=>{
+  btn.classList.toggle('active',btn.dataset.c===selectedCondition);
+  btn.onclick=()=>{
+    selectedCondition=btn.dataset.c;
+    document.querySelectorAll('[data-c]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+});
+document.getElementById('startBtn').onclick=async()=>{
+  const nick=ui.participantNickname || 'creator';
+  startBtn.disabled=true;
+  startBtn.textContent=ui.start.assigning;
+  const c=selectedCondition==='auto' ? await assignCondition() : selectedCondition;
   const next=new URLSearchParams({s,c,nick,lang});
   if(fast) next.set('fast','1');
   location.href=`apps/messenger/${s}/index.html?${next.toString()}`;

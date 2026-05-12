@@ -1,60 +1,33 @@
-AI Video Experiment App Flow — Dance Version
+AI Video Experiment App Flow
 
 실행:
 - index.html을 브라우저에서 엽니다.
-- 시나리오와 조건을 선택하고 실험을 시작합니다.
-- 빠른 테스트: URL에 &fast=1 추가
+- 참가자 닉네임을 입력하면 Google Apps Script의 조건별 응답 수를 조회해 c1-c4 중 가장 적게 배정된 조건으로 자동 이동합니다.
+- 빠른 테스트가 필요하면 URL 끝에 ?fast=1을 붙입니다.
 
-시나리오:
-1. dating: 연애 리얼리티 패러디
-2. sns: SNS 댄스 챌린지 패러디
+진행 순서:
+1. 실험 안내 페이지
+   - 진행 세션 안내
+   - 익명성 보장 안내
+   - 예상 총 소요 시간 안내: 실험 약 2분, 설문 약 3분
+2. 실험 페이지
+   - 조건에 따라 영상 자극과 AI autonomy 자극이 달라집니다.
+   - High PTS: 할로윈 상황에서 오리 옷을 입은 Hans를 민망하게 만드는 의도가 드러나는 영상
+   - Low PTS: 놀이공원에서 친구들과의 추억을 간직하려는 의도가 드러나는 영상
+   - High AI Autonomy: AI가 핵심 구성과 최종 판단을 결정하고 약 10초 처리 후 영상 생성
+   - Low AI Autonomy: 사용자가 8회 이상 선택에 관여하고 약 60초 처리 중 15초 간격으로 반영 사항 표시
+3. E-mail 보상 공개
+   - 모든 조건에서 영상은 SNS에 공유되어 1,000만 조회수를 달성합니다.
+   - 팔로워가 크게 늘어 루키 크리에이터 실버 버튼 지급 안내 메일을 받습니다.
+4. 사후 설문
+   - 실험이 끝난 뒤 설문으로 이어집니다.
 
 조건:
-C1 = High AA × High PTS
-C2 = High AA × Low PTS
-C3 = Low AA × High PTS
-C4 = Low AA × Low PTS
+- C1 = High AI Autonomy x High PTS
+- C2 = High AI Autonomy x Low PTS
+- C3 = Low AI Autonomy x High PTS
+- C4 = Low AI Autonomy x Low PTS
 
-수정 반영:
-- SNS 시나리오를 인터뷰형에서 댄스 챌린지형으로 교체
-- 채팅 메시지 사이에 사람처럼 딜레이 적용
-- 선택지 선택 후 동일 선택 내용을 사용자 말풍선으로 다시 출력하지 않음
-- 선택 버튼의 색상 변화로 선택 여부 표시
-- 영상 생성 후 black transition 유지
-- Article 앱은 실제 기사형 레이아웃 유지
-
-영상 파일 경로:
-assets/videos/dating_high.mp4
-assets/videos/dating_low.mp4
-assets/videos/sns_dance_high.mp4
-assets/videos/sns_dance_low.mp4
-
-
-v2 수정 사항:
-- 태블릿형 넓은 프레임으로 변경
-- 렌더링 진행 카드가 최종 결과 후 사라지도록 수정
-- Video AI 채팅방에서 Amily가 직접 대답하는 오류 제거
-- 3달 후 기사 링크는 Article 앱 알림으로 표시
-- 다음 단계 버튼은 해당 화면을 끝까지 스크롤해야 활성화
-- 사후 설문은 디바이스 프레임 밖 전체화면 레이아웃으로 변경
-
-
-v3 수정 사항:
-- High AA에서 선택/수정 단계 제거: AI가 세부 구성과 최종안을 자동 확정
-- Low AA는 기존처럼 4단계 선택 + 1회 수정 + 사용자 최종 확정 유지
-- 렌더링 중 총 초수(/10.0s, /30.0s) 및 초 표시 제거
-- 실제 렌더링 시간은 조건별로 유지하되, 참가자에게 숫자로 노출하지 않음
-
-
-v4 수정 사항:
-- Video AI 시작 시 참가자가 Amily의 평상복 사진을 먼저 업로드하는 UI 추가
-- 파일 경로: assets/images/amily_casual_photo.png
-- 사진 파일이 없으면 'Amily 평상복 사진' placeholder가 표시됨
-- 이후 AI가 사진을 확인한 뒤 영상 제작 요청을 받는 흐름으로 변경
-
-
-v5 수정 사항:
-- Video AI 시작 시 참가자가 먼저 “이건 에밀리의 사진인데…”라고 말하도록 변경
-- 사진 업로드 중 → 업로드 완료 → 사진 카드 표시 모션 추가
-- AI 발화를 짧고 단계적으로 수정
-- 긴 AI 설명문 축약
+Google Apps Script:
+- google_apps_script.gs의 doGet(mode=counts)는 JSON과 JSONP(callback 파라미터)를 모두 지원합니다.
+- Apps Script를 새로 배포한 뒤 index.html과 shared/common.js의 GOOGLE_SHEETS_WEB_APP_URL을 같은 배포 URL로 맞춰주세요.

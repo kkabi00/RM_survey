@@ -8,7 +8,7 @@
 <div class="blackout" id="blackout"><div class="dots">...</div><div class="line" id="line1"></div><div class="line" id="line2"></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const log=document.getElementById('log');
-const BASE_PHOTO='../../../images/amily.png';
+const BASE_PHOTO='../../../images/hans.png';
 document.getElementById('footerHint').textContent=UI.video.footerHint;
 document.getElementById('articleBtn').textContent=UI.video.articleButton;
 document.getElementById('line1').textContent=UI.video.sharedLine;
@@ -35,12 +35,12 @@ async function userSay(text, ms=520){
 }
 function addPhotoCard(){
   const card=document.createElement('div'); card.className='photo-upload-card';
-  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">amily.png</div>';
+  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">hans.png</div>';
   log.appendChild(card); scrollBottom();
 }
 async function showUploadMotion(ms){
   const card=document.createElement('div'); card.className='upload-card';
-  card.innerHTML='<div class="upload-title">'+escapeHtml(UI.video.uploading)+'</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">amily.png</div>';
+  card.innerHTML='<div class="upload-title">'+escapeHtml(UI.video.uploading)+'</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">hans.png</div>';
   log.appendChild(card); scrollBottom();
   const fill=card.querySelector('.upload-fill');
   const start=performance.now();
@@ -107,21 +107,30 @@ function addVideoResult(){
   const video = pts==='high' ? S.videoHigh : S.videoLow;
   const box=document.createElement('div'); box.className='video-box';
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
-  if(C.aa==='high'){
-    box.innerHTML+='<button class="btn video-next" type="button">'+escapeHtml(UI.video.videoDone)+'</button>';
-  }
+  const dlBtn=document.createElement('a');
+  dlBtn.className='btn video-download';
+  dlBtn.href=video;
+  dlBtn.download='draft_ver1.mp4';
+  dlBtn.textContent=UI.video.videoDownload;
+  box.appendChild(dlBtn);
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
-  if(C.aa==='high'){
-    return new Promise(resolve=>{
-      const btn=box.querySelector('.video-next');
-      btn.onclick=()=>{
-        btn.disabled=true;
-        btn.textContent=UI.video.done;
-        resolve();
-      };
-    });
-  }
+  return new Promise(resolve=>{
+    dlBtn.addEventListener('click', ()=>{
+      dlBtn.textContent=UI.video.videoDownloadDone;
+      dlBtn.classList.add('downloaded');
+      resolve();
+    }, {once:true});
+  });
+}
+function showVideoConfirmButton(){
+  return new Promise(resolve=>{
+    const row=document.createElement('div'); row.className='choice-row';
+    const btn=document.createElement('button'); btn.className='btn video-next'; btn.type='button';
+    btn.textContent=UI.video.videoDone;
+    btn.onclick=()=>{ btn.disabled=true; btn.textContent=UI.video.done; resolve(); };
+    row.appendChild(btn); log.appendChild(row); scrollBottom();
+  });
 }
 async function blackTransition(){
   const b=document.getElementById('blackout'), l1=document.getElementById('line1'), l2=document.getElementById('line2');
@@ -142,7 +151,7 @@ function addArticleMessage(html){
   msg.innerHTML='<div class="avatar">A</div><div class="article-bubble">'+html+'</div>';
   log.appendChild(msg); scrollBottom(); return msg;
 }
-async function amilySayArticle(html, delayText){
+async function hansSayArticle(html, delayText){
   const t=addArticleTyping(); await delay(humanDelay(delayText, 620)); t.remove();
   const msg=addArticleMessage(html); await delay(520);
   return msg;
@@ -152,14 +161,13 @@ async function articleLinkCard(){
   const article=S.article[pts];
   const nickname=qs('nick',UI.participantNickname);
   log.innerHTML='';
-  document.querySelector('.statusbar span:last-child').textContent='Talk';
   document.querySelector('.app-icon').textContent='A';
   document.querySelector('.app-title').textContent='Talk';
-  document.querySelector('.app-subtitle').textContent='Amily';
+  document.querySelector('.app-subtitle').textContent='Hans';
   document.querySelector('.progress').textContent='3 / 4';
   const greeting=UI.video.articleGreeting.replace('{nick}',nickname);
-  await amilySayArticle('<div class="article-text">'+escapeHtml(greeting)+'</div>', greeting);
-  const msg=await amilySayArticle('<div class="article-text">'+escapeHtml(UI.video.articleNews)+'</div><div class="link-card"><div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/amily</div></div>', UI.video.articleNews);
+  await hansSayArticle('<div class="article-text">'+escapeHtml(greeting)+'</div>', greeting);
+  const msg=await hansSayArticle('<div class="article-text">'+escapeHtml(UI.video.articleNews)+'</div><div class="link-card"><div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/hans</div></div>', UI.video.articleNews);
   msg.querySelector('.link-card').onclick=()=>{location.href=pathTo('article')};
   add('sys',escapeHtml(UI.video.articleInstruction));
   document.getElementById('footerHint').textContent=UI.video.articleInstruction;
@@ -199,10 +207,10 @@ async function run(){
 
   add('sys','🎬 '+escapeHtml(UI.video.renderStart));
   await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:30000));
+  await addVideoResult();
   if(C.aa==='high'){
-    await addVideoResult();
+    await showVideoConfirmButton();
   }else{
-    addVideoResult();
     await delay(500);
     await aiSay(UI.video.chooseFinal,420);
     await showFinalVideoChoice();

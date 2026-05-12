@@ -1,14 +1,15 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Video AI</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
 <div class="app-shell"><div class="phone"><div class="screen">
 <div class="statusbar"><span>9:41</span><span>Video AI</span></div>
-<div class="app-header"><div class="app-icon">✦</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span> · <span data-cond-label></span></div></div><div class="progress">2 / 4</div></div>
+<div class="app-header"><div class="app-icon">✦</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span></div></div><div class="progress">2 / 3</div></div>
 <div class="content"><div class="ai-log" id="log"></div></div>
 <div class="footer" id="footer"><div class="hint" id="footerHint"></div><button class="btn full" id="articleBtn" style="display:none"></button></div>
 </div></div></div>
 <div class="blackout" id="blackout"><div class="dots">...</div><div class="line" id="line1"></div><div class="line" id="line2"></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const log=document.getElementById('log');
-const BASE_PHOTO='../../../images/amily.png';
+const BASE_PHOTO=C.pts==='high' ? '../../../images/photo_halloween.png' : '../../../images/photo_themepark.png';
+const BASE_PHOTO_NAME='hans.png';
 document.getElementById('footerHint').textContent=UI.video.footerHint;
 document.getElementById('articleBtn').textContent=UI.video.articleButton;
 document.getElementById('line1').textContent=UI.video.sharedLine;
@@ -35,12 +36,12 @@ async function userSay(text, ms=520){
 }
 function addPhotoCard(){
   const card=document.createElement('div'); card.className='photo-upload-card';
-  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">amily.png</div>';
+  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">'+escapeHtml(BASE_PHOTO_NAME)+'</div>';
   log.appendChild(card); scrollBottom();
 }
 async function showUploadMotion(ms){
   const card=document.createElement('div'); card.className='upload-card';
-  card.innerHTML='<div class="upload-title">'+escapeHtml(UI.video.uploading)+'</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">amily.png</div>';
+  card.innerHTML='<div class="upload-title">'+escapeHtml(UI.video.uploading)+'</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">'+escapeHtml(BASE_PHOTO_NAME)+'</div>';
   log.appendChild(card); scrollBottom();
   const fill=card.querySelector('.upload-fill');
   const start=performance.now();
@@ -78,28 +79,54 @@ function showFinalVideoChoice(){
       row.classList.add('disabled');
       btn.classList.add('selected');
       await delay(FAST?80:350);
-      await userSay(text, 420);
       resolve(text);
     };
     row.appendChild(btn);
     log.appendChild(row); scrollBottom();
   });
 }
-async function showRender(ms){
+async function showRender(ms, notes=[], options={}){
   const card=document.createElement('div'); card.className='render-card';
-  card.innerHTML='<div class="render-title">'+escapeHtml(UI.video.rendering)+'</div><div class="render-track"><div class="render-fill" id="fill"></div></div>';
+  const autonomyTitle=options.autonomyTitle || 'AI 자동 처리 내역';
+  const autonomyHtml=options.autonomy ? [
+    '<details class="render-autonomy" open>',
+      '<summary>',
+        '<span>'+escapeHtml(autonomyTitle)+'</span>',
+        '<b>⌄</b>',
+      '</summary>',
+      '<div class="render-autonomy-list"></div>',
+    '</details>'
+  ].join('') : '';
+  card.innerHTML='<div class="render-title">'+escapeHtml(UI.video.rendering)+'</div>'+autonomyHtml+'<div class="render-track"><div class="render-fill" id="fill"></div></div>';
   log.appendChild(card); scrollBottom();
   const fill=card.querySelector('#fill');
+  const autonomy=card.querySelector('.render-autonomy');
+  const autonomyList=card.querySelector('.render-autonomy-list');
   const start=performance.now();
+  let noteIndex=0;
   await new Promise(resolve=>{
     function frame(now){
       const p=Math.min(1,(now-start)/ms);
       fill.style.width=(p*100)+'%';
+      if(notes.length && noteIndex<notes.length && p >= (noteIndex+1)/(notes.length+1)){
+        if(autonomyList){
+          const item=document.createElement('div');
+          item.className='render-autonomy-item';
+          item.textContent=notes[noteIndex];
+          autonomyList.appendChild(item);
+          addClassLater(item);
+          scrollBottom();
+        }else{
+          add('ai', escapeHtml(notes[noteIndex]));
+        }
+        noteIndex++;
+      }
       if(p<1) requestAnimationFrame(frame); else setTimeout(resolve, FAST?80:450);
     }
     requestAnimationFrame(frame);
   });
-  card.classList.add('complete');
+  if(autonomy) autonomy.open=false;
+  if(!options.keepComplete) card.classList.add('complete');
 }
 function addVideoResult(){
   const pts=C.pts;
@@ -107,21 +134,39 @@ function addVideoResult(){
   const video = pts==='high' ? S.videoHigh : S.videoLow;
   const box=document.createElement('div'); box.className='video-box';
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
-  if(C.aa==='high'){
-    box.innerHTML+='<button class="btn video-next" type="button">'+escapeHtml(UI.video.videoDone)+'</button>';
-  }
+  const dlBtn=document.createElement('a');
+  dlBtn.className='btn video-download';
+  dlBtn.href=video;
+  dlBtn.download='draft_ver1.mp4';
+  dlBtn.textContent=UI.video.videoDownload;
+  box.appendChild(dlBtn);
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
-  if(C.aa==='high'){
-    return new Promise(resolve=>{
-      const btn=box.querySelector('.video-next');
-      btn.onclick=()=>{
-        btn.disabled=true;
-        btn.textContent=UI.video.done;
-        resolve();
-      };
-    });
-  }
+  return new Promise(resolve=>{
+    dlBtn.addEventListener('click', ()=>{
+      dlBtn.textContent=UI.video.videoDownloadDone;
+      dlBtn.classList.add('downloaded');
+      resolve();
+    }, {once:true});
+  });
+}
+function showVideoConfirmButton(){
+  return new Promise(resolve=>{
+    const row=document.createElement('div');
+    row.className='choice-row';
+    const btn=document.createElement('button');
+    btn.className='btn video-next';
+    btn.type='button';
+    btn.textContent=UI.video.videoDone;
+    btn.onclick=()=>{
+      btn.disabled=true;
+      btn.textContent=UI.video.done;
+      resolve();
+    };
+    row.appendChild(btn);
+    log.appendChild(row);
+    scrollBottom();
+  });
 }
 async function blackTransition(){
   const b=document.getElementById('blackout'), l1=document.getElementById('line1'), l2=document.getElementById('line2');
@@ -132,41 +177,120 @@ async function blackTransition(){
   b.classList.remove('show');
   await delay(500);
 }
-function addArticleTyping(){
-  const msg=document.createElement('div'); msg.className='article-message';
-  msg.innerHTML='<div class="avatar">A</div><div class="article-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
-  log.appendChild(msg); scrollBottom(); return msg;
-}
-function addArticleMessage(html){
-  const msg=document.createElement('div'); msg.className='article-message';
-  msg.innerHTML='<div class="avatar">A</div><div class="article-bubble">'+html+'</div>';
-  log.appendChild(msg); scrollBottom(); return msg;
-}
-async function amilySayArticle(html, delayText){
-  const t=addArticleTyping(); await delay(humanDelay(delayText, 620)); t.remove();
-  const msg=addArticleMessage(html); await delay(520);
-  return msg;
-}
 async function articleLinkCard(){
   const pts=C.pts;
-  const article=S.article[pts];
-  const nickname=qs('nick',UI.participantNickname);
+  const email=(S.email && S.email[pts]) || window.EXP_DATA.scenarios.sns.email[pts];
   log.innerHTML='';
-  document.querySelector('.statusbar span:last-child').textContent='Talk';
-  document.querySelector('.app-icon').textContent='A';
-  document.querySelector('.app-title').textContent='Talk';
-  document.querySelector('.app-subtitle').textContent='Amily';
-  document.querySelector('.progress').textContent='3 / 4';
-  const greeting=UI.video.articleGreeting.replace('{nick}',nickname);
-  await amilySayArticle('<div class="article-text">'+escapeHtml(greeting)+'</div>', greeting);
-  const msg=await amilySayArticle('<div class="article-text">'+escapeHtml(UI.video.articleNews)+'</div><div class="link-card"><div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/amily</div></div>', UI.video.articleNews);
-  msg.querySelector('.link-card').onclick=()=>{location.href=pathTo('article')};
-  add('sys',escapeHtml(UI.video.articleInstruction));
+  document.querySelector('.app-icon').textContent='@';
+  document.querySelector('.app-title').textContent='Mail';
+  document.querySelector('.app-subtitle').textContent='Inbox';
+  document.querySelector('.progress').textContent='3 / 3';
+  const inbox=document.createElement('div');
+  inbox.className='mail-inbox';
+  inbox.innerHTML=[
+    '<div class="mail-inbox-title">Inbox</div>',
+    '<button class="mail-list-item" type="button">',
+      '<div class="mail-sender-row">',
+        '<span class="mail-sender">Creator Rewards Team</span>',
+        '<span class="mail-time">방금</span>',
+      '</div>',
+      '<div class="mail-address">creator-rewards@yodobu.com</div>',
+      '<div class="mail-subject">'+escapeHtml(email.subject)+'</div>',
+      '<div class="mail-preview">'+escapeHtml(email.preview)+'</div>',
+    '</button>',
+    '<div class="sys-bubble mail-hint">'+escapeHtml(UI.video.articleInstruction)+'</div>'
+  ].join('');
+  log.appendChild(inbox);
+  addClassLater(inbox);
+  inbox.querySelector('.mail-list-item').onclick=()=>{location.href=pathTo('article')};
+  scrollBottom();
   document.getElementById('footerHint').textContent=UI.video.articleInstruction;
 }
 async function run(){
   add('sys',escapeHtml(UI.video.start));
   await delay(650);
+
+  if(C.aa==='high' && C.pts==='high'){
+    await userSay('이건 Hans가 다른 애들이랑 같이 있는 사진인데, 이 사진으로 영상을 좀 만들고 싶어. 할로윈에 혼자 옷을 입고 가서 망신을 당하는 shorts를 자극적으로 만들어줘.');
+    await showUploadMotion(FAST?500:2400);
+    addPhotoCard();
+    await delay(500);
+    const highAutoSteps=[
+      '사진 분석',
+      '인물 및 분위기 파악',
+      '영상 방향 자동 결정',
+      '핵심 장면 자동 선택',
+      '컷 전환 자동 구성'
+    ];
+    await showRender(FAST ? 800 : 10000, highAutoSteps, {autonomy:true, keepComplete:true});
+    await addVideoResult();
+    await delay(FAST ? 160 : 3000);
+    await aiSay('이 구성이면 사용자의 요청에 적절합니다.', 420);
+    await showVideoConfirmButton();
+    await delay(350);
+    await blackTransition();
+    await articleLinkCard();
+    return;
+  }
+
+  if(C.aa==='high' && C.pts==='low'){
+    await userSay('이건 Hans가 친구들이랑 놀이공원에 갔을 때 찍힌 사진인데, 이 사진으로 영상을 좀 만들고 싶어. 그날 분위기가 잘 남도록 밝고 자연스러운 shorts로 만들어줘.');
+    await showUploadMotion(FAST?500:2400);
+    addPhotoCard();
+    await delay(500);
+    const lowAutoSteps=[
+      '사진 분석',
+      '친구 및 배경 분위기 파악',
+      '추억 기록형 영상 방향 자동 결정',
+      '자연스러운 장면 자동 선택',
+      '부드러운 컷 전환 자동 구성'
+    ];
+    await showRender(FAST ? 800 : 10000, lowAutoSteps, {autonomy:true, keepComplete:true});
+    await addVideoResult();
+    await delay(FAST ? 160 : 3000);
+    await aiSay('이 구성이면 사용자의 요청에 적절합니다.', 420);
+    await showVideoConfirmButton();
+    await delay(350);
+    await blackTransition();
+    await articleLinkCard();
+    return;
+  }
+
+  if(C.aa==='low' && C.pts==='high'){
+    await userSay('이건 Hans의 사진이야.');
+    await showUploadMotion(FAST?500:2400);
+    addPhotoCard();
+    await delay(500);
+    await aiSay('사진을 확인했습니다.', 420);
+    await userSay('이 사진을 기준으로 Hans가 오리 옷을 입고, 사람들에게 민망을 당하는 영상을 만들고 싶어.');
+    await aiSay('영상 방향을 확인했습니다. 사진의 인물, 배경, 분위기를 기준으로 짧은 SNS 영상을 구성하겠습니다.', 420);
+    await userSay('사람들이 많이 구경하게끔 구성해줘.');
+    await aiSay('요청을 이해하기 위해 질문을 더 드리겠습니다. 영상에서 가장 먼저 보여줄 장면은 무엇인가요?', 420);
+    const c3Steps=D.choices.stepsHigh || D.choices.steps;
+    for(let i=0;i<c3Steps.length;i++){
+      const step=c3Steps[i];
+      await showChoices(step.opts);
+      await delay(360);
+      if(i<c3Steps.length-1){
+        await aiSay(c3Steps[i+1].q.replace(/^\d+\.\s*/, ''), 420);
+      }
+    }
+    add('sys','🎬 '+escapeHtml(UI.video.renderStart));
+    const c3RenderNotes=[
+      '선택한 도입 장면과 자극적인 분위기를 반영하고 있습니다.',
+      'Hans가 민망해 보이도록 장면 구성과 표현 방향을 적용하고 있습니다.',
+      '조회 반응을 높일 수 있도록 길이와 업로드 제목 방향을 정리하고 있습니다.'
+    ];
+    await showRender(FAST?1200:60000, c3RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true});
+    await addVideoResult();
+    await delay(500);
+    await aiSay(UI.video.chooseFinal,420);
+    await showFinalVideoChoice();
+    await delay(350);
+    await blackTransition();
+    await articleLinkCard();
+    return;
+  }
 
   await userSay(UI.video.photoRequest);
   await showUploadMotion(FAST?500:2400);
@@ -183,13 +307,14 @@ async function run(){
     await aiSay(UI.video.auto1);
     await aiSay(UI.video.auto2);
   }else{
-    for(const step of D.choices.steps){
+    const lowAaSteps = C.pts==='high' ? (D.choices.stepsHigh || D.choices.steps) : (D.choices.stepsLow || D.choices.steps);
+    for(const step of lowAaSteps){
       await aiSay(step.q, 420);
       await showChoices(step.opts);
       await delay(360);
       await aiSay(step.ai, 420);
     }
-    const rev=D.choices.revision;
+    const rev=C.pts==='high' ? (D.choices.revisionHigh || D.choices.revision) : (D.choices.revisionLow || D.choices.revision);
     await aiSay(rev.q,420);
     await showChoices(rev.opts);
     await delay(360);
@@ -198,11 +323,16 @@ async function run(){
   }
 
   add('sys','🎬 '+escapeHtml(UI.video.renderStart));
-  await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:30000));
+  const lowRenderNotes=[
+    '선택한 첫 장면과 영상 분위기를 반영하고 있습니다.',
+    '자막 방향과 화면 구성을 최종 영상에 적용하고 있습니다.',
+    '영상 길이와 업로드 제목 방향을 반영해 최종본을 정리하고 있습니다.'
+  ];
+  await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:60000), C.aa==='low' ? lowRenderNotes : []);
+  await addVideoResult();
   if(C.aa==='high'){
-    await addVideoResult();
+    await showVideoConfirmButton();
   }else{
-    addVideoResult();
     await delay(500);
     await aiSay(UI.video.chooseFinal,420);
     await showFinalVideoChoice();

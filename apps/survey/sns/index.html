@@ -6,9 +6,9 @@
       <h1 id="surveyTitle">사후 설문</h1>
       <div class="survey-meta"><span data-scenario-label></span> · <span data-cond-label></span></div>
     </div>
-    <div class="small" id="surveyIntro" style="max-width:360px"></div>
   </div>
   <div class="survey-step" id="surveyStep"></div>
+  <div class="section-progress-wrap"><div class="section-progress-bar" id="sectionProgressBar"></div></div>
   <div id="survey"></div>
   <div class="survey-actions"><button class="btn" id="nextBtn"></button></div>
 </div>
@@ -16,15 +16,15 @@
 const sections=[
   // 1/9 Outcome Benefit
   ['Outcome Benefit',[
-    '이 영상은 결과적으로 Amily에게 이익이 되었다고 느껴진다.',
-    '이 영상은 Amily가 더 많은 관심을 받는 데 기여했다.',
+    '이 영상은 결과적으로 Hans에게 이익이 되었다고 느껴진다.',
+    '이 영상은 Hans가 더 많은 관심을 받는 데 기여했다.',
     '이 영상의 결과는 전반적으로 성공적이었다고 느껴진다.'
   ]],
   // 2/9 Credit Claiming
   ['Credit Claiming',[
     '이 영상이 좋은 반응을 얻은 데에는 내 선택이 기여했다고 느껴진다.',
     '결과를 보니, 내가 이 영상 제작에 의미 있게 관여했다고 느껴진다.',
-    'Amily가 관심을 얻게 된 데에는 내가 한 선택들이 영향을 주었다고 느껴진다.'
+    'Hans가 관심을 얻게 된 데에는 내가 한 선택들이 영향을 주었다고 느껴진다.'
   ]],
   // 3/9 Human Effort
   ['Human Effort',[
@@ -48,17 +48,17 @@ const sections=[
   ['Guilt',[
     '나는 이 영상을 만든 것에 대해 죄책감을 느낄 것 같다.',
     '나는 이 영상 제작에 관여한 것에 대해 불편함을 느낄 것 같다.',
-    '이 영상이 Amily의 이미지에 부정적 영향을 준다면 나 자신을 탓할 것 같다.'
+    '이 영상이 Hans의 이미지에 부정적 영향을 준다면 나 자신을 탓할 것 같다.'
   ]],
   // 7/9 Perceived Transgression Severity
   ['Perceived Transgression Severity',[
     '이 영상은 도덕적으로 문제가 있다고 느껴진다.',
-    '이 영상은 Amily의 이미지에 부정적인 영향을 줄 수 있다고 느껴진다.',
+    '이 영상은 Hans의 이미지에 부정적인 영향을 줄 수 있다고 느껴진다.',
     '대부분의 사람들은 이런 영상을 만드는 것을 부적절하다고 볼 것이다.'
   ]],
   // 8/9 Moral Justification
   ['Moral Justification',[
-    '결과적으로 Amily에게 이익이 되었다면, 이 영상을 만든 것은 어느 정도 정당화될 수 있다고 느껴진다.',
+    '결과적으로 Hans에게 이익이 되었다면, 이 영상을 만든 것은 어느 정도 정당화될 수 있다고 느껴진다.',
     '이 영상에 문제가 될 만한 부분이 있더라도, 좋은 결과가 있었다면 크게 잘못된 일은 아니라고 느껴진다.',
     '이 영상의 긍정적인 결과는 도덕적으로 불편한 부분을 어느 정도 상쇄한다고 느껴진다.'
   ]],
@@ -89,11 +89,11 @@ if(window.EXP_SURVEY){
 }
 document.getElementById('surveyBadge').textContent=UI.survey.badge;
 document.getElementById('surveyTitle').textContent=UI.survey.title;
-document.getElementById('surveyIntro').textContent=UI.survey.intro;
 document.getElementById('nextBtn').textContent=UI.survey.next;
 function likert(name){
+  const anchor={1:'anchor-low',4:'anchor-mid',7:'anchor-high'};
   let html='<div class="likert"><span class="end">'+UI.survey.left+'</span>';
-  for(let i=1;i<=7;i++) html+=`<label><input type="radio" name="${name}" value="${i}"><span class="circle">${i}</span></label>`;
+  for(let i=1;i<=7;i++) html+=`<label><input type="radio" name="${name}" value="${i}"><span class="circle${anchor[i]?' '+anchor[i]:''}">${i}</span></label>`;
   return html+'<span class="end r">'+UI.survey.right+'</span></div>';
 }
 const questionMeta=[];
@@ -103,17 +103,19 @@ sections.forEach(([title,items])=>{
 });
 let sectionIndex=0, demographicsMode=false;
 const responses={}, demoResponses={};
-let submitted=false;
+let submitted=false, sameWarned=false;
 const surveyEl=document.getElementById('survey');
 const nextBtn=document.getElementById('nextBtn');
 const surveyStep=document.getElementById('surveyStep');
 function sectionStart(index){ return sections.slice(0,index).reduce((sum,sec)=>sum+sec[1].length,0)+1; }
 function renderSection(){
   const items=sections[sectionIndex][1], start=sectionStart(sectionIndex);
-  let html='<div class="survey-block">';
+  const introParts=UI.survey.intro.split('\n');
+  const introHtml=introParts.map((p,i)=>i===introParts.length-1?`<mark class="hl">${escapeHtml(p)}</mark>`:escapeHtml(p)).join('<br>');
+  let html='<div class="survey-intro-panel">'+introHtml+'</div><div class="survey-block">';
   items.forEach((item,i)=>{
     const n=start+i;
-    html += `<div class="survey-item"><div class="survey-q">Q${n}. ${escapeHtml(item)}</div>${likert('Q'+n)}</div>`;
+    html += `<div class="survey-item"><div class="survey-q">Q${n}. ${escapeHtml(item.replace(/\s*\[역문항\]$/, ''))}</div>${likert('Q'+n)}</div>`;
   });
   html += '</div><div class="saved" id="saved">'+escapeHtml(UI.survey.saved)+'</div>';
   surveyEl.innerHTML=html;
@@ -123,8 +125,41 @@ function renderSection(){
     const input=document.querySelector(`input[name="${name}"][value="${value}"]`);
     if(input) input.checked=true;
   });
+  updateSectionProgress();
   window.scrollTo({top:0,behavior:'smooth'});
 }
+function launchConfetti(){
+  const colors=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c084fc','#fb923c'];
+  const wrap=document.createElement('div'); wrap.className='confetti-wrap';
+  document.body.appendChild(wrap);
+  for(let i=0;i<70;i++){
+    const p=document.createElement('div'); p.className='confetti-p';
+    const size=Math.random()*8+4;
+    p.style.cssText=`left:${Math.random()*100}%;background:${colors[i%colors.length]};width:${size}px;height:${size}px;animation-delay:${(Math.random()*0.6).toFixed(2)}s;animation-duration:${(Math.random()*1+1.2).toFixed(2)}s;border-radius:${Math.random()>.5?'50%':'2px'}`;
+    wrap.appendChild(p);
+  }
+  setTimeout(()=>wrap.remove(),3200);
+}
+function updateSectionProgress(){
+  const bar=document.getElementById('sectionProgressBar');
+  if(!bar||demographicsMode) return;
+  const start=sectionStart(sectionIndex), count=sections[sectionIndex][1].length;
+  let answered=0;
+  for(let i=start;i<start+count;i++){
+    if(document.querySelector(`input[name="Q${i}"]:checked`)||responses[`Q${i}`]) answered++;
+  }
+  bar.style.width=(answered/count*100)+'%';
+  if(answered===count){
+    bar.classList.add('complete');
+    if(!bar.dataset.done){bar.dataset.done='1';launchConfetti();}
+  }else{
+    bar.classList.remove('complete');
+    delete bar.dataset.done;
+  }
+}
+surveyEl.addEventListener('change',e=>{
+  if(e.target.type==='radio'){collectCurrent();updateSectionProgress();}
+});
 function demoOptions(item){
   return `<select class="demo-select" name="${item.id}"><option value="">${escapeHtml(UI.survey.select)}</option>${item.opts.map(opt=>`<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('')}</select>`;
 }
@@ -133,7 +168,8 @@ function renderDemographics(){
   surveyStep.textContent=UI.survey.backgroundStep;
   document.querySelector('.survey-top .badge').textContent=UI.survey.backgroundBadge;
   document.querySelector('.survey-top h1').textContent=UI.survey.backgroundTitle;
-  document.querySelector('.survey-top .small').textContent=UI.survey.backgroundIntro;
+  const topIntro=document.querySelector('.survey-top .small');
+  if(topIntro) topIntro.textContent=UI.survey.backgroundIntro;
   let html='<div class="demographics-panel">';
   demographics.forEach(item=>{
     html += `<div class="demo-item"><div class="demo-q"><b>${item.id}</b><span>${escapeHtml(item.q)}</span></div>`;
@@ -145,7 +181,7 @@ function renderDemographics(){
     }
     html += '</div>';
   });
-  html += '</div><div class="followup-panel"><label class="field-label" for="resultEmail">'+escapeHtml(UI.survey.emailLabel)+'</label><input class="text-input" id="resultEmail" type="email" placeholder="email@example.com"></div><div class="saved" id="saved">'+escapeHtml(UI.survey.thanks)+'</div>';
+  html += '</div><div class="followup-panel"><label class="field-label" for="resultEmail">'+escapeHtml(UI.survey.emailLabel)+'</label><input class="text-input" id="resultEmail" type="email" placeholder="email@example.com"></div><div class="followup-panel"><label class="field-label" for="researcherCode">'+escapeHtml(UI.survey.researcherCodeLabel)+'</label><input class="text-input" id="researcherCode" type="text" placeholder=""></div><div class="saved" id="saved">'+escapeHtml(UI.survey.thanks)+'</div>';
   surveyEl.innerHTML=html;
   nextBtn.textContent=UI.survey.submit;
   window.scrollTo({top:0,behavior:'smooth'});
@@ -184,6 +220,7 @@ function demographicsComplete(){
     return false;
   }
   demoResponses['result_email']=email;
+  demoResponses['researcher_code']=document.getElementById('researcherCode').value.trim();
   return true;
 }
 async function saveSurvey(){
@@ -192,6 +229,7 @@ async function saveSurvey(){
   questionMeta.forEach(meta=>answers[meta.name]=responses[meta.name]||'');
   demographics.forEach(item=>answers[item.id]=demoResponses[item.id]||'');
   answers.result_email=demoResponses.result_email||'';
+  answers.researcher_code=demoResponses.researcher_code||'';
   const header=['submitted_at','language','scenario','scenario_label','condition','condition_label','nickname'].concat(Object.keys(answers));
   const submittedAt=new Date().toISOString();
   const wideRow=[submittedAt,LANG,SCENARIO,S.label,COND,C.name,NICK].concat(Object.keys(answers).map(key=>answers[key]));
@@ -230,6 +268,12 @@ async function saveSurvey(){
   nextBtn.disabled=true;
   nextBtn.textContent=UI.survey.submitted;
 }
+function allSameResponse(){
+  const start=sectionStart(sectionIndex), count=sections[sectionIndex][1].length;
+  const vals=[];
+  for(let i=start;i<start+count;i++) if(responses[`Q${i}`]) vals.push(responses[`Q${i}`]);
+  return vals.length===count && vals.every(v=>v===vals[0]);
+}
 nextBtn.onclick=()=>{
   if(demographicsMode){
     if(demographicsComplete()) saveSurvey();
@@ -239,6 +283,12 @@ nextBtn.onclick=()=>{
     alert(UI.survey.missingCurrent);
     return;
   }
+  if(allSameResponse()&&!sameWarned){
+    alert(UI.survey.allSameWarning);
+    sameWarned=true;
+    return;
+  }
+  sameWarned=false;
   if(sectionIndex<sections.length-1){
     sectionIndex++;
     renderSection();

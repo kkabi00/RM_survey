@@ -45,8 +45,15 @@ function doGet(e) {
     }
   }
 
+  const body = JSON.stringify(counts);
+  if (params.callback) {
+    return ContentService
+      .createTextOutput(params.callback + '(' + body + ');')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+
   return ContentService
-    .createTextOutput(JSON.stringify(counts))
+    .createTextOutput(body)
     .setMimeType(ContentService.MimeType.JSON);
 }
 
