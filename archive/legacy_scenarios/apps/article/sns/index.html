@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>E-mail</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
+<div class="app-shell"><div class="phone"><div class="screen">
+<div class="statusbar"><span>9:41</span><span>Mail</span></div>
+<div class="app-header"><div class="app-icon">@</div><div><div class="app-title">Mail</div><div class="app-subtitle">Creator Rewards Team</div></div><div class="progress">3 / 3</div></div>
+<div class="content" style="padding:0"><div class="article-wrap" id="email"></div></div>
+<div class="footer"><button class="btn full" id="surveyBtn"></button></div>
+</div></div></div>
+<script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
+const A=S.article[C.pts];
+const meta=getScenarioOutcomeMeta();
+const el=document.getElementById('article');
+el.innerHTML = `
+  <div class="masthead">The Culture Times</div>
+  <div class="article-kicker">${escapeHtml(A.kicker)}</div>
+  <h1 class="article-title">${escapeHtml(A.title)}</h1>
+  <div class="article-sub">${escapeHtml(A.sub)}</div>
+  <div class="byline">${escapeHtml(UI.article.byline)}</div>
+  <div class="article-post-summary">
+    <b>${escapeHtml(meta.title_text)}</b>
+    <span>${escapeHtml(meta.caption_text)} · ${escapeHtml(meta.visibility_setting)} · 조회수 ${escapeHtml(meta.views)}</span>
+  </div>
+  <div class="article-body">${A.body.map(p=>`<p>${escapeHtml(p)}</p>`).join('')}</div>
+  <div class="quote">${escapeHtml(A.quote)}</div>
+  <div class="comments"><h3>${escapeHtml(UI.article.comments)}</h3>${A.comments.map(c=>`<div class="comment"><div class="name">${escapeHtml(c[0])}</div><div class="text">${escapeHtml(c[1])}</div></div>`).join('')}</div>
+`;
+document.getElementById('surveyBtn').textContent=UI.article.surveyButton;
+document.getElementById('surveyBtn').onclick=()=>{location.href=pathTo('survey')};
+enableWhenScrolledToBottom(document.getElementById('surveyBtn'));
+
+const contentEl=document.querySelector('.content');
+const revealEls=[];
+Array.from(el.querySelector('.mail-shell').children).forEach(child=>{
+  if(child.classList.contains('article-body')){
+    Array.from(child.children).forEach(p=>{p.classList.add('scroll-reveal');revealEls.push(p);});
+  }else{
+    child.classList.add('scroll-reveal');revealEls.push(child);
+  }
+});
+const revealObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');revealObserver.unobserve(e.target);}});
+},{root:contentEl,threshold:0.05});
+revealEls.forEach(e=>revealObserver.observe(e));
+</script></body></html>

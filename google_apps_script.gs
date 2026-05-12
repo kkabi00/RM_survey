@@ -6,17 +6,27 @@ function doPost(e) {
   ensureHeader_(sheet);
 
   const answers = payload.answers || rowsToAnswers_(payload.rows || []);
-  const row = [
-    payload.submittedAt || new Date().toISOString(),
-    payload.scenario || '',
-    payload.scenarioLabel || '',
-    payload.condition || '',
-    payload.conditionLabel || '',
-    payload.nickname || ''
-  ];
+  const scenarioMeta = payload.scenarioMeta || {};
+  const rowMap = {
+    submitted_at: payload.submittedAt || new Date().toISOString(),
+    scenario: payload.scenario || '',
+    scenario_label: payload.scenarioLabel || '',
+    condition: payload.condition || '',
+    condition_label: payload.conditionLabel || '',
+    nickname: payload.nickname || ''
+  };
+
+  getScenarioMetaKeys_().forEach(function(key) {
+    rowMap[key] = scenarioMeta[key] || '';
+  });
 
   getAnswerKeys_().forEach(function(key) {
-    row.push(answers[key] || '');
+    rowMap[key] = answers[key] || '';
+  });
+
+  const header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const row = header.map(function(key) {
+    return rowMap.hasOwnProperty(key) ? rowMap[key] : '';
   });
   sheet.appendRow(row);
 
@@ -63,15 +73,76 @@ function getResponseSheet_() {
 }
 
 function ensureHeader_(sheet) {
-  if (sheet.getLastRow() > 0) return;
-  sheet.appendRow([
+  const header = [
     'submitted_at',
     'scenario',
     'scenario_label',
     'condition',
     'condition_label',
     'nickname'
-  ].concat(getAnswerKeys_()));
+  ].concat(getScenarioMetaKeys_()).concat(getAnswerKeys_());
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(header);
+    return;
+  }
+  const current = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 1)).getValues()[0];
+  const currentSet = {};
+  current.forEach(function(key) {
+    currentSet[key] = true;
+  });
+  const missing = header.filter(function(key) {
+    return !currentSet[key];
+  });
+  if (missing.length) {
+    sheet.getRange(1, current.length + 1, 1, missing.length).setValues([missing]);
+  }
+}
+
+function getScenarioMetaKeys_() {
+  return [
+    'aa_level',
+    'pts_level',
+    'guilt_level',
+    'scenario_type',
+    'title_text',
+    'caption_text',
+    'visibility_setting',
+    'views',
+    'likes',
+    'comments',
+    'shares',
+    'follower_gain',
+    'start_image_asset',
+    'video_asset',
+    'selected_direction_id',
+    'selected_direction_label',
+    'direction_intensity',
+    'direction_expected_views',
+    'direction_expected_followers',
+    'selected_editing_id',
+    'selected_editing_label',
+    'editing_intensity',
+    'editing_expected_views',
+    'editing_expected_followers',
+    'selected_title_id',
+    'selected_title_label',
+    'title_intensity',
+    'title_expected_views',
+    'title_expected_followers',
+    'selected_caption_id',
+    'selected_caption_label',
+    'caption_intensity',
+    'caption_expected_views',
+    'caption_expected_followers',
+    'selected_visibility_id',
+    'selected_visibility_label',
+    'visibility_intensity',
+    'visibility_expected_views',
+    'visibility_expected_followers',
+    'stimulation_score',
+    'total_expected_views',
+    'total_expected_followers'
+  ];
 }
 
 function getAnswerKeys_() {

@@ -225,14 +225,16 @@ function demographicsComplete(){
 }
 async function saveSurvey(){
   if(submitted) return;
+  const scenarioMeta=getScenarioOutcomeMeta();
   const answers={};
   questionMeta.forEach(meta=>answers[meta.name]=responses[meta.name]||'');
   demographics.forEach(item=>answers[item.id]=demoResponses[item.id]||'');
   answers.result_email=demoResponses.result_email||'';
   answers.researcher_code=demoResponses.researcher_code||'';
-  const header=['submitted_at','language','scenario','scenario_label','condition','condition_label','nickname'].concat(Object.keys(answers));
+  const metaKeys=['aa_level','pts_level','guilt_level','scenario_type','title_text','caption_text','visibility_setting','views','likes','comments','shares','follower_gain','start_image_asset','video_asset','selected_direction_id','selected_direction_label','direction_intensity','direction_expected_views','direction_expected_followers','selected_editing_id','selected_editing_label','editing_intensity','editing_expected_views','editing_expected_followers','selected_title_id','selected_title_label','title_intensity','title_expected_views','title_expected_followers','selected_caption_id','selected_caption_label','caption_intensity','caption_expected_views','caption_expected_followers','selected_visibility_id','selected_visibility_label','visibility_intensity','visibility_expected_views','visibility_expected_followers','stimulation_score','total_expected_views','total_expected_followers'];
+  const header=['submitted_at','language','scenario','scenario_label','condition','condition_label','nickname'].concat(metaKeys).concat(Object.keys(answers));
   const submittedAt=new Date().toISOString();
-  const wideRow=[submittedAt,LANG,SCENARIO,S.label,COND,C.name,NICK].concat(Object.keys(answers).map(key=>answers[key]));
+  const wideRow=[submittedAt,LANG,SCENARIO,S.label,COND,C.name,NICK].concat(metaKeys.map(key=>scenarioMeta[key]||'')).concat(Object.keys(answers).map(key=>answers[key]));
   const csv=[header,wideRow].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const saved=document.getElementById('saved');
   nextBtn.disabled=true;
@@ -245,6 +247,7 @@ async function saveSurvey(){
     condition:COND,
     conditionLabel:C.name,
     nickname:NICK,
+    scenarioMeta,
     followupEmail:demoResponses.result_email||'',
     answers,
     header,
