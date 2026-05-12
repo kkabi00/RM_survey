@@ -651,6 +651,106 @@ window.EXP_DATA = {
 })();
 
 (function(){
+  const snsScenario = {
+    label: '사이버불링 vs 놀이공원 영상',
+    messenger: [
+      ['friend', '지인 A 사진으로 짧은 AI 영상을 만들어보려고 해.'],
+      ['friend', '같은 사진이어도 설정에 따라 완전히 다른 영상이 만들어질 수 있대.'],
+      ['user', '알겠어. 내가 영상 제작 도구에서 한번 만들어볼게.']
+    ],
+    startImage: '../../../assets/group_start.png',
+    startImageRoot: 'assets/group_start.png',
+    request: '여러 사람이 함께 있는 사진을 바탕으로 짧은 deepfake 영상을 생성합니다.',
+    aiIntro: '입력 이미지는 모든 조건에서 동일하며, 조건에 따라 생성되는 deepfake 영상의 내용만 달라집니다.',
+    highOutcome: 'AI deepfake 영상은 사진 속 지인 A가 친구들 사이에서 웃음거리처럼 보이도록 생성되었습니다. 영상 속 A는 실제로 하지 않은 우스꽝스럽고 민망한 행동을 하는 것처럼 보이며, 주변 사람들은 이를 보고 웃거나 조롱하는 반응을 보입니다. 영상은 전체 공개로 업로드되었고, 조회수와 댓글, 공유 수가 빠르게 증가합니다.',
+    lowOutcome: 'AI deepfake 영상은 사진 속 지인 A가 친구들과 놀이공원에서 즐겁게 어울리는 장면으로 생성되었습니다. 영상 속 A는 친구들과 함께 놀이기구를 타고, 사진을 찍고, 밝은 분위기에서 자연스럽게 어울리는 모습으로 나타납니다. 영상은 친구 공개로 업로드되었고, 사람들은 즐겁고 자연스러운 분위기에 반응합니다.',
+    videoHigh: '../../../videos/high guilt senario 2.mp4',
+    videoLow: '../../../videos/low guilt senario 2.mp4',
+    outcomes: {
+      high: {
+        scenario_type: 'cyberbullying',
+        title_text: '이 사람 진짜 왜 이래?',
+        caption_text: 'ㅋㅋㅋ 이거 보면 못 잊음',
+        visibility_setting: '전체 공개',
+        views: '12.3K',
+        likes: '6.2K',
+        comments: '840',
+        shares: '1.1K',
+        follower_gain: '+3.0K',
+        result_text: 'AI deepfake 영상은 사진 속 지인 A가 친구들 사이에서 웃음거리처럼 보이도록 생성되었습니다. 영상 속 A는 실제로 하지 않은 우스꽝스럽고 민망한 행동을 하는 것처럼 보이며, 주변 사람들은 이를 보고 웃거나 조롱하는 반응을 보입니다. 영상은 전체 공개로 업로드되었고, 조회수와 댓글, 공유 수가 빠르게 증가합니다.',
+        video_asset: '../../../videos/high guilt senario 2.mp4'
+      },
+      low: {
+        scenario_type: 'amusement_park',
+        title_text: '친구들과 놀이공원 간 날',
+        caption_text: '다 같이 즐거웠던 하루',
+        visibility_setting: '친구 공개',
+        views: '2.7K',
+        likes: '1.1K',
+        comments: '126',
+        shares: '210',
+        follower_gain: '+700',
+        result_text: 'AI deepfake 영상은 사진 속 지인 A가 친구들과 놀이공원에서 즐겁게 어울리는 장면으로 생성되었습니다. 영상 속 A는 친구들과 함께 놀이기구를 타고, 사진을 찍고, 밝은 분위기에서 자연스럽게 어울리는 모습으로 나타납니다. 영상은 친구 공개로 업로드되었고, 사람들은 즐겁고 자연스러운 분위기에 반응합니다.',
+        video_asset: '../../../videos/low guilt senario 2.mp4'
+      }
+    },
+    article: {
+      high: {
+        kicker: 'Online Culture',
+        title: 'AI 영상 게시물, 빠르게 퍼진 조롱성 편집',
+        sub: '같은 시작 사진에서 만들어진 영상이 공개 게시물로 확산되며 조회수와 댓글이 빠르게 늘었다.',
+        body: [
+          '한 AI 영상 제작 도구로 만든 짧은 영상이 업로드 이후 빠르게 퍼졌다. 게시물은 지인 A가 실제로 하지 않은 민망한 행동을 하는 것처럼 보이게 구성되었다.',
+          '영상은 특정 플랫폼명을 드러내지 않는 일반 공개 게시물 형태로 공유되었고, 조회수와 댓글, 공유 수가 짧은 시간 안에 증가했다.',
+          '일부 반응은 영상 속 인물을 웃음거리로 소비하는 방향으로 이어졌다. 제작 설정과 공개 범위가 결과의 분위기를 크게 바꾼 사례로 언급된다.'
+        ],
+        quote: '“같은 사진이어도 설정에 따라 전혀 다른 사회적 반응이 만들어질 수 있다.”',
+        comments: [['viewer_24','게시물이 너무 빨리 퍼진 것 같음.'],['daily_user','실제 장면처럼 보여서 더 신경 쓰인다.'],['clip_note','조회수는 높지만 분위기는 좋지 않아 보임.']]
+      },
+      low: {
+        kicker: 'Online Culture',
+        title: 'AI 영상 게시물, 놀이공원에서 보낸 즐거운 하루처럼 공유',
+        sub: '지인 A가 친구들과 밝게 어울리는 영상은 친구 공개 게시물로 공유되며 자연스러운 반응을 얻었다.',
+        body: [
+          '한 AI 영상 제작 도구로 만든 짧은 영상이 친구 공개 게시물로 업로드됐다. 영상은 지인 A가 친구들과 놀이공원에서 즐겁게 시간을 보내는 장면처럼 구성되었다.',
+          '게시물에는 놀이기구를 타고 사진을 찍는 듯한 밝은 분위기의 장면이 담겼고, 반응은 비교적 자연스럽고 긍정적인 편이었다.',
+          '같은 시작 사진을 사용하더라도 영상 설정과 공개 범위에 따라 결과의 의미와 반응은 크게 달라질 수 있다.'
+        ],
+        quote: '“영상은 일상적인 추억 게시물처럼 받아들여졌다.”',
+        comments: [['viewer_24','친구들이랑 놀러 간 영상 같아서 자연스러움.'],['daily_user','밝은 분위기라 보기 편했다.'],['clip_note','친구 공개면 무난한 게시물처럼 보임.']]
+      }
+    }
+  };
+
+  window.EXP_DATA.scenarios.sns = snsScenario;
+  if(window.EXP_UI && window.EXP_UI.start){
+    window.EXP_UI.start.scenarioSnsStrong = '사이버불링 vs 놀이공원';
+    window.EXP_UI.start.scenarioSnsSub = 'AI 영상 제작 설정';
+  }
+  if(window.EXP_UI && window.EXP_UI.video){
+    Object.assign(window.EXP_UI.video, {
+      photoAlt: '여러 사람이 함께 있는 시작 이미지',
+      start: 'AI 영상 제작 도구 시작',
+      photoRequest: '화면에는 여러 사람이 함께 있는 이미지가 제시됩니다. 당신은 이 이미지를 바탕으로 짧은 deepfake 영상을 만들 수 있는 AI 영상 제작 도구를 사용하게 됩니다. 같은 이미지를 사용하더라도, 조건에 따라 생성되는 영상은 달라집니다.',
+      photoChecked: '시작 이미지가 확인되었습니다.',
+      photoBase: '모든 조건에서 동일한 여러 사람 이미지가 기준으로 사용됩니다.',
+      direction: '조건에 따라 deepfake 영상을 생성합니다.',
+      renderStart: '영상 생성 시작',
+      rendering: '영상 생성 중...',
+      videoDone: '업로드 결과 확인',
+      done: '확인 완료',
+      articleButton: '설문으로 이동',
+      sharedLine: '생성된 영상이 게시물로 업로드되고',
+      afterLine: '반응이 표시됩니다.'
+    });
+  }
+  if(window.EXP_UI && window.EXP_UI.article){
+    window.EXP_UI.article.captionSnsHigh = '지인 A를 조롱하는 사이버불링 영상 게시물 미리보기.';
+    window.EXP_UI.article.captionSnsLow = '지인 A가 친구들과 놀이공원에서 즐겁게 어울리는 영상 게시물 미리보기.';
+  }
+})();
+
+(function(){
   const enSections = [
     ['Outcome Benefit',['This video ultimately benefited Amily.','This video helped Amily receive more attention.','Overall, the outcome of this video felt successful.']],
     ['Credit Claiming',['I feel that my choices contributed to the positive response this video received.','Looking at the outcome, I feel that I was meaningfully involved in making this video.','I feel that the choices I made influenced Amily receiving attention.']],

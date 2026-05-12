@@ -1,18 +1,16 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Video AI</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
 <div class="app-shell"><div class="phone"><div class="screen">
 <div class="statusbar"><span>9:41</span><span>Video AI</span></div>
-<div class="app-header"><div class="app-icon">✦</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span> · <span data-cond-label></span></div></div><div class="progress">2 / 4</div></div>
+<div class="app-header"><div class="app-icon">AI</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span> · <span data-cond-label></span></div></div><div class="progress">1 / 2</div></div>
 <div class="content"><div class="ai-log" id="log"></div></div>
-<div class="footer" id="footer"><div class="hint" id="footerHint"></div><button class="btn full" id="articleBtn" style="display:none"></button></div>
+<div class="footer" id="footer"><div class="hint" id="footerHint"></div><button class="btn full" id="surveyBtn" style="display:none"></button></div>
 </div></div></div>
-<div class="blackout" id="blackout"><div class="dots">...</div><div class="line" id="line1"></div><div class="line" id="line2"></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const log=document.getElementById('log');
-const BASE_PHOTO='../../../images/amily.png';
+let meta=getScenarioOutcomeMeta();
+const BASE_PHOTO=S.startImage || '../../../assets/person_a.png';
 document.getElementById('footerHint').textContent=UI.video.footerHint;
-document.getElementById('articleBtn').textContent=UI.video.articleButton;
-document.getElementById('line1').textContent=UI.video.sharedLine;
-document.getElementById('line2').textContent=UI.video.afterLine;
+document.getElementById('surveyBtn').textContent=UI.video.articleButton;
 
 function add(type, html){
   const el=document.createElement('div');
@@ -35,54 +33,19 @@ async function userSay(text, ms=520){
 }
 function addPhotoCard(){
   const card=document.createElement('div'); card.className='photo-upload-card';
-  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">amily.png</div>';
+  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">group_start.png</div>';
   log.appendChild(card); scrollBottom();
 }
-async function showUploadMotion(ms){
-  const card=document.createElement('div'); card.className='upload-card';
-  card.innerHTML='<div class="upload-title">'+escapeHtml(UI.video.uploading)+'</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">amily.png</div>';
-  log.appendChild(card); scrollBottom();
-  const fill=card.querySelector('.upload-fill');
-  const start=performance.now();
-  await new Promise(resolve=>{
-    function frame(now){
-      const p=Math.min(1,(now-start)/ms);
-      fill.style.width=(p*100)+'%';
-      if(p<1) requestAnimationFrame(frame); else setTimeout(resolve, FAST?80:350);
-    }
-    requestAnimationFrame(frame);
-  });
-  card.classList.add('complete');
-  card.querySelector('.upload-title').textContent=UI.video.uploaded;
-  await delay(450);
+function optionCard(title, value, helper, buttonText){
+  return '<div class="setting-card"><div><div class="setting-title">'+escapeHtml(title)+'</div><div class="setting-value">'+escapeHtml(value)+'</div>'+(helper?'<div class="setting-helper">'+escapeHtml(helper)+'</div>':'')+'</div><button class="btn secondary setting-btn" type="button">'+escapeHtml(buttonText)+'</button></div>';
 }
-function showChoices(opts){
+function showSetting(title, value, helper, buttonText){
   return new Promise(resolve=>{
-    const row=document.createElement('div'); row.className='choice-row';
-    opts.forEach((o,i)=>{
-      const btn=document.createElement('button'); btn.className='choice-btn';
-      btn.innerHTML='<b>'+String.fromCharCode(97+i)+')</b> '+escapeHtml(o);
-      btn.onclick=()=>{ row.classList.add('disabled'); btn.classList.add('selected'); setTimeout(()=>resolve(o), FAST?80:450); };
-      row.appendChild(btn);
-    });
-    log.appendChild(row); scrollBottom();
-  });
-}
-function showFinalVideoChoice(){
-  return new Promise(resolve=>{
-    const text=UI.video.finalChoice;
-    const row=document.createElement('div'); row.className='choice-row';
-    const btn=document.createElement('button'); btn.className='choice-btn';
-    btn.textContent=text;
-    btn.onclick=async ()=>{
-      row.classList.add('disabled');
-      btn.classList.add('selected');
-      await delay(FAST?80:350);
-      await userSay(text, 420);
-      resolve(text);
-    };
-    row.appendChild(btn);
-    log.appendChild(row); scrollBottom();
+    const wrap=document.createElement('div'); wrap.className='setting-wrap';
+    wrap.innerHTML=optionCard(title,value,helper,buttonText);
+    const btn=wrap.querySelector('button');
+    btn.onclick=()=>{ btn.disabled=true; btn.textContent='선택됨'; wrap.classList.add('selected'); setTimeout(resolve, FAST?80:360); };
+    log.appendChild(wrap); scrollBottom();
   });
 }
 async function showRender(ms){
@@ -101,118 +64,206 @@ async function showRender(ms){
   });
   card.classList.add('complete');
 }
-function addVideoResult(){
-  const pts=C.pts;
-  const body = pts==='high' ? S.highOutcome : S.lowOutcome;
-  const video = pts==='high' ? S.videoHigh : S.videoLow;
+async function showLowAARender(){
+  const total=FAST ? 1600 : 60000;
+  const statuses=[
+    '입력 이미지의 인물과 배경을 분석하는 중',
+    '선택한 설정을 영상 장면에 반영하는 중',
+    '표정과 동작을 자연스럽게 연결하는 중',
+    '업로드용 미리보기와 반응 정보를 구성하는 중'
+  ];
+  const card=document.createElement('div');
+  card.className='render-card lowaa-render-card';
+  card.innerHTML='<div class="render-title">'+escapeHtml(UI.video.rendering)+'</div><div class="render-track"><div class="render-fill" id="fill"></div></div><div class="render-status"><span class="status-dot"></span><span id="statusText"></span></div><div class="render-meta"><span id="elapsedText">0초</span><span>총 1분</span></div>';
+  log.appendChild(card); scrollBottom();
+  const fill=card.querySelector('#fill');
+  const statusText=card.querySelector('#statusText');
+  const elapsedText=card.querySelector('#elapsedText');
+  const start=performance.now();
+  await new Promise(resolve=>{
+    function frame(now){
+      const elapsed=now-start;
+      const p=Math.min(1, elapsed/total);
+      const realElapsed=Math.min(60, Math.floor(p*60));
+      const statusIndex=Math.min(statuses.length-1, Math.floor(realElapsed/15));
+      fill.style.width=(p*100)+'%';
+      statusText.textContent=statuses[statusIndex];
+      elapsedText.textContent=realElapsed+'초';
+      if(p<1) requestAnimationFrame(frame); else setTimeout(resolve, FAST?80:450);
+    }
+    requestAnimationFrame(frame);
+  });
+  card.classList.add('complete');
+}
+function addPreviewCard(){
   const box=document.createElement('div'); box.className='video-box';
-  box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
-  if(C.aa==='high'){
-    box.innerHTML+='<button class="btn video-next" type="button">'+escapeHtml(UI.video.videoDone)+'</button>';
-  }
+  const label = meta.scenario_type === 'cyberbullying' ? 'Cyberbullying deepfake' : 'Playing together deepfake';
+  box.innerHTML='<div class="preview-label">'+escapeHtml(label)+'</div><video class="result-video" src="'+meta.video_asset+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(meta.result_text)+'</div><button class="btn video-next" type="button">업로드 결과 보기</button>';
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
-  if(C.aa==='high'){
-    return new Promise(resolve=>{
-      const btn=box.querySelector('.video-next');
+  return new Promise(resolve=>{
+    const btn=box.querySelector('.video-next');
+    btn.onclick=()=>{ btn.disabled=true; btn.textContent='생성 요청됨'; resolve(); };
+  });
+}
+const c3Steps=[
+  {key:'direction', question:'이 사진으로 만들 영상의 방향을 선택하세요.', feedback:'선택한 영상 방향이 적용되었습니다.', options:[
+    {label:'A가 조금 어색해 보이는 영상', id:'direction_mild_mocking', intensity:1, expected_views:120, expected_followers:10, display_reward:'예상 반응: +120 views · +10 followers'},
+    {label:'A가 우스꽝스럽게 보이는 영상', id:'direction_moderate_mocking', intensity:2, expected_views:850, expected_followers:80, display_reward:'예상 반응: +850 views · +80 followers'},
+    {label:'A가 사람들이 보고 놀릴 만한 영상', id:'direction_strong_mocking', intensity:3, expected_views:2400, expected_followers:230, display_reward:'예상 반응: +2.4K views · +230 followers'}
+  ]},
+  {key:'editing', question:'영상 속 A의 모습을 어떻게 편집하시겠습니까?', feedback:'선택한 편집 방식이 적용되었습니다.', options:[
+    {label:'표정과 동작을 살짝 과장한다', id:'editing_slight_exaggeration', intensity:1, expected_views:180, expected_followers:15, display_reward:'예상 반응: +180 views · +15 followers'},
+    {label:'표정과 동작을 더 어색하게 만든다', id:'editing_awkward', intensity:2, expected_views:1100, expected_followers:95, display_reward:'예상 반응: +1.1K views · +95 followers'},
+    {label:'실제보다 더 민망하고 우스꽝스럽게 보이게 한다', id:'editing_embarrassing', intensity:3, expected_views:3100, expected_followers:310, display_reward:'예상 반응: +3.1K views · +310 followers'}
+  ]},
+  {key:'title', question:'영상 제목을 선택하세요.', feedback:'입력한 제목이 적용되었습니다.', options:[
+    {label:'A의 이상한 순간', id:'title_weird_moment', intensity:1, expected_views:220, expected_followers:20, display_reward:'예상 반응: +220 views · +20 followers'},
+    {label:'이 장면 좀 웃김', id:'title_kind_of_funny', intensity:2, expected_views:1400, expected_followers:120, display_reward:'예상 반응: +1.4K views · +120 followers'},
+    {label:'이 사람 진짜 왜 이래?', id:'title_why_like_this', intensity:3, expected_views:3800, expected_followers:420, display_reward:'예상 반응: +3.8K views · +420 followers'}
+  ]},
+  {key:'caption', question:'영상에 표시할 문구를 선택하세요.', feedback:'입력한 문구가 적용되었습니다.', options:[
+    {label:'이 장면 조금 웃김', id:'caption_slightly_funny', intensity:1, expected_views:200, expected_followers:18, display_reward:'예상 반응: +200 views · +18 followers'},
+    {label:'ㅋㅋ 이거 뭐야', id:'caption_what_is_this', intensity:2, expected_views:1600, expected_followers:140, display_reward:'예상 반응: +1.6K views · +140 followers'},
+    {label:'ㅋㅋㅋ 이거 보면 못 잊음', id:'caption_unforgettable', intensity:3, expected_views:4200, expected_followers:500, display_reward:'예상 반응: +4.2K views · +500 followers'}
+  ]},
+  {key:'visibility', question:'영상을 어디에 공유하시겠습니까?', feedback:'선택한 공개 범위가 적용되었습니다.', options:[
+    {label:'일부 친구에게만 공유한다', id:'visibility_some_friends', intensity:1, expected_views:300, expected_followers:25, display_reward:'예상 반응: +300 views · +25 followers'},
+    {label:'친구들이 있는 단체 채팅방에 공유한다', id:'visibility_group_chat', intensity:2, expected_views:1900, expected_followers:180, display_reward:'예상 반응: +1.9K views · +180 followers'},
+    {label:'전체 공개로 업로드한다', id:'visibility_public', intensity:3, expected_views:8700, expected_followers:1500, display_reward:'예상 반응: +8.7K views · +1.5K followers'}
+  ]}
+];
+const c3Selections={};
+function isC3LowAAHighGuilt(){ return COND==='c3' && C.aa==='low' && C.pts==='high'; }
+function showC3Step(step, index){
+  return new Promise(resolve=>{
+    let selected=null;
+    const panel=document.createElement('div');
+    panel.className='selection-panel card';
+    panel.innerHTML='<div class="selection-count">'+(index+1)+' / '+c3Steps.length+'</div><h2 class="card-title">'+escapeHtml(step.question)+'</h2><div class="option-stack"></div><div class="selection-feedback" aria-live="polite"></div><button class="btn full selection-next" type="button">다음</button>';
+    const stack=panel.querySelector('.option-stack');
+    step.options.forEach(opt=>{
+      const btn=document.createElement('button');
+      btn.className='option-card';
+      btn.type='button';
+      btn.innerHTML='<strong>'+escapeHtml(opt.label)+'</strong><span class="small reward-hint">'+escapeHtml(opt.display_reward)+'</span>';
       btn.onclick=()=>{
-        btn.disabled=true;
-        btn.textContent=UI.video.done;
-        resolve();
+        selected=opt;
+        stack.querySelectorAll('.option-card').forEach(el=>el.classList.remove('active'));
+        btn.classList.add('active');
+        panel.querySelector('.selection-feedback').textContent=step.feedback;
       };
+      stack.appendChild(btn);
     });
-  }
+    panel.querySelector('.selection-next').onclick=()=>{
+      if(!selected){
+        alert('선택지를 하나 골라주세요.');
+        return;
+      }
+      c3Selections[step.key]=selected;
+      panel.querySelector('.selection-next').disabled=true;
+      resolve(selected);
+    };
+    log.appendChild(panel);
+    panel.scrollIntoView({block:'start', behavior:FAST?'auto':'smooth'});
+  });
 }
-async function blackTransition(){
-  const b=document.getElementById('blackout'), l1=document.getElementById('line1'), l2=document.getElementById('line2');
-  b.classList.add('show');
-  await delay(900); l1.classList.add('show');
-  await delay(900); l2.classList.add('show');
-  await delay(1300);
-  b.classList.remove('show');
-  await delay(500);
+function buildC3Meta(){
+  const out={};
+  let stimulation=0, views=0, followers=0;
+  Object.entries(c3Selections).forEach(([key,opt])=>{
+    out['selected_'+key+'_id']=opt.id;
+    out['selected_'+key+'_label']=opt.label;
+    out[key+'_intensity']=opt.intensity;
+    out[key+'_expected_views']=opt.expected_views;
+    out[key+'_expected_followers']=opt.expected_followers;
+    stimulation+=opt.intensity;
+    views+=opt.expected_views;
+    followers+=opt.expected_followers;
+  });
+  out.stimulation_score=stimulation;
+  out.total_expected_views=views;
+  out.total_expected_followers=followers;
+  out.title_text=out.selected_title_label || meta.title_text;
+  out.caption_text=out.selected_caption_label || meta.caption_text;
+  out.visibility_setting=out.selected_visibility_label || meta.visibility_setting;
+  out.result_text='AI 영상은 지인 A를 웃음거리로 만드는 방식으로 생성되었습니다. 영상 속 A는 실제로 하지 않은 우스꽝스럽고 민망한 행동을 하는 것처럼 보이며, 사람들은 이를 보고 웃거나 조롱하는 반응을 보입니다.';
+  return out;
 }
-function addArticleTyping(){
-  const msg=document.createElement('div'); msg.className='article-message';
-  msg.innerHTML='<div class="avatar">A</div><div class="article-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
-  log.appendChild(msg); scrollBottom(); return msg;
+function addUploadResult(){
+  const box=document.createElement('div'); box.className='post-card';
+  const expectedHtml = meta.stimulation_score ? `
+      <div class="result-note">선택한 설정으로 AI 영상이 생성되었습니다.</div>
+      <div class="metric-heading">예상 반응 합계</div>
+      <div class="metric-grid">
+        <div><b>${escapeHtml(meta.total_expected_views)}</b><span>예상 조회수</span></div>
+        <div><b>${escapeHtml(meta.total_expected_followers)}</b><span>예상 팔로워 증가</span></div>
+        <div><b>${escapeHtml(meta.stimulation_score)}</b><span>stimulation score</span></div>
+      </div>
+      <div class="metric-heading">업로드 후 반응</div>` : '';
+  box.innerHTML=`
+    <div class="post-top"><div class="avatar">A</div><div><div class="post-account">AI Video Post</div><div class="post-visibility">${escapeHtml(meta.visibility_setting)}</div></div></div>
+    <video class="post-video" src="${meta.video_asset}" controls playsinline preload="metadata"></video>
+    <div class="post-body">
+      <div class="post-title">${escapeHtml(meta.title_text)}</div>
+      <div class="post-caption">${escapeHtml(meta.caption_text)}</div>
+      <div class="post-desc">${escapeHtml(meta.result_text)}</div>
+      ${expectedHtml}
+      <div class="metric-grid">
+        <div><b>${escapeHtml(meta.views)}</b><span>조회수</span></div>
+        <div><b>${escapeHtml(meta.likes)}</b><span>좋아요</span></div>
+        <div><b>${escapeHtml(meta.comments)}</b><span>댓글</span></div>
+        <div><b>${escapeHtml(meta.shares)}</b><span>공유</span></div>
+        <div><b>${escapeHtml(meta.follower_gain)}</b><span>팔로워 증가</span></div>
+      </div>
+    </div>`;
+  log.appendChild(box);
+  box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
 }
-function addArticleMessage(html){
-  const msg=document.createElement('div'); msg.className='article-message';
-  msg.innerHTML='<div class="avatar">A</div><div class="article-bubble">'+html+'</div>';
-  log.appendChild(msg); scrollBottom(); return msg;
-}
-async function amilySayArticle(html, delayText){
-  const t=addArticleTyping(); await delay(humanDelay(delayText, 620)); t.remove();
-  const msg=addArticleMessage(html); await delay(520);
-  return msg;
-}
-async function articleLinkCard(){
-  const pts=C.pts;
-  const article=S.article[pts];
-  const nickname=qs('nick',UI.participantNickname);
-  log.innerHTML='';
-  document.querySelector('.statusbar span:last-child').textContent='Talk';
-  document.querySelector('.app-icon').textContent='A';
-  document.querySelector('.app-title').textContent='Talk';
-  document.querySelector('.app-subtitle').textContent='Amily';
-  document.querySelector('.progress').textContent='3 / 4';
-  const greeting=UI.video.articleGreeting.replace('{nick}',nickname);
-  await amilySayArticle('<div class="article-text">'+escapeHtml(greeting)+'</div>', greeting);
-  const msg=await amilySayArticle('<div class="article-text">'+escapeHtml(UI.video.articleNews)+'</div><div class="link-card"><div class="kicker">Article Link</div><div class="headline">'+escapeHtml(article.title)+'</div><div class="url">theculturetimes.example/article/amily</div></div>', UI.video.articleNews);
-  msg.querySelector('.link-card').onclick=()=>{location.href=pathTo('article')};
-  add('sys',escapeHtml(UI.video.articleInstruction));
-  document.getElementById('footerHint').textContent=UI.video.articleInstruction;
+function saveMeta(){
+  try{
+    localStorage.setItem('rm_survey_sns_meta', JSON.stringify({
+      saved_at:new Date().toISOString(),
+      language:LANG,
+      scenario:SCENARIO,
+      ...meta
+    }));
+  }catch(err){}
 }
 async function run(){
   add('sys',escapeHtml(UI.video.start));
-  await delay(650);
+  await delay(500);
 
-  await userSay(UI.video.photoRequest);
-  await showUploadMotion(FAST?500:2400);
+  await aiSay(UI.video.photoRequest);
   addPhotoCard();
   await delay(500);
   await aiSay(UI.video.photoChecked);
   await aiSay(UI.video.photoBase);
-
-  await userSay(S.request);
-  await aiSay(UI.video.direction);
-  await aiSay(S.aiIntro);
-
-  if(C.aa==='high'){
-    await aiSay(UI.video.auto1);
-    await aiSay(UI.video.auto2);
-  }else{
-    for(const step of D.choices.steps){
-      await aiSay(step.q, 420);
-      await showChoices(step.opts);
-      await delay(360);
-      await aiSay(step.ai, 420);
+  if(isC3LowAAHighGuilt()){
+    for(let i=0;i<c3Steps.length;i++){
+      await showC3Step(c3Steps[i], i);
+      await delay(220);
     }
-    const rev=D.choices.revision;
-    await aiSay(rev.q,420);
-    await showChoices(rev.opts);
-    await delay(360);
-    await aiSay(rev.ai,420);
-    await aiSay(UI.video.generate,420);
+    meta={...meta, ...buildC3Meta()};
+    await aiSay('선택한 설정으로 영상이 생성됩니다.');
+  }else{
+    await aiSay(meta.scenario_type === 'cyberbullying' ? '조건에 따라 사이버불링 deepfake 영상이 생성됩니다.' : '조건에 따라 친구들과 같이 어울려 노는 deepfake 영상이 생성됩니다.');
   }
 
-  add('sys','🎬 '+escapeHtml(UI.video.renderStart));
-  await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:30000));
-  if(C.aa==='high'){
-    await addVideoResult();
+  add('sys','▶ '+escapeHtml(UI.video.renderStart));
+  if(C.aa==='low'){
+    await showLowAARender();
   }else{
-    addVideoResult();
-    await delay(500);
-    await aiSay(UI.video.chooseFinal,420);
-    await showFinalVideoChoice();
-    await delay(400);
-    await aiSay(UI.video.savedFinal,420);
+    await showRender(FAST?900:6000);
   }
+  await addPreviewCard();
   await delay(350);
-  await blackTransition();
-  await articleLinkCard();
+  addUploadResult();
+  saveMeta();
+  document.getElementById('footerHint').style.display='none';
+  document.getElementById('surveyBtn').style.display='';
+  enableWhenScrolledToBottom(document.getElementById('surveyBtn'));
 }
-document.getElementById('articleBtn').onclick=()=>{location.href=pathTo('article')};
+document.getElementById('surveyBtn').onclick=()=>{location.href=pathTo('survey')};
 run();
 </script></body></html>

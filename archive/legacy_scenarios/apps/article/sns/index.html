@@ -7,8 +7,7 @@
 </div></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const A=S.article[C.pts];
-const articleImage=`../../../images/${C.pts} PTS 2.png`;
-const articleCaption=C.pts==='high' ? UI.article.captionSnsHigh : UI.article.captionSnsLow;
+const meta=getScenarioOutcomeMeta();
 const el=document.getElementById('article');
 el.innerHTML = `
   <div class="masthead">The Culture Times</div>
@@ -16,10 +15,10 @@ el.innerHTML = `
   <h1 class="article-title">${escapeHtml(A.title)}</h1>
   <div class="article-sub">${escapeHtml(A.sub)}</div>
   <div class="byline">${escapeHtml(UI.article.byline)}</div>
-  <figure class="article-photo">
-    <img src="${articleImage}" alt="Amily AI video still">
-    <figcaption>${escapeHtml(articleCaption)}</figcaption>
-  </figure>
+  <div class="article-post-summary">
+    <b>${escapeHtml(meta.title_text)}</b>
+    <span>${escapeHtml(meta.caption_text)} · ${escapeHtml(meta.visibility_setting)} · 조회수 ${escapeHtml(meta.views)}</span>
+  </div>
   <div class="article-body">${A.body.map(p=>`<p>${escapeHtml(p)}</p>`).join('')}</div>
   <div class="quote">${escapeHtml(A.quote)}</div>
   <div class="comments"><h3>${escapeHtml(UI.article.comments)}</h3>${A.comments.map(c=>`<div class="comment"><div class="name">${escapeHtml(c[0])}</div><div class="text">${escapeHtml(c[1])}</div></div>`).join('')}</div>

@@ -58,6 +58,105 @@ function setMeta(){
 }
 window.addEventListener('DOMContentLoaded', setMeta);
 
+function getScenarioOutcomeMeta(){
+  const aaLevel = C.aa === 'high' ? 'HighAA' : 'LowAA';
+  const ptsLevel = C.pts === 'high' ? 'HighPTS' : 'LowPTS';
+  const guiltLevel = C.pts === 'high' ? 'HighGuilt' : 'LowGuilt';
+  const fallback = {
+    high: {
+      scenario_type: 'high_pts',
+      title_text: '',
+      caption_text: '',
+      visibility_setting: '',
+      views: '',
+      likes: '',
+      comments: '',
+      shares: '',
+      follower_gain: '',
+      result_text: S.highOutcome || '',
+      video_asset: S.videoHigh || ''
+    },
+    low: {
+      scenario_type: 'low_pts',
+      title_text: '',
+      caption_text: '',
+      visibility_setting: '',
+      views: '',
+      likes: '',
+      comments: '',
+      shares: '',
+      follower_gain: '',
+      result_text: S.lowOutcome || '',
+      video_asset: S.videoLow || ''
+    }
+  };
+  const outcome = (S.outcomes && S.outcomes[C.pts]) || fallback[C.pts];
+  const base = {
+    condition: COND,
+    aa_level: aaLevel,
+    pts_level: ptsLevel,
+    guilt_level: guiltLevel,
+    scenario_type: outcome.scenario_type || fallback[C.pts].scenario_type,
+    title_text: outcome.title_text || '',
+    caption_text: outcome.caption_text || '',
+    visibility_setting: outcome.visibility_setting || '',
+    views: outcome.views || '',
+    likes: outcome.likes || '',
+    comments: outcome.comments || '',
+    shares: outcome.shares || '',
+    follower_gain: outcome.follower_gain || '',
+    start_image_asset: S.startImageRoot || S.startImage || '',
+    video_asset: outcome.video_asset || fallback[C.pts].video_asset,
+    result_text: outcome.result_text || fallback[C.pts].result_text
+  };
+  const selectionFields = {
+    selected_direction_id: '',
+    selected_direction_label: '',
+    direction_intensity: '',
+    direction_expected_views: '',
+    direction_expected_followers: '',
+    selected_editing_id: '',
+    selected_editing_label: '',
+    editing_intensity: '',
+    editing_expected_views: '',
+    editing_expected_followers: '',
+    selected_title_id: '',
+    selected_title_label: '',
+    title_intensity: '',
+    title_expected_views: '',
+    title_expected_followers: '',
+    selected_caption_id: '',
+    selected_caption_label: '',
+    caption_intensity: '',
+    caption_expected_views: '',
+    caption_expected_followers: '',
+    selected_visibility_id: '',
+    selected_visibility_label: '',
+    visibility_intensity: '',
+    visibility_expected_views: '',
+    visibility_expected_followers: '',
+    stimulation_score: '',
+    total_expected_views: '',
+    total_expected_followers: ''
+  };
+  const meta = {...base, ...selectionFields};
+  try{
+    const saved = JSON.parse(localStorage.getItem('rm_survey_sns_meta') || '{}');
+    if(saved && saved.scenario === SCENARIO && saved.condition === COND){
+      Object.keys(selectionFields).forEach(key=>{
+        if(saved[key] !== undefined) meta[key] = saved[key];
+      });
+      if(COND === 'c3'){
+        if(saved.selected_title_label) meta.title_text = saved.selected_title_label;
+        if(saved.selected_caption_label) meta.caption_text = saved.selected_caption_label;
+        if(saved.selected_visibility_label) meta.visibility_setting = saved.selected_visibility_label;
+        meta.result_text = 'AI 영상은 지인 A를 웃음거리로 만드는 방식으로 생성되었습니다. 영상 속 A는 실제로 하지 않은 우스꽝스럽고 민망한 행동을 하는 것처럼 보이며, 사람들은 이를 보고 웃거나 조롱하는 반응을 보입니다.';
+      }
+    }
+  }catch(err){}
+  return meta;
+}
+
 function enableWhenScrolledToBottom(button, scrollEl=document.querySelector('.content'), threshold=16){
   if(!button || !scrollEl) return;
   button.classList.add('locked');
