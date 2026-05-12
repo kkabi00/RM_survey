@@ -379,6 +379,8 @@ window.EXP_DATA = {
   window.EXP_SURVEY = {sections, demographics};
 })();
 
+/* snsScenario (scenario 2) removed — kept in archive/legacy_scenarios */
+/*
 (function(){
   const snsScenario = {
     label: '사이버불링 vs 놀이공원 영상',
@@ -478,6 +480,7 @@ window.EXP_DATA = {
     window.EXP_UI.article.captionSnsLow = '지인 A가 친구들과 놀이공원에서 즐겁게 어울리는 영상 게시물 미리보기.';
   }
 })();
+*/
 
 (function(){
   function formatCurrentTime(){

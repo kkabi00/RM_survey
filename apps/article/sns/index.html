@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>E-mail</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
+<div class="app-shell"><div class="phone"><div class="screen">
+<div class="statusbar"><span>9:41</span><span>Mail</span></div>
+<div class="app-header"><div class="app-icon">@</div><div><div class="app-title">Mail</div><div class="app-subtitle">Creator Rewards Team</div></div><div class="progress">3 / 3</div></div>
+<div class="content" style="padding:0"><div class="article-wrap" id="email"></div></div>
+<div class="footer"><button class="btn full" id="surveyBtn"></button></div>
+</div></div></div>
+<script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
+const E=(S.email && S.email[C.pts]) || window.EXP_DATA.scenarios.sns.email[C.pts];
+const emailImage=C.pts==='high' ? '../../../images/high_pts_silver_email.png' : '../../../images/low_pts_silver_email.png';
+const emailCaption=C.pts==='high' ? UI.article.captionSnsHigh : UI.article.captionSnsLow;
+const nickname=qs('nick',UI.participantNickname);
+const el=document.getElementById('email');
+el.innerHTML = `
+  <div class="mail-shell">
+    <div class="mail-topline">
+      <div><b>From</b> Creator Rewards Team &lt;creator-rewards@yodobu.com&gt;</div>
+      <div><b>To</b> ${escapeHtml(nickname)}</div>
+    </div>
+    <div class="reward-hero">
+      <div class="reward-kicker">Creator Reward Notification</div>
+      <div class="reward-number">10,000,000+</div>
+      <div class="reward-label">누적 조회수 달성</div>
+    </div>
+    <h1 class="article-title">${escapeHtml(E.subject)}</h1>
+    <div class="article-sub">${escapeHtml(E.preview)}</div>
+    <div class="byline">${escapeHtml(UI.article.byline)} · 영상 게시 3개월 후</div>
+    <div class="reward-callout">
+      <strong>creator님의 영상이 계정 성장 보상 기준을 충족했습니다.</strong>
+      <span>조회수, 팔로워 증가, 공유 지표를 기준으로 실버 버튼 지급 대상으로 분류되었습니다.</span>
+    </div>
+    <div class="stats-grid">${E.stats.map(item=>`<div class="stat-pill">${escapeHtml(item)}</div>`).join('')}</div>
+    <figure class="article-photo">
+      <img src="${emailImage}" alt="AI video still">
+    </figure>
+    <div class="article-body">${E.body.map(p=>`<p${p.startsWith('※ 경고:') ? ' class="warning-text"' : ''}>${escapeHtml(p)}</p>`).join('')}</div>
+    <div class="quote">실버 버튼 발송을 위해 아래 안내에 따라 크리에이터 보상 정보를 확인해주세요.</div>
+    <div class="exp-end-notice">
+      <div class="exp-end-dots">. . .</div>
+      <p>실험이 모두 종료되었습니다.</p>
+      <p>사후 설문으로 이동해주세요.</p>
+    </div>
+  </div>
+`;
+document.getElementById('surveyBtn').textContent=UI.article.surveyButton;
+document.getElementById('surveyBtn').onclick=()=>{location.href=pathTo('survey')};
+enableWhenScrolledToBottom(document.getElementById('surveyBtn'));
+
+const contentEl=document.querySelector('.content');
+const revealEls=[];
+Array.from(el.querySelector('.mail-shell').children).forEach(child=>{
+  if(child.classList.contains('article-body')){
+    Array.from(child.children).forEach(p=>{p.classList.add('scroll-reveal');revealEls.push(p);});
+  }else{
+    child.classList.add('scroll-reveal');revealEls.push(child);
+  }
+});
+const revealObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');revealObserver.unobserve(e.target);}});
+},{root:contentEl,threshold:0.05});
+revealEls.forEach(e=>revealObserver.observe(e));
+</script></body></html>

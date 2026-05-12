@@ -28,8 +28,8 @@
   <div class="card">
     <h2 class="card-title" id="scenarioTitle">시나리오 선택</h2>
     <div class="cond-row">
-      <button class="option-card active" data-s="dating"><strong id="datingStrong"></strong><span id="datingSub"></span></button>
-      <button class="option-card" data-s="sns"><strong id="snsStrong"></strong><span id="snsSub"></span></button>
+      <button class="option-card" data-s="dating"><strong id="datingStrong"></strong><span id="datingSub"></span></button>
+      <button class="option-card active" data-s="sns"><strong id="snsStrong"></strong><span id="snsSub"></span></button>
     </div>
   </div>
   <div class="card">
@@ -50,7 +50,7 @@ const params=new URLSearchParams(location.search);
 const fast=params.get('fast')==='1';
 const lang=window.EXP_LANG || 'ko';
 const ui=window.EXP_UI;
-const GOOGLE_SHEETS_WEB_APP_URL='https://script.google.com/macros/s/AKfycbxF-iP-hX1SbjinZX6BO_bHEjXCwejwLxQe4uqs67hLgMutPg3yv5DRGUOvPvd17YP1/exec';
+let selectedCondition=params.get('c') || 'c1';
 document.documentElement.lang=lang;
 
 function applyLanguage(){
@@ -70,20 +70,11 @@ function applyLanguage(){
   snsStrong.textContent=ui.start.scenarioSnsStrong;
   snsSub.textContent=ui.start.scenarioSnsSub;
   conditionTitle.textContent=ui.start.conditionTitle;
-  fastHelp.innerHTML=ui.start.fastHelp;
   startBtn.textContent=ui.start.startButton;
 }
-document.querySelectorAll('[data-s]').forEach(btn=>btn.onclick=()=>{s=btn.dataset.s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')});
-document.querySelectorAll('[data-c]').forEach(btn=>btn.onclick=()=>{c=btn.dataset.c;document.querySelectorAll('[data-c]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')});
-document.querySelectorAll('[data-lang]').forEach(btn=>{
-  btn.classList.toggle('active',btn.dataset.lang===lang);
-  btn.onclick=()=>{
-    const next=new URLSearchParams(location.search);
-    next.set('lang',btn.dataset.lang);
-    next.set('c',c);
-    if(fast) next.set('fast','1');
-    location.href=`index.html?${next.toString()}`;
-  };
+document.querySelectorAll('[data-s]').forEach(btn=>{
+  btn.classList.toggle('active',btn.dataset.s===s);
+  btn.onclick=()=>{s=btn.dataset.s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('active'));btn.classList.add('active')};
 });
 document.querySelectorAll('[data-c]').forEach(btn=>{
   btn.classList.toggle('active',btn.dataset.c===selectedCondition);
@@ -93,12 +84,20 @@ document.querySelectorAll('[data-c]').forEach(btn=>{
     btn.classList.add('active');
   };
 });
-document.getElementById('startBtn').onclick=async()=>{
-  const nick=ui.participantNickname || 'creator';
-  startBtn.disabled=true;
-  startBtn.textContent=ui.start.assigning;
-  const c=selectedCondition==='auto' ? await assignCondition() : selectedCondition;
-  const next=new URLSearchParams({s,c,nick,lang});
+document.querySelectorAll('[data-lang]').forEach(btn=>{
+  btn.classList.toggle('active',btn.dataset.lang===lang);
+  btn.onclick=()=>{
+    const next=new URLSearchParams(location.search);
+    next.set('lang',btn.dataset.lang);
+    next.set('c',selectedCondition);
+    if(fast) next.set('fast','1');
+    location.href=`index.html?${next.toString()}`;
+  };
+});
+applyLanguage();
+document.getElementById('startBtn').onclick=()=>{
+  const nick=nickInput.value.trim() || (ui.start.missingNickname || 'creator');
+  const next=new URLSearchParams({s,c:selectedCondition,nick,lang});
   if(fast) next.set('fast','1');
   location.href=`apps/video_ai/sns/index.html?${next.toString()}`;
 };
