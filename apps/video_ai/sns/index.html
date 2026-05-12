@@ -69,13 +69,14 @@ function showChoices(opts){
     log.appendChild(row); scrollBottom();
   });
 }
+const choiceLog=[];
 function addScoreLine(btn, followers, views){
   const el=document.createElement('div');
   el.className='score-badges';
   el.innerHTML='<span><b>+'+followers+'</b> followers</span><span><b>+'+views.toLocaleString()+'</b> views</span>';
   btn.insertAdjacentElement('beforebegin', el);
 }
-function showChoicesWithScore(opts, scores){
+function showChoicesWithScore(opts, scores, stepLabel){
   return new Promise(resolve=>{
     const row=document.createElement('div'); row.className='choice-row';
     opts.forEach((o,i)=>{
@@ -83,13 +84,44 @@ function showChoicesWithScore(opts, scores){
       btn.innerHTML='<b>'+String.fromCharCode(97+i)+')</b> '+escapeHtml(o);
       btn.onclick=()=>{
         row.classList.add('disabled'); btn.classList.add('selected');
-        if(scores && scores[i]) addScoreLine(btn, scores[i].f, scores[i].v);
+        const sc=scores && scores[i];
+        if(sc) addScoreLine(btn, sc.f, sc.v);
+        choiceLog.push({step:stepLabel||('step_'+(choiceLog.length+1)), option_index:i, option_label:o, expected_views:sc?sc.v:'', expected_followers:sc?sc.f:''});
         setTimeout(()=>resolve(o), FAST?80:450);
       };
       row.appendChild(btn);
     });
     log.appendChild(row); scrollBottom();
   });
+}
+function showChoicesLogged(opts, stepLabel){
+  return new Promise(resolve=>{
+    const row=document.createElement('div'); row.className='choice-row';
+    opts.forEach((o,i)=>{
+      const btn=document.createElement('button'); btn.className='choice-btn';
+      btn.innerHTML='<b>'+String.fromCharCode(97+i)+')</b> '+escapeHtml(o);
+      btn.onclick=()=>{
+        row.classList.add('disabled'); btn.classList.add('selected');
+        choiceLog.push({step:stepLabel||('step_'+(choiceLog.length+1)), option_index:i, option_label:o, expected_views:'', expected_followers:''});
+        setTimeout(()=>resolve(o), FAST?80:450);
+      };
+      row.appendChild(btn);
+    });
+    log.appendChild(row); scrollBottom();
+  });
+}
+function saveChoiceLog(){
+  try{
+    localStorage.setItem('rm_choice_log', JSON.stringify({
+      saved_at: new Date().toISOString(),
+      nickname: NICK,
+      scenario: SCENARIO,
+      condition: COND,
+      aa: C.aa,
+      pts: C.pts,
+      choices: choiceLog
+    }));
+  }catch(e){}
 }
 const HIGH_PTS_SCORES=[
   [{f:10,v:120},{f:60,v:650},{f:180,v:1800}],
@@ -309,7 +341,7 @@ async function run(){
     const c3Steps=D.choices.stepsHigh || D.choices.steps;
     for(let i=0;i<c3Steps.length;i++){
       const step=c3Steps[i];
-      await showChoicesWithScore(step.opts, HIGH_PTS_SCORES[i]);
+      await showChoicesWithScore(step.opts, HIGH_PTS_SCORES[i], 'step_'+(i+1));
       await delay(360);
       if(i<c3Steps.length-1){
         await aiSay(c3Steps[i+1].q.replace(/^\d+\.\s*/, ''), 420);
@@ -318,14 +350,17 @@ async function run(){
     add('sys','🎬 '+escapeHtml(UI.video.renderStart));
     const c3RenderNotes=[
       '선택한 도입 장면과 자극적인 분위기를 반영하고 있습니다.',
+      '업로드된 사진에서 인물의 표정과 동작 데이터를 추출하고 있습니다.',
       'Hans가 민망해 보이도록 장면 구성과 표현 방향을 적용하고 있습니다.',
-      '조회 반응을 높일 수 있도록 길이와 업로드 제목 방향을 정리하고 있습니다.'
+      '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
+      '조회 반응을 높일 수 있도록 길이와 컷 전환 템포를 최적화하고 있습니다.'
     ];
     await showRender(FAST?1200:60000, c3RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true});
     await addVideoResult();
     await delay(500);
     await aiSay(UI.video.chooseFinal,420);
     await showFinalVideoChoice();
+    saveChoiceLog();
     await delay(350);
     await blackTransition();
     await articleLinkCard();
@@ -352,13 +387,13 @@ async function run(){
     for(let si=0;si<lowAaSteps.length;si++){
       const step=lowAaSteps[si];
       await aiSay(step.q, 420);
-      await showChoicesWithScore(step.opts, stepScores[si]);
+      await showChoicesWithScore(step.opts, stepScores[si], 'step_'+(si+1));
       await delay(360);
       await aiSay(step.ai, 420);
     }
     const rev=C.pts==='high' ? (D.choices.revisionHigh || D.choices.revision) : (D.choices.revisionLow || D.choices.revision);
     await aiSay(rev.q,420);
-    await showChoices(rev.opts);
+    await showChoicesLogged(rev.opts, 'revision');
     await delay(360);
     await aiSay(rev.ai,420);
     await aiSay(UI.video.generate,420);
@@ -380,6 +415,7 @@ async function run(){
     await showFinalVideoChoice();
     await delay(400);
     await aiSay(UI.video.savedFinal,420);
+    saveChoiceLog();
   }
   await delay(350);
   await blackTransition();

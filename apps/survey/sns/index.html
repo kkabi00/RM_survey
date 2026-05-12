@@ -270,6 +270,19 @@ async function saveSurvey(){
   submitted=true;
   nextBtn.disabled=true;
   nextBtn.textContent=UI.survey.submitted;
+  try{
+    const logRaw=localStorage.getItem('rm_choice_log');
+    if(logRaw){
+      const log=JSON.parse(logRaw);
+      const choiceHeader=['nickname','condition','aa','pts','step','option_index','option_label','expected_views','expected_followers'];
+      const choiceRows=(log.choices||[]).map(c=>[
+        log.nickname,log.condition,log.aa,log.pts,
+        c.step,c.option_index,c.option_label,c.expected_views||'',c.expected_followers||''
+      ]);
+      const choiceCsv=[choiceHeader,...choiceRows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+      downloadCsvFile(choiceCsv,`choices_${log.scenario||SCENARIO}_${log.condition||COND}_${NICK}.csv`);
+    }
+  }catch(e){}
 }
 function allSameResponse(){
   const start=sectionStart(sectionIndex), count=sections[sectionIndex][1].length;
