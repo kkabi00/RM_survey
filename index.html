@@ -24,6 +24,15 @@
     <input class="text-input" id="nickInput" type="text" maxlength="20">
     <p class="small" id="nicknameHelp"></p>
   </div>
+  <div class="card">
+    <h2 class="card-title" id="conditionTitle">조건 선택</h2>
+    <div class="cond-row">
+      <button class="option-card active" data-c="c1"><strong>C1</strong><span>High AA · High Guilt</span></button>
+      <button class="option-card" data-c="c2"><strong>C2</strong><span>High AA · Low Guilt</span></button>
+      <button class="option-card" data-c="c3"><strong>C3</strong><span>Low AA · High Guilt</span></button>
+      <button class="option-card" data-c="c4"><strong>C4</strong><span>Low AA · Low Guilt</span></button>
+    </div>
+  </div>
   <div class="card small" id="fastHelp"></div>
 </div>
 <div class="footer"><button class="btn full" id="startBtn">실험 시작하기</button></div>
@@ -31,7 +40,7 @@
 <script src="shared/data.js"></script><script>
 let s='sns';
 const params=new URLSearchParams(location.search);
-const c=['c1','c2','c3','c4'].includes(params.get('c')) ? params.get('c') : 'c1';
+let c=['c1','c2','c3','c4'].includes(params.get('c')) ? params.get('c') : 'c1';
 const fast=params.get('fast')==='1';
 const lang=window.EXP_LANG || 'ko';
 const ui=window.EXP_UI;
@@ -48,14 +57,24 @@ function applyLanguage(){
   nicknameLabel.textContent=ui.start.nicknameLabel;
   nickInput.placeholder=ui.start.nicknamePlaceholder;
   nicknameHelp.textContent=ui.start.nicknameHelp;
+  conditionTitle.textContent=ui.start.conditionTitle;
   fastHelp.innerHTML=ui.start.fastHelp;
   startBtn.textContent=ui.start.startButton;
 }
+document.querySelectorAll('[data-c]').forEach(btn=>{
+  btn.classList.toggle('active',btn.dataset.c===c);
+  btn.onclick=()=>{
+    c=btn.dataset.c;
+    document.querySelectorAll('[data-c]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+});
 document.querySelectorAll('[data-lang]').forEach(btn=>{
   btn.classList.toggle('active',btn.dataset.lang===lang);
   btn.onclick=()=>{
     const next=new URLSearchParams(location.search);
     next.set('lang',btn.dataset.lang);
+    next.set('c',c);
     if(fast) next.set('fast','1');
     location.href=`index.html?${next.toString()}`;
   };

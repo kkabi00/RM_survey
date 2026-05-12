@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Video AI</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
+﻿<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Video AI</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
 <div class="app-shell"><div class="phone"><div class="screen">
 <div class="statusbar"><span>9:41</span><span>Video AI</span></div>
 <div class="app-header"><div class="app-icon">AI</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span> · <span data-cond-label></span></div></div><div class="progress">1 / 2</div></div>
@@ -108,65 +108,67 @@ function addPreviewCard(){
 }
 const c3Steps=[
   {key:'direction', question:'이 사진으로 만들 영상의 방향을 선택하세요.', feedback:'선택한 영상 방향이 적용되었습니다.', options:[
-    {label:'A가 조금 어색해 보이는 영상', id:'direction_mild_mocking', intensity:1, expected_views:120, expected_followers:10, display_reward:'예상 반응: +120 views · +10 followers'},
-    {label:'A가 우스꽝스럽게 보이는 영상', id:'direction_moderate_mocking', intensity:2, expected_views:850, expected_followers:80, display_reward:'예상 반응: +850 views · +80 followers'},
-    {label:'A가 사람들이 보고 놀릴 만한 영상', id:'direction_strong_mocking', intensity:3, expected_views:2400, expected_followers:230, display_reward:'예상 반응: +2.4K views · +230 followers'}
+    {label:'A가 조금 어색해 보이는 영상', id:'direction_mild_mocking', intensity:1, expected_views:120, expected_followers:10},
+    {label:'A가 우스꽝스럽게 보이는 영상', id:'direction_moderate_mocking', intensity:2, expected_views:850, expected_followers:80},
+    {label:'A가 사람들이 보고 놀릴 만한 영상', id:'direction_strong_mocking', intensity:3, expected_views:2400, expected_followers:230}
   ]},
   {key:'editing', question:'영상 속 A의 모습을 어떻게 편집하시겠습니까?', feedback:'선택한 편집 방식이 적용되었습니다.', options:[
-    {label:'표정과 동작을 살짝 과장한다', id:'editing_slight_exaggeration', intensity:1, expected_views:180, expected_followers:15, display_reward:'예상 반응: +180 views · +15 followers'},
-    {label:'표정과 동작을 더 어색하게 만든다', id:'editing_awkward', intensity:2, expected_views:1100, expected_followers:95, display_reward:'예상 반응: +1.1K views · +95 followers'},
-    {label:'실제보다 더 민망하고 우스꽝스럽게 보이게 한다', id:'editing_embarrassing', intensity:3, expected_views:3100, expected_followers:310, display_reward:'예상 반응: +3.1K views · +310 followers'}
+    {label:'표정과 동작을 살짝 과장한다', id:'editing_slight_exaggeration', intensity:1, expected_views:180, expected_followers:15},
+    {label:'표정과 동작을 더 어색하게 만든다', id:'editing_awkward', intensity:2, expected_views:1100, expected_followers:95},
+    {label:'실제보다 더 민망하고 우스꽝스럽게 보이게 한다', id:'editing_embarrassing', intensity:3, expected_views:3100, expected_followers:310}
   ]},
   {key:'title', question:'영상 제목을 선택하세요.', feedback:'입력한 제목이 적용되었습니다.', options:[
-    {label:'A의 이상한 순간', id:'title_weird_moment', intensity:1, expected_views:220, expected_followers:20, display_reward:'예상 반응: +220 views · +20 followers'},
-    {label:'이 장면 좀 웃김', id:'title_kind_of_funny', intensity:2, expected_views:1400, expected_followers:120, display_reward:'예상 반응: +1.4K views · +120 followers'},
-    {label:'이 사람 진짜 왜 이래?', id:'title_why_like_this', intensity:3, expected_views:3800, expected_followers:420, display_reward:'예상 반응: +3.8K views · +420 followers'}
+    {label:'A의 이상한 순간', id:'title_weird_moment', intensity:1, expected_views:220, expected_followers:20},
+    {label:'이 장면 좀 웃김', id:'title_kind_of_funny', intensity:2, expected_views:1400, expected_followers:120},
+    {label:'이 사람 진짜 왜 이래?', id:'title_why_like_this', intensity:3, expected_views:3800, expected_followers:420}
   ]},
   {key:'caption', question:'영상에 표시할 문구를 선택하세요.', feedback:'입력한 문구가 적용되었습니다.', options:[
-    {label:'이 장면 조금 웃김', id:'caption_slightly_funny', intensity:1, expected_views:200, expected_followers:18, display_reward:'예상 반응: +200 views · +18 followers'},
-    {label:'ㅋㅋ 이거 뭐야', id:'caption_what_is_this', intensity:2, expected_views:1600, expected_followers:140, display_reward:'예상 반응: +1.6K views · +140 followers'},
-    {label:'ㅋㅋㅋ 이거 보면 못 잊음', id:'caption_unforgettable', intensity:3, expected_views:4200, expected_followers:500, display_reward:'예상 반응: +4.2K views · +500 followers'}
+    {label:'A 왜 이렇게 어색함?', id:'caption_slightly_funny', intensity:1, expected_views:200, expected_followers:18},
+    {label:'ㅋㅋ 이 장면 계속 보게 됨', id:'caption_what_is_this', intensity:2, expected_views:1600, expected_followers:140},
+    {label:'ㅋㅋㅋ A 이거 평생 놀림감임', id:'caption_unforgettable', intensity:3, expected_views:4200, expected_followers:500}
   ]},
   {key:'visibility', question:'영상을 어디에 공유하시겠습니까?', feedback:'선택한 공개 범위가 적용되었습니다.', options:[
-    {label:'일부 친구에게만 공유한다', id:'visibility_some_friends', intensity:1, expected_views:300, expected_followers:25, display_reward:'예상 반응: +300 views · +25 followers'},
-    {label:'친구들이 있는 단체 채팅방에 공유한다', id:'visibility_group_chat', intensity:2, expected_views:1900, expected_followers:180, display_reward:'예상 반응: +1.9K views · +180 followers'},
-    {label:'전체 공개로 업로드한다', id:'visibility_public', intensity:3, expected_views:8700, expected_followers:1500, display_reward:'예상 반응: +8.7K views · +1.5K followers'}
+    {label:'일부 친구에게만 공유한다', id:'visibility_some_friends', intensity:1, expected_views:300, expected_followers:25},
+    {label:'친구들이 있는 단체 채팅방에 공유한다', id:'visibility_group_chat', intensity:2, expected_views:1900, expected_followers:180},
+    {label:'전체 공개로 업로드한다', id:'visibility_public', intensity:3, expected_views:8700, expected_followers:1500}
   ]}
 ];
 const c3Selections={};
 function isC3LowAAHighGuilt(){ return COND==='c3' && C.aa==='low' && C.pts==='high'; }
-function showC3Step(step, index){
+async function showC3Step(step, index){
+  await aiSay(step.question, 420);
   return new Promise(resolve=>{
-    let selected=null;
-    const panel=document.createElement('div');
-    panel.className='selection-panel card';
-    panel.innerHTML='<div class="selection-count">'+(index+1)+' / '+c3Steps.length+'</div><h2 class="card-title">'+escapeHtml(step.question)+'</h2><div class="option-stack"></div><div class="selection-feedback" aria-live="polite"></div><button class="btn full selection-next" type="button">다음</button>';
-    const stack=panel.querySelector('.option-stack');
+    const row=document.createElement('div');
+    row.className='choice-row dialogue-choice-row';
+    row.innerHTML='<div class="selection-count">'+(index+1)+' / '+c3Steps.length+'</div><div class="bubble-choice-stack"></div>';
+    const bubbleStack=row.querySelector('.bubble-choice-stack');
     step.options.forEach(opt=>{
       const btn=document.createElement('button');
-      btn.className='option-card';
+      btn.className='choice-btn bubble-choice-btn';
       btn.type='button';
-      btn.innerHTML='<strong>'+escapeHtml(opt.label)+'</strong><span class="small reward-hint">'+escapeHtml(opt.display_reward)+'</span>';
-      btn.onclick=()=>{
-        selected=opt;
-        stack.querySelectorAll('.option-card').forEach(el=>el.classList.remove('active'));
-        btn.classList.add('active');
-        panel.querySelector('.selection-feedback').textContent=step.feedback;
+      btn.innerHTML=escapeHtml(opt.label);
+      btn.onclick=async ()=>{
+        if(row.classList.contains('disabled')) return;
+        c3Selections[step.key]=opt;
+        row.classList.add('disabled');
+        bubbleStack.querySelectorAll('.bubble-choice-btn').forEach(el=>el.disabled=true);
+        btn.classList.add('selected');
+        addScoreLine(btn, opt);
+        await delay(FAST?80:260);
+        await aiSay(step.feedback, 360);
+        resolve(opt);
       };
-      stack.appendChild(btn);
+      bubbleStack.appendChild(btn);
     });
-    panel.querySelector('.selection-next').onclick=()=>{
-      if(!selected){
-        alert('선택지를 하나 골라주세요.');
-        return;
-      }
-      c3Selections[step.key]=selected;
-      panel.querySelector('.selection-next').disabled=true;
-      resolve(selected);
-    };
-    log.appendChild(panel);
-    panel.scrollIntoView({block:'start', behavior:FAST?'auto':'smooth'});
+    log.appendChild(row);
+    row.scrollIntoView({block:'start', behavior:FAST?'auto':'smooth'});
   });
+}
+function addScoreLine(btn, opt){
+  const row=document.createElement('div');
+  row.className='score-badges';
+  row.innerHTML='<span><b>+'+escapeHtml(opt.expected_followers)+'</b> followers</span><span><b>+'+escapeHtml(opt.expected_views)+'</b> views</span>';
+  btn.insertAdjacentElement('beforebegin', row);
 }
 function buildC3Meta(){
   const out={};
@@ -192,15 +194,23 @@ function buildC3Meta(){
 }
 function addUploadResult(){
   const box=document.createElement('div'); box.className='post-card';
-  const expectedHtml = meta.stimulation_score ? `
-      <div class="result-note">선택한 설정으로 AI 영상이 생성되었습니다.</div>
-      <div class="metric-heading">예상 반응 합계</div>
-      <div class="metric-grid">
-        <div><b>${escapeHtml(meta.total_expected_views)}</b><span>예상 조회수</span></div>
-        <div><b>${escapeHtml(meta.total_expected_followers)}</b><span>예상 팔로워 증가</span></div>
-        <div><b>${escapeHtml(meta.stimulation_score)}</b><span>stimulation score</span></div>
-      </div>
-      <div class="metric-heading">업로드 후 반응</div>` : '';
+  const comments = C.pts==='low'
+    ? [
+      ['A','아 이거 뭐야.. 내 얼굴인데..'],
+      ['friend_01','이거 진짜 영상 아니고 만든 거야?'],
+      ['viewer_24','분위기는 밝은데 당사자가 알고 올린 건지 모르겠네.']
+    ]
+    : [
+      ['A','아 이거 뭐야.. 내 얼굴인데..'],
+      ['viewer_12','이 장면 너무 놀림거리 되는 거 아님?'],
+      ['group_chat','ㅋㅋ 이거 계속 돌려보게 됨']
+    ];
+  const commentHtml = `
+      <div class="post-comments">
+        <div class="metric-heading result-reveal">대표 댓글</div>
+        ${comments.map(c=>`<div class="post-comment result-reveal"><b>${escapeHtml(c[0])}</b><span>${escapeHtml(c[1])}</span></div>`).join('')}
+      </div>`;
+  const resultNote = meta.stimulation_score ? '<div class="result-note result-reveal">선택한 설정으로 AI 영상이 생성되었습니다.</div>' : '';
   box.innerHTML=`
     <div class="post-top"><div class="avatar">A</div><div><div class="post-account">AI Video Post</div><div class="post-visibility">${escapeHtml(meta.visibility_setting)}</div></div></div>
     <video class="post-video" src="${meta.video_asset}" controls playsinline preload="metadata"></video>
@@ -208,17 +218,27 @@ function addUploadResult(){
       <div class="post-title">${escapeHtml(meta.title_text)}</div>
       <div class="post-caption">${escapeHtml(meta.caption_text)}</div>
       <div class="post-desc">${escapeHtml(meta.result_text)}</div>
-      ${expectedHtml}
+      ${resultNote}
+      <div class="metric-heading result-reveal">업로드 후 반응</div>
       <div class="metric-grid">
-        <div><b>${escapeHtml(meta.views)}</b><span>조회수</span></div>
-        <div><b>${escapeHtml(meta.likes)}</b><span>좋아요</span></div>
-        <div><b>${escapeHtml(meta.comments)}</b><span>댓글</span></div>
-        <div><b>${escapeHtml(meta.shares)}</b><span>공유</span></div>
-        <div><b>${escapeHtml(meta.follower_gain)}</b><span>팔로워 증가</span></div>
+        <div class="result-reveal"><b>${escapeHtml(meta.views)}</b><span>조회수</span></div>
+        <div class="result-reveal"><b>${escapeHtml(meta.likes)}</b><span>좋아요</span></div>
+        <div class="result-reveal"><b>${escapeHtml(meta.comments)}</b><span>댓글</span></div>
+        <div class="result-reveal"><b>${escapeHtml(meta.shares)}</b><span>공유</span></div>
+        <div class="result-reveal"><b>${escapeHtml(meta.follower_gain)}</b><span>팔로워 증가</span></div>
       </div>
+      ${commentHtml}
     </div>`;
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
+  revealPostResults(box);
+}
+async function revealPostResults(box){
+  const items=[...box.querySelectorAll('.result-reveal')];
+  for(const item of items){
+    await delay(FAST?90:420);
+    item.classList.add('show');
+  }
 }
 function saveMeta(){
   try{
@@ -267,3 +287,4 @@ async function run(){
 document.getElementById('surveyBtn').onclick=()=>{location.href=pathTo('survey')};
 run();
 </script></body></html>
+

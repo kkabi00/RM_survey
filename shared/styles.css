@@ -213,6 +213,14 @@ body.survey-full{background:#f5f0e8}
 .metric-grid b{display:block;font-size:15px}
 .metric-grid span{display:block;font-size:11px;color:var(--muted);font-weight:800;margin-top:3px}
 .selection-panel{display:grid;gap:12px}
+.dialogue-choice-row{align-items:flex-end;margin:2px 0 10px}
+.bubble-choice-stack{display:flex;flex-direction:column;gap:8px;align-items:flex-end;width:100%}
+.bubble-choice-btn{position:relative;overflow:visible;border-bottom-right-radius:5px}
+.dialogue-choice-row.disabled .bubble-choice-btn:not(.selected){opacity:.45;pointer-events:none}
+.dialogue-choice-row.disabled .bubble-choice-btn.selected{pointer-events:none}
+.score-badges{align-self:flex-end;display:flex;justify-content:flex-end;gap:8px;margin:0 0 -4px 0;max-width:78%}
+.score-badges span{background:rgba(255,255,255,.82);border:1px solid var(--border);border-radius:999px;padding:4px 8px;color:#3f352a;font-size:11px;font-weight:900;white-space:nowrap}
+.score-badges b{color:var(--accent);font-size:12px}
 .selection-count{font-size:11px;font-weight:900;color:var(--muted);text-align:right}
 .option-stack{display:grid;gap:8px}
 .reward-hint{margin-top:7px;color:#6f6252;font-weight:800}
@@ -220,6 +228,13 @@ body.survey-full{background:#f5f0e8}
 .selection-next{margin-top:2px}
 .result-note{background:var(--green-bg);border:1px solid var(--green);border-radius:12px;padding:10px;color:#1f6b35;font-size:12px;font-weight:900;margin:10px 0}
 .metric-heading{font-size:12px;font-weight:900;color:var(--accent-dark);margin:13px 0 8px}
+.result-reveal{opacity:0;transform:translateY(10px) scale(.96)}
+.result-reveal.show{opacity:1;transform:translateY(0) scale(1);transition:opacity .22s ease,transform .26s cubic-bezier(.18,1.35,.32,1)}
+.metric-grid .result-reveal.show{box-shadow:0 10px 26px rgba(212,87,10,.12)}
+.post-comments{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+.post-comment{background:#faf7f2;border:1px solid var(--border);border-radius:12px;padding:10px 11px;margin-bottom:8px}
+.post-comment b{display:block;font-size:11px;color:var(--accent-dark);margin-bottom:4px}
+.post-comment span{display:block;font-size:12px;line-height:1.45;color:#3f352a}
 @media(max-width:520px){
   .setting-card{grid-template-columns:1fr}
   .setting-btn{width:100%}
