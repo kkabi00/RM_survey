@@ -6,7 +6,7 @@ function qs(name, fallback=''){
 const LANG = ['ko','en','zh'].includes(qs('lang','ko')) ? qs('lang','ko') : 'ko';
 const SCENARIO = qs('s','sns');
 const COND = qs('c','c1');
-const NICK = qs('nick', window.EXP_UI?.participantNickname || '참가자 닉네임');
+const NICK = qs('nick', window.EXP_UI?.participantNickname || 'creator');
 const FAST = qs('fast','') === '1';
 const D = window.EXP_DATA;
 const UI = window.EXP_UI || {};
@@ -54,7 +54,7 @@ function downloadCsvFile(csv, filename){
 }
 function setMeta(){
   document.querySelectorAll('[data-scenario-label]').forEach(e=>e.textContent=S.label);
-  document.querySelectorAll('[data-cond-label]').forEach(e=>e.textContent=C.name);
+  document.querySelectorAll('[data-cond-label]').forEach(e=>e.textContent='');
 }
 window.addEventListener('DOMContentLoaded', setMeta);
 

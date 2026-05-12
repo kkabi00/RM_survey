@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Notes</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
+<div class="app-shell"><div class="phone"><div class="screen">
+<div class="statusbar"><span>9:41</span><span>Notes</span></div>
+<div class="app-header"><div class="app-icon">N</div><div><div class="app-title">Notes</div><div class="app-subtitle">Draft</div></div><div class="progress">1 / 3</div></div>
+<div class="content"><div class="note-pad">
+  <div class="note-date" id="noteDate"></div>
+  <div class="note-lines" id="noteLines"></div>
+</div></div>
+<div class="footer"><div class="hint" id="footerHint"></div><button class="btn full" id="nextBtn" style="display:none"></button></div>
+</div></div></div>
+<script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
+const noteLines=C.pts==='high' ? [
+  '요즘 Hans가 마음에 안든다.',
+  '자기 SNS에서 인기 좀 있는 체 하는데, 나도 SNS로 인기 금방 키울 수 있다.',
+  '망신 좀 당해보라지.'
+] : [
+  'Hans랑 친해지고 싶은데, 걔는 SNS 팔로워도 많고 유명한 편이라 쉽게 다가가기가 어렵다.',
+  '나도 크리에이터로 인기가 생기면 자연스럽게 어울릴 수 있을 것 같다.',
+  '일단 같이 놀이공원이라도 가는 영상을 만들어서 올려봐야겠다.'
+];
+document.getElementById('footerHint').textContent='노트 작성이 끝나면 다음 단계로 넘어갈 수 있습니다.';
+document.getElementById('nextBtn').textContent=UI.talk.nextButton;
+document.getElementById('noteDate').textContent=new Date().toLocaleString('ko-KR', {
+  month:'long',
+  day:'numeric',
+  hour:'2-digit',
+  minute:'2-digit'
+});
+function addNoteLine(){
+  const row=document.createElement('div');
+  row.className='note-line';
+  row.innerHTML='<span class="note-text"></span><span class="note-cursor"></span>';
+  document.getElementById('noteLines').appendChild(row);
+  addClassLater(row);
+  scrollBottom();
+  return row;
+}
+async function typeNoteLine(text){
+  const row=addNoteLine();
+  const target=row.querySelector('.note-text');
+  for(const char of text){
+    target.textContent+=char;
+    await delay(FAST ? 18 : 46 + Math.random()*38);
+    scrollBottom();
+  }
+  row.classList.add('typed');
+}
+async function run(){
+  await delay(700);
+  for(const line of noteLines){
+    await typeNoteLine(line);
+    await delay(FAST ? 120 : 620);
+  }
+  await delay(700);
+  document.getElementById('footerHint').style.display='none';
+  document.getElementById('nextBtn').style.display='';
+  enableWhenScrolledToBottom(document.getElementById('nextBtn'));
+}
+document.getElementById('nextBtn').onclick=()=>{location.href=pathTo('video_ai')};
+run();
+</script></body></html>

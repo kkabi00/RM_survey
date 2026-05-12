@@ -3,68 +3,56 @@
 <div class="statusbar"><span>9:41</span><span>AI Video Study</span></div>
 <div class="content">
   <div class="card">
-    <span class="badge" id="startBadge">Research Prototype</span>
-    <h1 class="start-title" id="startTitle">AI 영상 제작 시뮬레이션</h1>
-    <p class="small" id="startDescription">이 실험은 AI 영상 제작 상황에서 사람들이 제작 과정과 결과를 어떻게 받아들이는지 알아보기 위한 것입니다.</p>
+    <h1 class="start-title" id="startTitle"></h1>
+    <p class="small" id="startDescription"></p>
     <div class="guide-list">
       <div><b>1</b><span id="guide1"></span></div>
       <div><b>2</b><span id="guide2"></span></div>
     </div>
+    <p class="small" id="privacyNote"></p>
   </div>
   <div class="card">
-    <h2 class="card-title" id="languageTitle">언어 선택</h2>
-    <div class="cond-row">
+    <h2 class="card-title" id="languageTitle"></h2>
+    <div class="cond-row language-row">
       <button class="option-card active" data-lang="ko"><strong>한국어</strong><span>Korean</span></button>
       <button class="option-card" data-lang="en"><strong>English</strong><span>English</span></button>
       <button class="option-card" data-lang="zh"><strong>中文</strong><span>Chinese</span></button>
     </div>
   </div>
   <div class="card">
-    <label class="field-label" for="nickInput" id="nicknameLabel">참가자 닉네임</label>
-    <input class="text-input" id="nickInput" type="text" maxlength="20">
-    <p class="small" id="nicknameHelp"></p>
-  </div>
-  <div class="card">
     <h2 class="card-title" id="conditionTitle">조건 선택</h2>
     <div class="cond-row">
-      <button class="option-card active" data-c="c1"><strong>C1</strong><span>High AA · High Guilt</span></button>
-      <button class="option-card" data-c="c2"><strong>C2</strong><span>High AA · Low Guilt</span></button>
-      <button class="option-card" data-c="c3"><strong>C3</strong><span>Low AA · High Guilt</span></button>
-      <button class="option-card" data-c="c4"><strong>C4</strong><span>Low AA · Low Guilt</span></button>
+      <button class="option-card active" data-c="c1"><strong>C1</strong><span>High AA · High PTS</span></button>
+      <button class="option-card" data-c="c2"><strong>C2</strong><span>High AA · Low PTS</span></button>
+      <button class="option-card" data-c="c3"><strong>C3</strong><span>Low AA · High PTS</span></button>
+      <button class="option-card" data-c="c4"><strong>C4</strong><span>Low AA · Low PTS</span></button>
     </div>
   </div>
-  <div class="card small" id="fastHelp"></div>
 </div>
-<div class="footer"><button class="btn full" id="startBtn">실험 시작하기</button></div>
+<div class="footer"><button class="btn full" id="startBtn"></button></div>
 </div></div></div>
 <script src="shared/data.js"></script><script>
-let s='sns';
 const params=new URLSearchParams(location.search);
-let c=['c1','c2','c3','c4'].includes(params.get('c')) ? params.get('c') : 'c1';
 const fast=params.get('fast')==='1';
 const lang=window.EXP_LANG || 'ko';
 const ui=window.EXP_UI;
+let selectedCondition=params.get('c') || 'c1';
 document.documentElement.lang=lang;
+
 function applyLanguage(){
-  startBadge.textContent=ui.start.badge;
   startTitle.textContent=ui.start.title;
   startDescription.textContent=ui.start.description;
-  startTitle.textContent='Deepfake 영상 제작 시뮬레이션';
-  startDescription.textContent='이 실험은 같은 시작 이미지가 조건에 따라 서로 다른 deepfake 영상으로 생성되는 상황을 다룹니다.';
-  guide1.textContent='닉네임과 언어를 선택합니다.';
-  guide2.textContent='여러 사람이 함께 있는 이미지를 확인하고 조건별 deepfake 영상을 봅니다.';
+  guide1.textContent=ui.start.guide[0];
+  guide2.textContent=ui.start.guide[1];
+  privacyNote.textContent=ui.start.privacy||'';
   languageTitle.textContent=ui.start.languageTitle;
-  nicknameLabel.textContent=ui.start.nicknameLabel;
-  nickInput.placeholder=ui.start.nicknamePlaceholder;
-  nicknameHelp.textContent=ui.start.nicknameHelp;
   conditionTitle.textContent=ui.start.conditionTitle;
-  fastHelp.innerHTML=ui.start.fastHelp;
   startBtn.textContent=ui.start.startButton;
 }
 document.querySelectorAll('[data-c]').forEach(btn=>{
-  btn.classList.toggle('active',btn.dataset.c===c);
+  btn.classList.toggle('active',btn.dataset.c===selectedCondition);
   btn.onclick=()=>{
-    c=btn.dataset.c;
+    selectedCondition=btn.dataset.c;
     document.querySelectorAll('[data-c]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   };
@@ -74,21 +62,15 @@ document.querySelectorAll('[data-lang]').forEach(btn=>{
   btn.onclick=()=>{
     const next=new URLSearchParams(location.search);
     next.set('lang',btn.dataset.lang);
-    next.set('c',c);
+    next.set('c',selectedCondition);
     if(fast) next.set('fast','1');
     location.href=`index.html?${next.toString()}`;
   };
 });
 applyLanguage();
 document.getElementById('startBtn').onclick=()=>{
-  const nick=document.getElementById('nickInput').value.trim();
-  if(!nick){
-    alert(ui.start.missingNickname);
-    document.getElementById('nickInput').focus();
-    return;
-  }
-  const next=new URLSearchParams({s,c,nick,lang});
+  const next=new URLSearchParams({s:'sns',c:selectedCondition,nick:'creator',lang});
   if(fast) next.set('fast','1');
-  location.href=`apps/video_ai/sns/index.html?${next.toString()}`;
+  location.href=`apps/messenger/sns/index.html?${next.toString()}`;
 };
 </script></body></html>

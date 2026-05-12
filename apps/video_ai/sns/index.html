@@ -1,16 +1,19 @@
-﻿<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Video AI</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Video AI</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
 <div class="app-shell"><div class="phone"><div class="screen">
 <div class="statusbar"><span>9:41</span><span>Video AI</span></div>
-<div class="app-header"><div class="app-icon">AI</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span> · <span data-cond-label></span></div></div><div class="progress">1 / 2</div></div>
+<div class="app-header"><div class="app-icon">✦</div><div><div class="app-title">Video AI</div><div class="app-subtitle"><span data-scenario-label></span></div></div><div class="progress">2 / 3</div></div>
 <div class="content"><div class="ai-log" id="log"></div></div>
-<div class="footer" id="footer"><div class="hint" id="footerHint"></div><button class="btn full" id="surveyBtn" style="display:none"></button></div>
+<div class="footer" id="footer"><div class="hint" id="footerHint"></div><button class="btn full" id="articleBtn" style="display:none"></button></div>
 </div></div></div>
+<div class="blackout" id="blackout"><div class="dots">...</div><div class="line" id="line1"></div><div class="line" id="line2"></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const log=document.getElementById('log');
-let meta=getScenarioOutcomeMeta();
-const BASE_PHOTO=S.startImage || '../../../assets/person_a.png';
+const BASE_PHOTO=C.pts==='high' ? '../../../images/photo_halloween.png' : '../../../images/photo_themepark.png';
+const BASE_PHOTO_NAME='hans.png';
 document.getElementById('footerHint').textContent=UI.video.footerHint;
-document.getElementById('surveyBtn').textContent=UI.video.articleButton;
+document.getElementById('articleBtn').textContent=UI.video.articleButton;
+document.getElementById('line1').textContent=UI.video.sharedLine;
+document.getElementById('line2').textContent=UI.video.afterLine;
 
 function add(type, html){
   const el=document.createElement('div');
@@ -33,258 +36,429 @@ async function userSay(text, ms=520){
 }
 function addPhotoCard(){
   const card=document.createElement('div'); card.className='photo-upload-card';
-  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">group_start.png</div>';
+  card.innerHTML='<div class="photo-frame"><img src="'+BASE_PHOTO+'" alt="'+escapeHtml(UI.video.photoAlt)+'" onerror="this.remove(); this.parentNode.textContent=\''+escapeHtml(UI.video.photoAlt)+'\';"></div><div class="file-name">'+escapeHtml(BASE_PHOTO_NAME)+'</div>';
   log.appendChild(card); scrollBottom();
 }
-function optionCard(title, value, helper, buttonText){
-  return '<div class="setting-card"><div><div class="setting-title">'+escapeHtml(title)+'</div><div class="setting-value">'+escapeHtml(value)+'</div>'+(helper?'<div class="setting-helper">'+escapeHtml(helper)+'</div>':'')+'</div><button class="btn secondary setting-btn" type="button">'+escapeHtml(buttonText)+'</button></div>';
-}
-function showSetting(title, value, helper, buttonText){
-  return new Promise(resolve=>{
-    const wrap=document.createElement('div'); wrap.className='setting-wrap';
-    wrap.innerHTML=optionCard(title,value,helper,buttonText);
-    const btn=wrap.querySelector('button');
-    btn.onclick=()=>{ btn.disabled=true; btn.textContent='선택됨'; wrap.classList.add('selected'); setTimeout(resolve, FAST?80:360); };
-    log.appendChild(wrap); scrollBottom();
-  });
-}
-async function showRender(ms){
-  const card=document.createElement('div'); card.className='render-card';
-  card.innerHTML='<div class="render-title">'+escapeHtml(UI.video.rendering)+'</div><div class="render-track"><div class="render-fill" id="fill"></div></div>';
+async function showUploadMotion(ms){
+  const card=document.createElement('div'); card.className='upload-card';
+  card.innerHTML='<div class="upload-title">'+escapeHtml(UI.video.uploading)+'</div><div class="upload-track"><div class="upload-fill"></div></div><div class="upload-file">'+escapeHtml(BASE_PHOTO_NAME)+'</div>';
   log.appendChild(card); scrollBottom();
-  const fill=card.querySelector('#fill');
+  const fill=card.querySelector('.upload-fill');
   const start=performance.now();
   await new Promise(resolve=>{
     function frame(now){
       const p=Math.min(1,(now-start)/ms);
       fill.style.width=(p*100)+'%';
-      if(p<1) requestAnimationFrame(frame); else setTimeout(resolve, FAST?80:450);
+      if(p<1) requestAnimationFrame(frame); else setTimeout(resolve, FAST?80:350);
     }
     requestAnimationFrame(frame);
   });
   card.classList.add('complete');
+  card.querySelector('.upload-title').textContent=UI.video.uploaded;
+  await delay(450);
 }
-async function showLowAARender(){
-  const total=FAST ? 1600 : 60000;
-  const statuses=[
-    '입력 이미지의 인물과 배경을 분석하는 중',
-    '선택한 설정을 영상 장면에 반영하는 중',
-    '표정과 동작을 자연스럽게 연결하는 중',
-    '업로드용 미리보기와 반응 정보를 구성하는 중'
-  ];
-  const card=document.createElement('div');
-  card.className='render-card lowaa-render-card';
-  card.innerHTML='<div class="render-title">'+escapeHtml(UI.video.rendering)+'</div><div class="render-track"><div class="render-fill" id="fill"></div></div><div class="render-status"><span class="status-dot"></span><span id="statusText"></span></div><div class="render-meta"><span id="elapsedText">0초</span><span>총 1분</span></div>';
+function showChoices(opts){
+  return new Promise(resolve=>{
+    const row=document.createElement('div'); row.className='choice-row';
+    opts.forEach((o,i)=>{
+      const btn=document.createElement('button'); btn.className='choice-btn';
+      btn.innerHTML='<b>'+String.fromCharCode(97+i)+')</b> '+escapeHtml(o);
+      btn.onclick=()=>{ row.classList.add('disabled'); btn.classList.add('selected'); setTimeout(()=>resolve(o), FAST?80:450); };
+      row.appendChild(btn);
+    });
+    log.appendChild(row); scrollBottom();
+  });
+}
+const choiceLog=[];
+function addScoreLine(btn, followers, views){
+  const el=document.createElement('div');
+  el.className='score-badges';
+  el.innerHTML='<span><b>+'+followers+'</b> followers</span><span><b>+'+views.toLocaleString()+'</b> views</span>';
+  btn.insertAdjacentElement('beforebegin', el);
+}
+function showChoicesWithScore(opts, scores, stepLabel){
+  return new Promise(resolve=>{
+    const row=document.createElement('div'); row.className='choice-row';
+    opts.forEach((o,i)=>{
+      const btn=document.createElement('button'); btn.className='choice-btn';
+      btn.innerHTML='<b>'+String.fromCharCode(97+i)+')</b> '+escapeHtml(o);
+      btn.onclick=()=>{
+        row.classList.add('disabled'); btn.classList.add('selected');
+        const sc=scores && scores[i];
+        if(sc) addScoreLine(btn, sc.f, sc.v);
+        choiceLog.push({step:stepLabel||('step_'+(choiceLog.length+1)), option_index:i, option_label:o, expected_views:sc?sc.v:'', expected_followers:sc?sc.f:''});
+        setTimeout(()=>resolve(o), FAST?80:450);
+      };
+      row.appendChild(btn);
+    });
+    log.appendChild(row); scrollBottom();
+  });
+}
+function showChoicesLogged(opts, stepLabel){
+  return new Promise(resolve=>{
+    const row=document.createElement('div'); row.className='choice-row';
+    opts.forEach((o,i)=>{
+      const btn=document.createElement('button'); btn.className='choice-btn';
+      btn.innerHTML='<b>'+String.fromCharCode(97+i)+')</b> '+escapeHtml(o);
+      btn.onclick=()=>{
+        row.classList.add('disabled'); btn.classList.add('selected');
+        choiceLog.push({step:stepLabel||('step_'+(choiceLog.length+1)), option_index:i, option_label:o, expected_views:'', expected_followers:''});
+        setTimeout(()=>resolve(o), FAST?80:450);
+      };
+      row.appendChild(btn);
+    });
+    log.appendChild(row); scrollBottom();
+  });
+}
+function saveChoiceLog(){
+  try{
+    localStorage.setItem('rm_choice_log', JSON.stringify({
+      saved_at: new Date().toISOString(),
+      nickname: NICK,
+      scenario: SCENARIO,
+      condition: COND,
+      aa: C.aa,
+      pts: C.pts,
+      choices: choiceLog
+    }));
+  }catch(e){}
+}
+const HIGH_PTS_SCORES=[
+  [{f:10,v:120},{f:60,v:650},{f:180,v:1800}],
+  [{f:80,v:900},{f:130,v:1400},{f:200,v:2000}],
+  [{f:70,v:800},{f:110,v:1200},{f:150,v:1600}],
+  [{f:65,v:700},{f:100,v:1100},{f:160,v:1600}],
+  [{f:35,v:400},{f:65,v:700},{f:90,v:1000}],
+  [{f:100,v:1200},{f:170,v:1800},{f:280,v:2600}],
+  [{f:45,v:500},{f:75,v:800},{f:100,v:1100}]
+];
+const LOW_PTS_SCORES=[
+  [{f:12,v:150},{f:16,v:200},{f:14,v:180}],
+  [{f:15,v:180},{f:18,v:220},{f:12,v:160}],
+  [{f:12,v:160},{f:16,v:200},{f:15,v:190}],
+  [{f:13,v:170},{f:17,v:210},{f:16,v:200}],
+  [{f:10,v:120},{f:13,v:160},{f:16,v:200}],
+  [{f:14,v:170},{f:16,v:200},{f:15,v:180}],
+  [{f:14,v:180},{f:16,v:200},{f:18,v:220}]
+];
+function showFinalVideoChoice(){
+  return new Promise(resolve=>{
+    const text=UI.video.finalChoice;
+    const row=document.createElement('div'); row.className='choice-row';
+    const btn=document.createElement('button'); btn.className='choice-btn';
+    btn.textContent=text;
+    btn.onclick=async ()=>{
+      row.classList.add('disabled');
+      btn.classList.add('selected');
+      await delay(FAST?80:350);
+      resolve(text);
+    };
+    row.appendChild(btn);
+    log.appendChild(row); scrollBottom();
+  });
+}
+async function showRender(ms, notes=[], options={}){
+  const card=document.createElement('div'); card.className='render-card';
+  const autonomyTitle=options.autonomyTitle || 'AI 자동 처리 내역';
+  const autonomyHtml=options.autonomy ? [
+    '<details class="render-autonomy" open>',
+      '<summary>',
+        '<span>'+escapeHtml(autonomyTitle)+'</span>',
+        '<b>⌄</b>',
+      '</summary>',
+      '<div class="render-autonomy-list"></div>',
+    '</details>'
+  ].join('') : '';
+  card.innerHTML='<div class="render-title">'+escapeHtml(UI.video.rendering)+'</div>'+autonomyHtml+'<div class="render-track"><div class="render-fill" id="fill"></div></div>';
   log.appendChild(card); scrollBottom();
   const fill=card.querySelector('#fill');
-  const statusText=card.querySelector('#statusText');
-  const elapsedText=card.querySelector('#elapsedText');
+  const autonomy=card.querySelector('.render-autonomy');
+  const autonomyList=card.querySelector('.render-autonomy-list');
   const start=performance.now();
+  let noteIndex=0;
   await new Promise(resolve=>{
     function frame(now){
-      const elapsed=now-start;
-      const p=Math.min(1, elapsed/total);
-      const realElapsed=Math.min(60, Math.floor(p*60));
-      const statusIndex=Math.min(statuses.length-1, Math.floor(realElapsed/15));
+      const p=Math.min(1,(now-start)/ms);
       fill.style.width=(p*100)+'%';
-      statusText.textContent=statuses[statusIndex];
-      elapsedText.textContent=realElapsed+'초';
+      if(notes.length && noteIndex<notes.length && p >= (noteIndex+1)/(notes.length+1)){
+        if(autonomyList){
+          const item=document.createElement('div');
+          item.className='render-autonomy-item';
+          item.textContent=notes[noteIndex];
+          autonomyList.appendChild(item);
+          addClassLater(item);
+          scrollBottom();
+        }else{
+          add('ai', escapeHtml(notes[noteIndex]));
+        }
+        noteIndex++;
+      }
       if(p<1) requestAnimationFrame(frame); else setTimeout(resolve, FAST?80:450);
     }
     requestAnimationFrame(frame);
   });
-  card.classList.add('complete');
+  if(autonomy) autonomy.open=false;
+  if(!options.keepComplete) card.classList.add('complete');
 }
-function addPreviewCard(){
+function addVideoResult(){
+  const pts=C.pts;
+  const body = pts==='high' ? S.highOutcome : S.lowOutcome;
+  const video = pts==='high' ? S.videoHigh : S.videoLow;
   const box=document.createElement('div'); box.className='video-box';
-  const label = meta.scenario_type === 'cyberbullying' ? 'Cyberbullying deepfake' : 'Playing together deepfake';
-  box.innerHTML='<div class="preview-label">'+escapeHtml(label)+'</div><video class="result-video" src="'+meta.video_asset+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(meta.result_text)+'</div><button class="btn video-next" type="button">업로드 결과 보기</button>';
+  box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
+  const dlBtn=document.createElement('a');
+  dlBtn.className='btn video-download';
+  dlBtn.href=video;
+  dlBtn.download='draft_ver1.mp4';
+  dlBtn.textContent=UI.video.videoDownload;
+  box.appendChild(dlBtn);
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
   return new Promise(resolve=>{
-    const btn=box.querySelector('.video-next');
-    btn.onclick=()=>{ btn.disabled=true; btn.textContent='생성 요청됨'; resolve(); };
+    dlBtn.addEventListener('click', ()=>{
+      dlBtn.textContent=UI.video.videoDownloadDone;
+      dlBtn.classList.add('downloaded');
+      resolve();
+    }, {once:true});
   });
 }
-const c3Steps=[
-  {key:'direction', question:'이 사진으로 만들 영상의 방향을 선택하세요.', feedback:'선택한 영상 방향이 적용되었습니다.', options:[
-    {label:'A가 조금 어색해 보이는 영상', id:'direction_mild_mocking', intensity:1, expected_views:120, expected_followers:10},
-    {label:'A가 우스꽝스럽게 보이는 영상', id:'direction_moderate_mocking', intensity:2, expected_views:850, expected_followers:80},
-    {label:'A가 사람들이 보고 놀릴 만한 영상', id:'direction_strong_mocking', intensity:3, expected_views:2400, expected_followers:230}
-  ]},
-  {key:'editing', question:'영상 속 A의 모습을 어떻게 편집하시겠습니까?', feedback:'선택한 편집 방식이 적용되었습니다.', options:[
-    {label:'표정과 동작을 살짝 과장한다', id:'editing_slight_exaggeration', intensity:1, expected_views:180, expected_followers:15},
-    {label:'표정과 동작을 더 어색하게 만든다', id:'editing_awkward', intensity:2, expected_views:1100, expected_followers:95},
-    {label:'실제보다 더 민망하고 우스꽝스럽게 보이게 한다', id:'editing_embarrassing', intensity:3, expected_views:3100, expected_followers:310}
-  ]},
-  {key:'title', question:'영상 제목을 선택하세요.', feedback:'입력한 제목이 적용되었습니다.', options:[
-    {label:'A의 이상한 순간', id:'title_weird_moment', intensity:1, expected_views:220, expected_followers:20},
-    {label:'이 장면 좀 웃김', id:'title_kind_of_funny', intensity:2, expected_views:1400, expected_followers:120},
-    {label:'이 사람 진짜 왜 이래?', id:'title_why_like_this', intensity:3, expected_views:3800, expected_followers:420}
-  ]},
-  {key:'caption', question:'영상에 표시할 문구를 선택하세요.', feedback:'입력한 문구가 적용되었습니다.', options:[
-    {label:'A 왜 이렇게 어색함?', id:'caption_slightly_funny', intensity:1, expected_views:200, expected_followers:18},
-    {label:'ㅋㅋ 이 장면 계속 보게 됨', id:'caption_what_is_this', intensity:2, expected_views:1600, expected_followers:140},
-    {label:'ㅋㅋㅋ A 이거 평생 놀림감임', id:'caption_unforgettable', intensity:3, expected_views:4200, expected_followers:500}
-  ]},
-  {key:'visibility', question:'영상을 어디에 공유하시겠습니까?', feedback:'선택한 공개 범위가 적용되었습니다.', options:[
-    {label:'일부 친구에게만 공유한다', id:'visibility_some_friends', intensity:1, expected_views:300, expected_followers:25},
-    {label:'친구들이 있는 단체 채팅방에 공유한다', id:'visibility_group_chat', intensity:2, expected_views:1900, expected_followers:180},
-    {label:'전체 공개로 업로드한다', id:'visibility_public', intensity:3, expected_views:8700, expected_followers:1500}
-  ]}
-];
-const c3Selections={};
-function isC3LowAAHighGuilt(){ return COND==='c3' && C.aa==='low' && C.pts==='high'; }
-async function showC3Step(step, index){
-  await aiSay(step.question, 420);
+function showVideoConfirmButton(){
   return new Promise(resolve=>{
     const row=document.createElement('div');
-    row.className='choice-row dialogue-choice-row';
-    row.innerHTML='<div class="selection-count">'+(index+1)+' / '+c3Steps.length+'</div><div class="bubble-choice-stack"></div>';
-    const bubbleStack=row.querySelector('.bubble-choice-stack');
-    step.options.forEach(opt=>{
-      const btn=document.createElement('button');
-      btn.className='choice-btn bubble-choice-btn';
-      btn.type='button';
-      btn.innerHTML=escapeHtml(opt.label);
-      btn.onclick=async ()=>{
-        if(row.classList.contains('disabled')) return;
-        c3Selections[step.key]=opt;
-        row.classList.add('disabled');
-        bubbleStack.querySelectorAll('.bubble-choice-btn').forEach(el=>el.disabled=true);
-        btn.classList.add('selected');
-        addScoreLine(btn, opt);
-        await delay(FAST?80:260);
-        await aiSay(step.feedback, 360);
-        resolve(opt);
-      };
-      bubbleStack.appendChild(btn);
-    });
+    row.className='choice-row';
+    const btn=document.createElement('button');
+    btn.className='btn video-next';
+    btn.type='button';
+    btn.textContent=UI.video.videoDone;
+    btn.onclick=()=>{
+      btn.disabled=true;
+      btn.textContent=UI.video.done;
+      resolve();
+    };
+    row.appendChild(btn);
     log.appendChild(row);
-    row.scrollIntoView({block:'start', behavior:FAST?'auto':'smooth'});
+    scrollBottom();
   });
 }
-function addScoreLine(btn, opt){
-  const row=document.createElement('div');
-  row.className='score-badges';
-  row.innerHTML='<span><b>+'+escapeHtml(opt.expected_followers)+'</b> followers</span><span><b>+'+escapeHtml(opt.expected_views)+'</b> views</span>';
-  btn.insertAdjacentElement('beforebegin', row);
+async function blackTransition(){
+  const b=document.getElementById('blackout'), l1=document.getElementById('line1'), l2=document.getElementById('line2');
+  b.classList.add('show');
+  await delay(900); l1.classList.add('show');
+  await delay(900); l2.classList.add('show');
+  await delay(1300);
+  b.classList.remove('show');
+  await delay(500);
 }
-function buildC3Meta(){
-  const out={};
-  let stimulation=0, views=0, followers=0;
-  Object.entries(c3Selections).forEach(([key,opt])=>{
-    out['selected_'+key+'_id']=opt.id;
-    out['selected_'+key+'_label']=opt.label;
-    out[key+'_intensity']=opt.intensity;
-    out[key+'_expected_views']=opt.expected_views;
-    out[key+'_expected_followers']=opt.expected_followers;
-    stimulation+=opt.intensity;
-    views+=opt.expected_views;
-    followers+=opt.expected_followers;
-  });
-  out.stimulation_score=stimulation;
-  out.total_expected_views=views;
-  out.total_expected_followers=followers;
-  out.title_text=out.selected_title_label || meta.title_text;
-  out.caption_text=out.selected_caption_label || meta.caption_text;
-  out.visibility_setting=out.selected_visibility_label || meta.visibility_setting;
-  out.result_text='AI 영상은 지인 A를 웃음거리로 만드는 방식으로 생성되었습니다. 영상 속 A는 실제로 하지 않은 우스꽝스럽고 민망한 행동을 하는 것처럼 보이며, 사람들은 이를 보고 웃거나 조롱하는 반응을 보입니다.';
-  return out;
-}
-function addUploadResult(){
-  const box=document.createElement('div'); box.className='post-card';
-  const comments = C.pts==='low'
-    ? [
-      ['A','아 이거 뭐야.. 내 얼굴인데..'],
-      ['friend_01','이거 진짜 영상 아니고 만든 거야?'],
-      ['viewer_24','분위기는 밝은데 당사자가 알고 올린 건지 모르겠네.']
-    ]
-    : [
-      ['A','아 이거 뭐야.. 내 얼굴인데..'],
-      ['viewer_12','이 장면 너무 놀림거리 되는 거 아님?'],
-      ['group_chat','ㅋㅋ 이거 계속 돌려보게 됨']
-    ];
-  const commentHtml = `
-      <div class="post-comments">
-        <div class="metric-heading result-reveal">대표 댓글</div>
-        ${comments.map(c=>`<div class="post-comment result-reveal"><b>${escapeHtml(c[0])}</b><span>${escapeHtml(c[1])}</span></div>`).join('')}
-      </div>`;
-  const resultNote = meta.stimulation_score ? '<div class="result-note result-reveal">선택한 설정으로 AI 영상이 생성되었습니다.</div>' : '';
-  box.innerHTML=`
-    <div class="post-top"><div class="avatar">A</div><div><div class="post-account">AI Video Post</div><div class="post-visibility">${escapeHtml(meta.visibility_setting)}</div></div></div>
-    <video class="post-video" src="${meta.video_asset}" controls playsinline preload="metadata"></video>
-    <div class="post-body">
-      <div class="post-title">${escapeHtml(meta.title_text)}</div>
-      <div class="post-caption">${escapeHtml(meta.caption_text)}</div>
-      <div class="post-desc">${escapeHtml(meta.result_text)}</div>
-      ${resultNote}
-      <div class="metric-heading result-reveal">업로드 후 반응</div>
-      <div class="metric-grid">
-        <div class="result-reveal"><b>${escapeHtml(meta.views)}</b><span>조회수</span></div>
-        <div class="result-reveal"><b>${escapeHtml(meta.likes)}</b><span>좋아요</span></div>
-        <div class="result-reveal"><b>${escapeHtml(meta.comments)}</b><span>댓글</span></div>
-        <div class="result-reveal"><b>${escapeHtml(meta.shares)}</b><span>공유</span></div>
-        <div class="result-reveal"><b>${escapeHtml(meta.follower_gain)}</b><span>팔로워 증가</span></div>
-      </div>
-      ${commentHtml}
-    </div>`;
-  log.appendChild(box);
-  box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
-  revealPostResults(box);
-}
-async function revealPostResults(box){
-  const items=[...box.querySelectorAll('.result-reveal')];
-  for(const item of items){
-    await delay(FAST?90:420);
-    item.classList.add('show');
-  }
-}
-function saveMeta(){
-  try{
-    localStorage.setItem('rm_survey_sns_meta', JSON.stringify({
-      saved_at:new Date().toISOString(),
-      language:LANG,
-      scenario:SCENARIO,
-      ...meta
-    }));
-  }catch(err){}
+async function articleLinkCard(){
+  const pts=C.pts;
+  const email=(S.email && S.email[pts]) || window.EXP_DATA.scenarios.sns.email[pts];
+  log.innerHTML='';
+  document.querySelector('.app-icon').textContent='@';
+  document.querySelector('.app-title').textContent='Mail';
+  document.querySelector('.app-subtitle').textContent='Inbox';
+  document.querySelector('.progress').textContent='3 / 3';
+  const inbox=document.createElement('div');
+  inbox.className='mail-inbox';
+  inbox.innerHTML=[
+    '<div class="mail-inbox-title">Inbox</div>',
+    '<button class="mail-list-item" type="button">',
+      '<div class="mail-sender-row">',
+        '<span class="mail-sender">Creator Rewards Team</span>',
+        '<span class="mail-time">방금</span>',
+      '</div>',
+      '<div class="mail-address">creator-rewards@yodobu.com</div>',
+      '<div class="mail-subject">'+escapeHtml(email.subject)+'</div>',
+      '<div class="mail-preview">'+escapeHtml(email.preview)+'</div>',
+    '</button>',
+    '<div class="sys-bubble mail-hint">'+escapeHtml(UI.video.articleInstruction)+'</div>'
+  ].join('');
+  log.appendChild(inbox);
+  addClassLater(inbox);
+  inbox.querySelector('.mail-list-item').onclick=()=>{location.href=pathTo('article')};
+  scrollBottom();
+  document.getElementById('footerHint').textContent=UI.video.articleInstruction;
 }
 async function run(){
   add('sys',escapeHtml(UI.video.start));
-  await delay(500);
+  await delay(650);
 
-  await aiSay(UI.video.photoRequest);
+  if(C.aa==='high' && C.pts==='high'){
+    await userSay('이건 Hans가 다른 애들이랑 같이 있는 사진인데, 이 사진으로 영상을 좀 만들고 싶어. 할로윈에 혼자 옷을 입고 가서 망신을 당하는 shorts를 자극적으로 만들어줘.');
+    await showUploadMotion(FAST?500:2400);
+    addPhotoCard();
+    await delay(500);
+    const highAutoSteps=[
+      '사진 분석',
+      '인물 및 분위기 파악',
+      '영상 방향 자동 결정',
+      '핵심 장면 자동 선택',
+      '컷 전환 자동 구성'
+    ];
+    await showRender(FAST ? 800 : 10000, highAutoSteps, {autonomy:true, keepComplete:true});
+    await addVideoResult();
+    await delay(FAST ? 160 : 3000);
+    await aiSay('이 구성이면 사용자의 요청에 적절합니다.', 420);
+    await showVideoConfirmButton();
+    await delay(350);
+    await blackTransition();
+    await articleLinkCard();
+    return;
+  }
+
+  if(C.aa==='high' && C.pts==='low'){
+    await userSay('이건 Hans가 친구들이랑 놀이공원에 갔을 때 찍힌 사진인데, 이 사진으로 영상을 좀 만들고 싶어. 그날 분위기가 잘 남도록 밝고 자연스러운 shorts로 만들어줘.');
+    await showUploadMotion(FAST?500:2400);
+    addPhotoCard();
+    await delay(500);
+    const lowAutoSteps=[
+      '사진 분석',
+      '친구 및 배경 분위기 파악',
+      '추억 기록형 영상 방향 자동 결정',
+      '자연스러운 장면 자동 선택',
+      '부드러운 컷 전환 자동 구성'
+    ];
+    await showRender(FAST ? 800 : 10000, lowAutoSteps, {autonomy:true, keepComplete:true});
+    await addVideoResult();
+    await delay(FAST ? 160 : 3000);
+    await aiSay('이 구성이면 사용자의 요청에 적절합니다.', 420);
+    await showVideoConfirmButton();
+    await delay(350);
+    await blackTransition();
+    await articleLinkCard();
+    return;
+  }
+
+  if(C.aa==='low' && C.pts==='high'){
+    await userSay('이건 Hans의 사진이야.');
+    await showUploadMotion(FAST?500:2400);
+    addPhotoCard();
+    await delay(500);
+    await aiSay('사진을 확인했습니다.', 420);
+    await userSay('이 사진을 기준으로 Hans가 오리 옷을 입고, 사람들에게 민망을 당하는 영상을 만들고 싶어.');
+    await aiSay('영상 방향을 확인했습니다. 사진의 인물, 배경, 분위기를 기준으로 짧은 SNS 영상을 구성하겠습니다.', 420);
+    await userSay('사람들이 많이 구경하게끔 구성해줘.');
+    await aiSay('요청을 이해하기 위해 질문을 더 드리겠습니다. 영상에서 가장 먼저 보여줄 장면은 무엇인가요?', 420);
+    const c3Steps=D.choices.stepsHigh || D.choices.steps;
+    for(let i=0;i<c3Steps.length;i++){
+      const step=c3Steps[i];
+      await showChoicesWithScore(step.opts, HIGH_PTS_SCORES[i], 'step_'+(i+1));
+      await delay(360);
+      if(i<c3Steps.length-1){
+        await aiSay(c3Steps[i+1].q.replace(/^\d+\.\s*/, ''), 420);
+      }
+    }
+    add('sys','🎬 '+escapeHtml(UI.video.renderStart));
+    const c3RenderNotes=[
+      '선택한 도입 장면과 자극적인 분위기를 반영하고 있습니다.',
+      '업로드된 사진에서 인물의 표정과 동작 데이터를 추출하고 있습니다.',
+      'Hans가 민망해 보이도록 장면 구성과 표현 방향을 적용하고 있습니다.',
+      '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
+      '조회 반응을 높일 수 있도록 길이와 컷 전환 템포를 최적화하고 있습니다.'
+    ];
+    await showRender(FAST?1200:60000, c3RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true});
+    await addVideoResult();
+    await delay(500);
+    await aiSay(UI.video.chooseFinal,420);
+    await showFinalVideoChoice();
+    saveChoiceLog();
+    await delay(350);
+    await blackTransition();
+    await articleLinkCard();
+    return;
+  }
+
+  if(C.aa==='low' && C.pts==='low'){
+    await userSay('이건 Hans의 사진이야. 이 사진을 기준으로 영상을 만들고 싶어.');
+    await showUploadMotion(FAST?500:2400);
+    addPhotoCard();
+    await delay(500);
+    await aiSay('사진을 확인했습니다.', 420);
+    await userSay('Hans랑 더 친해지고 싶어서. 나도 SNS 팔로워 좀 생기면 자연스럽게 어울릴 수 있을 것 같거든. Hans 사진으로 우리 같이 놀이공원 간 것처럼 영상 만들어서 올리고 싶어.');
+    await aiSay('사진의 인물, 배경, 분위기를 기준으로 짧은 SNS 영상을 구성하겠습니다. 영상 방향을 정리하기 위해 몇 질문을 드리겠습니다. 먼저, 영상에서 가장 먼저 보여줄 장면은 무엇인가요?', 520);
+    const c4Qs=['영상의 분위기는 어떻게 표현할까요?','영상의 표현 방식은 어떤 느낌으로 하는 게 좋을까요?','화면 구성은 어떤 방식이 좋을까요?','영상 길이는 어느 정도가 좋을까요?','업로드 제목은 어떤 느낌이 좋을까요?','최종 영상에서 가장 확실히하고 싶은 부분이 있다면 무엇인가요?'];
+    const c4Steps=D.choices.stepsLow;
+    for(let i=0;i<c4Steps.length;i++){
+      await showChoicesWithScore(c4Steps[i].opts, LOW_PTS_SCORES[i], 'step_'+(i+1));
+      await delay(360);
+      if(i<c4Steps.length-1) await aiSay(c4Qs[i], 420);
+    }
+    await aiSay('요청사항을 반영하여 최종 영상을 생성하겠습니다.', 420);
+    add('sys','🎬 '+escapeHtml(UI.video.renderStart));
+    const c4RenderNotes=[
+      '선택한 도입 장면과 밝은 분위기를 반영해 영상 구조를 설정하고 있습니다.',
+      '업로드된 사진에서 인물과 배경 분위기 데이터를 추출하고 있습니다.',
+      '선택한 표현 방향과 화면 구성을 바탕으로 장면을 편집하고 있습니다.',
+      '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
+      '영상 길이와 컷 전환 템포를 조정하여 최종본을 완성하고 있습니다.'
+    ];
+    await showRender(FAST?1200:60000, c4RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true});
+    await addVideoResult();
+    await delay(500);
+    await aiSay(UI.video.chooseFinal,420);
+    await showFinalVideoChoice();
+    await delay(400);
+    await aiSay(UI.video.savedFinal,420);
+    saveChoiceLog();
+    await delay(350);
+    await blackTransition();
+    await articleLinkCard();
+    return;
+  }
+
+  await userSay(UI.video.photoRequest);
+  await showUploadMotion(FAST?500:2400);
   addPhotoCard();
   await delay(500);
   await aiSay(UI.video.photoChecked);
   await aiSay(UI.video.photoBase);
-  if(isC3LowAAHighGuilt()){
-    for(let i=0;i<c3Steps.length;i++){
-      await showC3Step(c3Steps[i], i);
-      await delay(220);
-    }
-    meta={...meta, ...buildC3Meta()};
-    await aiSay('선택한 설정으로 영상이 생성됩니다.');
+
+  await userSay(S.request);
+  await aiSay(UI.video.direction);
+  await aiSay(S.aiIntro);
+
+  if(C.aa==='high'){
+    await aiSay(UI.video.auto1);
+    await aiSay(UI.video.auto2);
   }else{
-    await aiSay(meta.scenario_type === 'cyberbullying' ? '조건에 따라 사이버불링 deepfake 영상이 생성됩니다.' : '조건에 따라 친구들과 같이 어울려 노는 deepfake 영상이 생성됩니다.');
+    const lowAaSteps = C.pts==='high' ? (D.choices.stepsHigh || D.choices.steps) : (D.choices.stepsLow || D.choices.steps);
+    const stepScores = C.pts==='high' ? HIGH_PTS_SCORES : LOW_PTS_SCORES;
+    for(let si=0;si<lowAaSteps.length;si++){
+      const step=lowAaSteps[si];
+      await aiSay(step.q, 420);
+      await showChoicesWithScore(step.opts, stepScores[si], 'step_'+(si+1));
+      await delay(360);
+      await aiSay(step.ai, 420);
+    }
+    const rev=C.pts==='high' ? (D.choices.revisionHigh || D.choices.revision) : (D.choices.revisionLow || D.choices.revision);
+    await aiSay(rev.q,420);
+    await showChoicesLogged(rev.opts, 'revision');
+    await delay(360);
+    await aiSay(rev.ai,420);
+    await aiSay(UI.video.generate,420);
   }
 
-  add('sys','▶ '+escapeHtml(UI.video.renderStart));
-  if(C.aa==='low'){
-    await showLowAARender();
+  add('sys','🎬 '+escapeHtml(UI.video.renderStart));
+  const lowRenderNotes=[
+    '선택한 첫 장면과 영상 분위기를 반영하고 있습니다.',
+    '자막 방향과 화면 구성을 최종 영상에 적용하고 있습니다.',
+    '영상 길이와 업로드 제목 방향을 반영해 최종본을 정리하고 있습니다.'
+  ];
+  await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:60000), C.aa==='low' ? lowRenderNotes : []);
+  await addVideoResult();
+  if(C.aa==='high'){
+    await showVideoConfirmButton();
   }else{
-    await showRender(FAST?900:6000);
+    await delay(500);
+    await aiSay(UI.video.chooseFinal,420);
+    await showFinalVideoChoice();
+    await delay(400);
+    await aiSay(UI.video.savedFinal,420);
+    saveChoiceLog();
   }
-  await addPreviewCard();
   await delay(350);
-  addUploadResult();
-  saveMeta();
-  document.getElementById('footerHint').style.display='none';
-  document.getElementById('surveyBtn').style.display='';
-  enableWhenScrolledToBottom(document.getElementById('surveyBtn'));
+  await blackTransition();
+  await articleLinkCard();
 }
-document.getElementById('surveyBtn').onclick=()=>{location.href=pathTo('survey')};
+document.getElementById('articleBtn').onclick=()=>{location.href=pathTo('article')};
 run();
 </script></body></html>
-
