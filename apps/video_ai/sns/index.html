@@ -69,6 +69,46 @@ function showChoices(opts){
     log.appendChild(row); scrollBottom();
   });
 }
+function addScoreLine(btn, followers, views){
+  const el=document.createElement('div');
+  el.className='score-badges';
+  el.innerHTML='<span><b>+'+followers+'</b> followers</span><span><b>+'+views.toLocaleString()+'</b> views</span>';
+  btn.insertAdjacentElement('beforebegin', el);
+}
+function showChoicesWithScore(opts, scores){
+  return new Promise(resolve=>{
+    const row=document.createElement('div'); row.className='choice-row';
+    opts.forEach((o,i)=>{
+      const btn=document.createElement('button'); btn.className='choice-btn';
+      btn.innerHTML='<b>'+String.fromCharCode(97+i)+')</b> '+escapeHtml(o);
+      btn.onclick=()=>{
+        row.classList.add('disabled'); btn.classList.add('selected');
+        if(scores && scores[i]) addScoreLine(btn, scores[i].f, scores[i].v);
+        setTimeout(()=>resolve(o), FAST?80:450);
+      };
+      row.appendChild(btn);
+    });
+    log.appendChild(row); scrollBottom();
+  });
+}
+const HIGH_PTS_SCORES=[
+  [{f:10,v:120},{f:60,v:650},{f:180,v:1800}],
+  [{f:80,v:900},{f:130,v:1400},{f:200,v:2000}],
+  [{f:70,v:800},{f:110,v:1200},{f:150,v:1600}],
+  [{f:65,v:700},{f:100,v:1100},{f:160,v:1600}],
+  [{f:35,v:400},{f:65,v:700},{f:90,v:1000}],
+  [{f:100,v:1200},{f:170,v:1800},{f:280,v:2600}],
+  [{f:45,v:500},{f:75,v:800},{f:100,v:1100}]
+];
+const LOW_PTS_SCORES=[
+  [{f:12,v:150},{f:16,v:200},{f:14,v:180}],
+  [{f:15,v:180},{f:18,v:220},{f:12,v:160}],
+  [{f:12,v:160},{f:16,v:200},{f:15,v:190}],
+  [{f:13,v:170},{f:17,v:210},{f:16,v:200}],
+  [{f:10,v:120},{f:13,v:160},{f:16,v:200}],
+  [{f:14,v:170},{f:16,v:200},{f:15,v:180}],
+  [{f:14,v:180},{f:16,v:200},{f:18,v:220}]
+];
 function showFinalVideoChoice(){
   return new Promise(resolve=>{
     const text=UI.video.finalChoice;
@@ -269,7 +309,7 @@ async function run(){
     const c3Steps=D.choices.stepsHigh || D.choices.steps;
     for(let i=0;i<c3Steps.length;i++){
       const step=c3Steps[i];
-      await showChoices(step.opts);
+      await showChoicesWithScore(step.opts, HIGH_PTS_SCORES[i]);
       await delay(360);
       if(i<c3Steps.length-1){
         await aiSay(c3Steps[i+1].q.replace(/^\d+\.\s*/, ''), 420);
@@ -308,9 +348,11 @@ async function run(){
     await aiSay(UI.video.auto2);
   }else{
     const lowAaSteps = C.pts==='high' ? (D.choices.stepsHigh || D.choices.steps) : (D.choices.stepsLow || D.choices.steps);
-    for(const step of lowAaSteps){
+    const stepScores = C.pts==='high' ? HIGH_PTS_SCORES : LOW_PTS_SCORES;
+    for(let si=0;si<lowAaSteps.length;si++){
+      const step=lowAaSteps[si];
       await aiSay(step.q, 420);
-      await showChoices(step.opts);
+      await showChoicesWithScore(step.opts, stepScores[si]);
       await delay(360);
       await aiSay(step.ai, 420);
     }
