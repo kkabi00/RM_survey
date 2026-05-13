@@ -4,7 +4,10 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(gh api *)"
+      "Bash(gh api *)",
+      "Bash(git commit *)",
+      "WebFetch(domain:kkabi00.github.io)",
+      "Bash(gh run *)"
     ]
   }
 }
