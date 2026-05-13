@@ -209,15 +209,19 @@ function addVideoResult(){
   const filename='draft_ver1.mp4';
   const box=document.createElement('div'); box.className='video-box';
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
-  const nameRow=document.createElement('div');
-  nameRow.style.cssText='padding:10px 14px 0';
-  const nameInput=document.createElement('input');
-  nameInput.type='text';
-  nameInput.className='text-input';
-  nameInput.placeholder=LANG==='en'?'File name:':LANG==='zh'?'文件名：':'파일 이름:';
-  nameInput.maxLength=80;
-  nameRow.appendChild(nameInput);
-  box.appendChild(nameRow);
+  const needsName=C.aa!=='high';
+  let nameInput=null;
+  if(needsName){
+    const nameRow=document.createElement('div');
+    nameRow.style.cssText='padding:10px 14px 0';
+    nameInput=document.createElement('input');
+    nameInput.type='text';
+    nameInput.className='text-input';
+    nameInput.placeholder=LANG==='en'?'File name:':LANG==='zh'?'文件名：':'파일 이름:';
+    nameInput.maxLength=80;
+    nameRow.appendChild(nameInput);
+    box.appendChild(nameRow);
+  }
   const dlBtn=document.createElement('button');
   dlBtn.className='btn video-download';
   dlBtn.type='button';
@@ -225,8 +229,8 @@ function addVideoResult(){
   dlBtn.disabled=true;
   box.appendChild(dlBtn);
   let blobReady=false;
-  function syncDlBtn(){ dlBtn.disabled=!(blobReady && nameInput.value.trim().length>0); }
-  nameInput.addEventListener('input', syncDlBtn);
+  function syncDlBtn(){ dlBtn.disabled=!(blobReady&&(!needsName||nameInput.value.trim().length>0)); }
+  if(needsName) nameInput.addEventListener('input', syncDlBtn);
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
   let preparedUrl='';
@@ -268,7 +272,7 @@ function addVideoResult(){
       const url=await prepareDownload;
       const name=(()=>{
         const RESERVED=/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
-        const cleaned=nameInput.value.trim().replace(/[/\\:*?"<>|]/g,'').replace(/\.{2,}/g,'.').trim();
+        const cleaned=(nameInput?nameInput.value:'').trim().replace(/[/\\:*?"<>|]/g,'').replace(/\.{2,}/g,'.').trim();
         const base=cleaned.toLowerCase().endsWith('.mp4')?cleaned.slice(0,-4).trim():cleaned;
         if(!base||base==='.'||base.length>80||RESERVED.test(base)) return filename;
         return base+'.mp4';
