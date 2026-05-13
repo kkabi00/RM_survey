@@ -267,8 +267,13 @@ function addVideoResult(){
       if(dlBtn.disabled) return;
       dlBtn.disabled=true;
       const url=await prepareDownload;
-      const raw=nameInput.value.trim().replace(/[/\\:*?"<>|]/g,'');
-      const name=raw?(raw.toLowerCase().endsWith('.mp4')?raw:raw+'.mp4'):filename;
+      const name=(()=>{
+        const RESERVED=/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
+        const cleaned=nameInput.value.trim().replace(/[/\\:*?"<>|]/g,'').replace(/\.{2,}/g,'.').trim();
+        const base=cleaned.toLowerCase().endsWith('.mp4')?cleaned.slice(0,-4).trim():cleaned;
+        if(!base||base==='.'||base.length>80||RESERVED.test(base)) return filename;
+        return base+'.mp4';
+      })();
       triggerDownload(url, name);
       setTimeout(()=>{
         if(preparedUrl) URL.revokeObjectURL(preparedUrl);
