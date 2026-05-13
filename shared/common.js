@@ -27,8 +27,8 @@ const UI = window.EXP_UI || {};
 document.documentElement.lang = LANG;
 const S = D.scenarios[SCENARIO];
 const C = D.conds[COND];
-// Google Apps Script를 웹앱으로 배포한 뒤, /google_apps_script.gs의 배포 URL을 여기에 넣습니다.
-const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbya93yxUly2mjifoWanAqcd9D6Zmvv2YrFdMal93L229js8W_TE_vKAQ5Zl3eToUaDW/exec';
+// Google Apps Script를 웹앱으로 배포한 뒤, shared/data.js의 배포 URL을 갱신합니다.
+const GOOGLE_SHEETS_WEB_APP_URL = window.GOOGLE_SHEETS_WEB_APP_URL || '';
 function enc(v){return encodeURIComponent(v)}
 function pathTo(app){
   return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}&pid=${enc(PARTICIPANT_ID_AUTO)}&lang=${enc(LANG)}${FAST?'&fast=1':''}`;
