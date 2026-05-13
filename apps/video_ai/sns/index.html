@@ -211,14 +211,10 @@ function addVideoResult(){
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
   const nameRow=document.createElement('div');
   nameRow.style.cssText='padding:10px 14px 0';
-  const nameLabel=document.createElement('div');
-  nameLabel.style.cssText='font-size:13px;font-weight:700;margin-bottom:6px;color:#fff';
-  nameLabel.innerHTML=(LANG==='en'?'File name':LANG==='zh'?'文件名':'파일 이름')+' <span style="color:#b42318">*</span>';
-  nameRow.appendChild(nameLabel);
   const nameInput=document.createElement('input');
   nameInput.type='text';
   nameInput.className='text-input';
-  nameInput.placeholder='';
+  nameInput.placeholder=LANG==='en'?'File name:':LANG==='zh'?'文件名：':'파일 이름:';
   nameInput.maxLength=80;
   nameRow.appendChild(nameInput);
   box.appendChild(nameRow);
