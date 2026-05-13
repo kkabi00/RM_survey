@@ -208,45 +208,60 @@ function addVideoResult(){
   const filename='draft_ver1.mp4';
   const box=document.createElement('div'); box.className='video-box';
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
-  const dlBtn=document.createElement('a');
+  const dlBtn=document.createElement('button');
   dlBtn.className='btn video-download';
-  dlBtn.href=video;
-  dlBtn.download=filename;
+  dlBtn.type='button';
   dlBtn.textContent=UI.video.videoDownload;
+  dlBtn.disabled=true;
   box.appendChild(dlBtn);
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
+  let preparedUrl='';
+  const prepareDownload=fetch(video)
+    .then(res=>{
+      if(!res.ok) throw new Error('download failed');
+      return res.blob();
+    })
+    .then(blob=>{
+      if(!blob.size) throw new Error('empty download');
+      preparedUrl=URL.createObjectURL(blob);
+      dlBtn.disabled=false;
+      return preparedUrl;
+    })
+    .catch(err=>{
+      console.warn('Blob download preparation failed; falling back to browser download.', err);
+      dlBtn.disabled=false;
+      return video;
+    });
+  function triggerDownload(url, name){
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=name;
+    a.target='_self';
+    a.rel='noopener';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.dispatchEvent(new MouseEvent('click', {
+      bubbles:true,
+      cancelable:true,
+      view:window
+    }));
+    a.remove();
+  }
   return new Promise(resolve=>{
-    let clicked=false;
-    dlBtn.addEventListener('click', async e=>{
-      e.preventDefault();
-      if(clicked) return;
-      clicked=true;
-      try{
-        const res=await fetch(video);
-        if(!res.ok) throw new Error('download failed');
-        const blob=await res.blob();
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement('a');
-        a.href=url;
-        a.download=filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(()=>URL.revokeObjectURL(url), 1000);
-      }catch(err){
-        const a=document.createElement('a');
-        a.href=video;
-        a.download=filename;
-        a.rel='noopener';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      }
-      dlBtn.textContent=UI.video.videoDownloadDone;
-      dlBtn.classList.add('downloaded');
-      resolve();
-    }, {once:true});
+    dlBtn.addEventListener('click', async ()=>{
+      if(dlBtn.disabled) return;
+      dlBtn.disabled=true;
+      const url=await prepareDownload;
+      triggerDownload(url, filename);
+      setTimeout(()=>{
+        if(preparedUrl) URL.revokeObjectURL(preparedUrl);
+        dlBtn.disabled=false;
+        dlBtn.textContent=UI.video.videoDownloadDone;
+        dlBtn.classList.add('downloaded');
+        resolve();
+      }, 450);
+    });
   });
 }
 function showVideoConfirmButton(){
