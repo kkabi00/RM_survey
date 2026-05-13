@@ -160,6 +160,7 @@ function showFinalVideoChoice(){
 async function showRender(ms, notes=[], options={}){
   const card=document.createElement('div'); card.className='render-card';
   const autonomyTitle=options.autonomyTitle || 'AI 자동 처리 내역';
+  const renderNotes=options.prependUserChoice ? [UI.video.reflectingUserChoices || '사용자 선택을 분석 및 반영 중'].concat(notes) : notes;
   const autonomyHtml=options.autonomy ? [
     '<details class="render-autonomy" open>',
       '<summary>',
@@ -180,16 +181,16 @@ async function showRender(ms, notes=[], options={}){
     function frame(now){
       const p=Math.min(1,(now-start)/ms);
       fill.style.width=(p*100)+'%';
-      if(notes.length && noteIndex<notes.length && p >= (noteIndex+1)/(notes.length+1)){
+      if(renderNotes.length && noteIndex<renderNotes.length && p >= (noteIndex+1)/(renderNotes.length+1)){
         if(autonomyList){
           const item=document.createElement('div');
           item.className='render-autonomy-item';
-          item.textContent=notes[noteIndex];
+          item.textContent=renderNotes[noteIndex];
           autonomyList.appendChild(item);
           addClassLater(item);
           scrollBottom();
         }else{
-          add('ai', escapeHtml(notes[noteIndex]));
+          add('ai', escapeHtml(renderNotes[noteIndex]));
         }
         noteIndex++;
       }
@@ -204,18 +205,44 @@ function addVideoResult(){
   const pts=C.pts;
   const body = pts==='high' ? S.highOutcome : S.lowOutcome;
   const video = pts==='high' ? S.videoHigh : S.videoLow;
+  const filename='draft_ver1.mp4';
   const box=document.createElement('div'); box.className='video-box';
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
   const dlBtn=document.createElement('a');
   dlBtn.className='btn video-download';
   dlBtn.href=video;
-  dlBtn.download='draft_ver1.mp4';
+  dlBtn.download=filename;
   dlBtn.textContent=UI.video.videoDownload;
   box.appendChild(dlBtn);
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
   return new Promise(resolve=>{
-    dlBtn.addEventListener('click', ()=>{
+    let clicked=false;
+    dlBtn.addEventListener('click', async e=>{
+      e.preventDefault();
+      if(clicked) return;
+      clicked=true;
+      try{
+        const res=await fetch(video);
+        if(!res.ok) throw new Error('download failed');
+        const blob=await res.blob();
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');
+        a.href=url;
+        a.download=filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url), 1000);
+      }catch(err){
+        const a=document.createElement('a');
+        a.href=video;
+        a.download=filename;
+        a.rel='noopener';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
       dlBtn.textContent=UI.video.videoDownloadDone;
       dlBtn.classList.add('downloaded');
       resolve();
@@ -355,7 +382,7 @@ async function run(){
       '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
       '조회 반응을 높일 수 있도록 길이와 컷 전환 템포를 최적화하고 있습니다.'
     ];
-    await showRender(FAST?1200:60000, c3RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true});
+    await showRender(FAST?1200:60000, c3RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true, prependUserChoice:true});
     await addVideoResult();
     await delay(500);
     await aiSay(UI.video.chooseFinal,420);
@@ -391,7 +418,7 @@ async function run(){
       '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
       '영상 길이와 컷 전환 템포를 조정하여 최종본을 완성하고 있습니다.'
     ];
-    await showRender(FAST?1200:60000, c4RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true});
+    await showRender(FAST?1200:60000, c4RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true, prependUserChoice:true});
     await addVideoResult();
     await delay(500);
     await aiSay(UI.video.chooseFinal,420);
