@@ -9,6 +9,7 @@ function doPost(e) {
   const scenarioMeta = payload.scenarioMeta || {};
   const rowMap = {
     submitted_at: payload.submittedAt || new Date().toISOString(),
+    submitted_at_kst: payload.submittedAtKst || formatKst_(new Date()),
     language: payload.language || '',
     scenario: payload.scenario || '',
     scenario_label: payload.scenarioLabel || '',
@@ -78,9 +79,14 @@ function getResponseSheet_() {
   return spreadsheet.getSheetByName(SHEET_NAME) || spreadsheet.insertSheet(SHEET_NAME);
 }
 
+function formatKst_(date) {
+  return Utilities.formatDate(date, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
+}
+
 function ensureHeader_(sheet, extraHeader) {
   const header = [
     'submitted_at',
+    'submitted_at_kst',
     'language',
     'scenario',
     'scenario_label',

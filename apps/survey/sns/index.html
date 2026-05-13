@@ -230,15 +230,27 @@ async function saveSurvey(){
   answers.researcher_code=demoResponses.researcher_code||'';
   const participantId=answers.researcher_code || PARTICIPANT_ID_AUTO;
   const metaKeys=['aa_level','pts_level','guilt_level','scenario_type','title_text','caption_text','visibility_setting','views','likes','comments','shares','follower_gain','start_image_asset','video_asset','selected_direction_id','selected_direction_label','direction_intensity','direction_expected_views','direction_expected_followers','selected_editing_id','selected_editing_label','editing_intensity','editing_expected_views','editing_expected_followers','selected_title_id','selected_title_label','title_intensity','title_expected_views','title_expected_followers','selected_caption_id','selected_caption_label','caption_intensity','caption_expected_views','caption_expected_followers','selected_visibility_id','selected_visibility_label','visibility_intensity','visibility_expected_views','visibility_expected_followers','stimulation_score','total_expected_views','total_expected_followers'];
-  const header=['submitted_at','language','scenario','scenario_label','condition','condition_label','participant_id'].concat(metaKeys).concat(Object.keys(answers));
-  const submittedAt=new Date().toISOString();
-  const wideRow=[submittedAt,LANG,SCENARIO,S.label,COND,C.name,participantId].concat(metaKeys.map(key=>scenarioMeta[key]||'')).concat(Object.keys(answers).map(key=>answers[key]));
+  const header=['submitted_at','submitted_at_kst','language','scenario','scenario_label','condition','condition_label','participant_id'].concat(metaKeys).concat(Object.keys(answers));
+  const submittedDate=new Date();
+  const submittedAt=submittedDate.toISOString();
+  const submittedAtKst=new Intl.DateTimeFormat('sv-SE', {
+    timeZone:'Asia/Seoul',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit',
+    hour:'2-digit',
+    minute:'2-digit',
+    second:'2-digit',
+    hour12:false
+  }).format(submittedDate);
+  const wideRow=[submittedAt,submittedAtKst,LANG,SCENARIO,S.label,COND,C.name,participantId].concat(metaKeys.map(key=>scenarioMeta[key]||'')).concat(Object.keys(answers).map(key=>answers[key]));
   const csv=[header,wideRow].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const saved=document.getElementById('saved');
   nextBtn.disabled=true;
   nextBtn.textContent=UI.survey.submitting;
   const payload={
     submittedAt,
+    submittedAtKst,
     language:LANG,
     scenario:SCENARIO,
     scenarioLabel:S.label,

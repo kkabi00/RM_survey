@@ -32,9 +32,14 @@ http.createServer((req, res) => {
       res.end('Not found');
       return;
     }
-    res.writeHead(200, {
-      'Content-Type': types[path.extname(file).toLowerCase()] || 'application/octet-stream'
-    });
+    const ext = path.extname(file).toLowerCase();
+    const headers = {
+      'Content-Type': types[ext] || 'application/octet-stream'
+    };
+    if (ext === '.mp4') {
+      headers['Content-Disposition'] = `attachment; filename="${path.basename(file)}"`;
+    }
+    res.writeHead(200, headers);
     res.end(data);
   });
 }).listen(port, host, () => {
