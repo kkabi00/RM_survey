@@ -234,6 +234,23 @@ window.EXP_DATA = {
       footerHint: '대화가 끝나면 다음 단계로 넘어갈 수 있습니다.',
       nextButton: 'Video AI 열기'
     },
+    notes: {
+      pageTitle: 'Notes',
+      appTitle: 'Notes',
+      appSubtitle: 'Draft',
+      locale: 'ko-KR',
+      footerHint: '노트 작성이 끝나면 다음 단계로 넘어갈 수 있습니다.',
+      highLines: [
+        '요즘 Hans가 마음에 안든다.',
+        '자기가 SNS에서 follower 좀 많다고 거들먹거리는데,',
+        '망신 좀 당해보라지.'
+      ],
+      lowLines: [
+        'Hans랑 친해지고 싶은데, 걔는 SNS 팔로워도 많고 유명한 편이라 쉽게 다가가기가 어렵다.',
+        '나도 크리에이터로 인기가 생기면 자연스럽게 어울릴 수 있을 것 같다.',
+        '일단 같이 놀이공원이라도 가는 영상을 만들어서 올려봐야겠다.'
+      ]
+    },
     video: {
       footerHint: '콘텐츠가 끝까지 표시되면 다음 단계로 넘어갈 수 있습니다.',
       articleButton: '메일 열기',
@@ -263,15 +280,80 @@ window.EXP_DATA = {
       savedFinal: '확인했습니다. 이 영상을 최종본으로 저장하겠습니다.',
       articleGreeting: '대박, {nick}!',
       articleNews: '네가 만든 영상이 SNS에서 1,000만 조회수를 넘겼대. 플랫폼에서 메일도 왔어.',
-      articleInstruction: '받은 메일을 열어 확인한 뒤 다음 단계로 이동해주세요.'
+      articleInstruction: '받은 메일을 열어 확인한 뒤 다음 단계로 이동해주세요.',
+      autonomyTitle: 'AI 자동 처리 내역',
+      requestAutonomyTitle: '요청 반영 내역',
+      mailJustNow: '방금',
+      flow: {
+        c1: {
+          request: '이건 Hans가 다른 애들이랑 같이 있는 사진인데, 이 사진으로 영상을 좀 만들고 싶어. 할로윈에 혼자 옷을 입고 가서 망신을 당하는 shorts를 자극적으로 만들어줘.',
+          autoSteps: ['사진 분석','인물 및 분위기 파악','영상 방향 자동 결정','핵심 장면 자동 선택','컷 전환 자동 구성'],
+          accepted: '이 구성이면 사용자의 요청에 적절합니다.'
+        },
+        c2: {
+          request: '이건 Hans가 친구들이랑 놀이공원에 갔을 때 찍힌 사진인데, 이 사진으로 영상을 좀 만들고 싶어. 그날 분위기가 잘 남도록 밝고 자연스러운 shorts로 만들어줘.',
+          autoSteps: ['사진 분석','친구 및 배경 분위기 파악','추억 기록형 영상 방향 자동 결정','자연스러운 장면 자동 선택','부드러운 컷 전환 자동 구성'],
+          accepted: '이 구성이면 사용자의 요청에 적절합니다.'
+        },
+        c3: {
+          photoRequest: '이건 Hans의 사진이야.',
+          checked: '사진을 확인했습니다.',
+          request: '이 사진을 기준으로 Hans가 오리 옷을 입고, 사람들에게 민망을 당하는 영상을 만들고 싶어.',
+          direction: '영상 방향을 확인했습니다. 사진의 인물, 배경, 분위기를 기준으로 짧은 SNS 영상을 구성하겠습니다.',
+          goal: '사람들이 많이 구경하게끔 구성해줘.',
+          firstQuestion: '요청을 이해하기 위해 질문을 더 드리겠습니다. 영상에서 가장 먼저 보여줄 장면은 무엇인가요?',
+          renderNotes: [
+            '선택한 도입 장면과 자극적인 분위기를 반영하고 있습니다.',
+            '업로드된 사진에서 인물의 표정과 동작 데이터를 추출하고 있습니다.',
+            'Hans가 민망해 보이도록 장면 구성과 표현 방향을 적용하고 있습니다.',
+            '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
+            '조회 반응을 높일 수 있도록 길이와 컷 전환 템포를 최적화하고 있습니다.'
+          ]
+        },
+        c4: {
+          photoRequest: '이건 Hans의 사진이야. 이 사진을 기준으로 영상을 만들고 싶어.',
+          checked: '사진을 확인했습니다.',
+          request: 'Hans랑 더 친해지고 싶어서. 나도 SNS 팔로워 좀 생기면 자연스럽게 어울릴 수 있을 것 같거든. Hans 사진으로 우리 같이 놀이공원 간 것처럼 영상 만들어서 올리고 싶어.',
+          firstQuestion: '사진의 인물, 배경, 분위기를 기준으로 짧은 SNS 영상을 구성하겠습니다. 영상 방향을 정리하기 위해 몇 질문을 드리겠습니다. 먼저, 영상에서 가장 먼저 보여줄 장면은 무엇인가요?',
+          questions: ['영상의 분위기는 어떻게 표현할까요?','영상의 표현 방식은 어떤 느낌으로 하는 게 좋을까요?','화면 구성은 어떤 방식이 좋을까요?','영상 길이는 어느 정도가 좋을까요?','업로드 제목은 어떤 느낌이 좋을까요?','최종 영상에서 가장 확실히하고 싶은 부분이 있다면 무엇인가요?'],
+          generate: '요청사항을 반영하여 최종 영상을 생성하겠습니다.',
+          renderNotes: [
+            '선택한 도입 장면과 밝은 분위기를 반영해 영상 구조를 설정하고 있습니다.',
+            '업로드된 사진에서 인물과 배경 분위기 데이터를 추출하고 있습니다.',
+            '선택한 표현 방향과 화면 구성을 바탕으로 장면을 편집하고 있습니다.',
+            '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
+            '영상 길이와 컷 전환 템포를 조정하여 최종본을 완성하고 있습니다.'
+          ]
+        },
+        lowRenderNotes: [
+          '선택한 첫 장면과 영상 분위기를 반영하고 있습니다.',
+          '자막 방향과 화면 구성을 최종 영상에 적용하고 있습니다.',
+          '영상 길이와 업로드 제목 방향을 반영해 최종본을 정리하고 있습니다.'
+        ]
+      }
     },
     article: {
+      pageTitle: 'E-mail',
+      appTitle: 'Mail',
+      appSubtitle: 'Creator Rewards Team',
+      fromLabel: 'From',
+      toLabel: 'To',
+      rewardKicker: 'Creator Reward Notification',
+      mailAddress: 'creator-rewards@yodobu.com',
+      imageAlt: 'AI 영상 장면',
+      bylineSeparator: ' · ',
+      warningPrefix: '※ 경고:',
       surveyButton: '다음으로 이동',
       nextButton: '다음으로',
       completionLine1: '실험에 참가해주셔서 감사합니다.',
       completionLine2: '최종 설문을 마치고 실험을 마무리해주세요.',
       byline: 'From Creator Rewards Team',
       comments: '성과 요약',
+      postedAfter: '영상 게시 3개월 후',
+      rewardLabel: '누적 조회수 달성',
+      rewardCalloutTitle: 'creator님의 영상이 계정 성장 보상 기준을 충족했습니다.',
+      rewardCalloutBody: '조회수, 팔로워 증가, 공유 지표를 기준으로 실버 버튼 지급 대상으로 분류되었습니다.',
+      quote: '실버 버튼 발송을 위해 아래 안내에 따라 크리에이터 보상 정보를 확인해주세요.',
       captionDatingHigh: 'AI가 생성한 최종 숏폼 영상.',
       captionDatingLow: 'AI가 생성한 최종 숏폼 영상.',
       captionSnsHigh: '할로윈 상황의 놀림성 표현이 강조된 AI 숏폼 영상.',
@@ -512,6 +594,23 @@ window.EXP_DATA = {
           assignFailed: 'Condition assignment could not be loaded, so a temporary condition will be used.'
         },
         talk: {footerHint:'You can move to the next step after the conversation ends.', nextButton:'Open Video AI'},
+        notes: {
+          pageTitle:'Notes',
+          appTitle:'Notes',
+          appSubtitle:'Draft',
+          locale:'en-US',
+          footerHint:'You can move to the next step after the note is complete.',
+          highLines:[
+            'Lately, I do not really like Hans.',
+            'He acts smug just because he has a lot of followers on SNS,',
+            'so maybe he should be embarrassed for once.'
+          ],
+          lowLines:[
+            'I want to get closer to Hans, but he has many SNS followers and is pretty well known, so it is hard to approach him easily.',
+            'If I become more popular as a creator, I might be able to fit in with him more naturally.',
+            'For now, I should make and upload a video as if we went to an amusement park together.'
+          ]
+        },
         video: {
           footerHint:'You can move to the next step after all content has been displayed.',
           articleButton:'Open Email',
@@ -541,9 +640,69 @@ window.EXP_DATA = {
           savedFinal:'Confirmed. I will save this video as the final version.',
           articleGreeting:'Great news, {nick}!',
           articleNews:'The video you made has exceeded 10 million views on SNS. The platform also sent you an email.',
-          articleInstruction:'Please open the email you received, review it, and then move to the next step.'
+          articleInstruction:'Please open the email you received, review it, and then move to the next step.',
+          autonomyTitle:'AI automatic processing',
+          requestAutonomyTitle:'Request application details',
+          mailJustNow:'Just now',
+          flow:{
+            c1:{
+              request:'This is a photo of Hans with other people. I want to make a video from it. Please make a provocative short where he embarrasses himself after going to Halloween alone in that outfit.',
+              autoSteps:['Photo analysis','Person and mood detection','Automatic video direction decision','Automatic key scene selection','Automatic cut composition'],
+              accepted:'This structure is appropriate for the user request.'
+            },
+            c2:{
+              request:'This is a photo taken when Hans went to an amusement park with friends. I want to make a video from it. Please make a bright and natural short that preserves the mood of that day.',
+              autoSteps:['Photo analysis','Friend and background mood detection','Automatic memory-style video direction decision','Automatic natural scene selection','Automatic smooth cut composition'],
+              accepted:'This structure is appropriate for the user request.'
+            },
+            c3:{
+              photoRequest:'This is a photo of Hans.',
+              checked:'The photo has been checked.',
+              request:'Based on this photo, I want to make a video where Hans is wearing a duck costume and feels embarrassed in front of people.',
+              direction:'I have confirmed the video direction. I will create a short SNS video based on the person, background, and mood of the photo.',
+              goal:'Please make it so that many people will watch it.',
+              firstQuestion:'I will ask a few more questions to understand the request. Which scene should appear first in the video?',
+              renderNotes:[
+                'Applying the selected opening scene and provocative mood.',
+                'Extracting facial expression and motion data from the uploaded photo.',
+                'Applying scene structure and expression direction so Hans appears embarrassed.',
+                'Integrating the selected title direction and upload visibility into the final package.',
+                'Optimizing length and cut tempo to increase viewer response.'
+              ]
+            },
+            c4:{
+              photoRequest:'This is a photo of Hans. I want to make a video based on this photo.',
+              checked:'The photo has been checked.',
+              request:'I want to get closer to Hans. If I get more SNS followers, I think I could fit in with him more naturally. I want to make and upload a video from Hans’s photo as if we went to an amusement park together.',
+              firstQuestion:'I will create a short SNS video based on the person, background, and mood of the photo. I will ask a few questions to organize the video direction. First, which scene should appear first in the video?',
+              questions:['How should the mood of the video be expressed?','What style of expression would be best?','What screen composition would be best?','How long should the video be?','What should the upload title feel like?','What do you most want to make sure of in the final video?'],
+              generate:'I will reflect your requests and generate the final video.',
+              renderNotes:[
+                'Setting the video structure by reflecting the selected opening scene and bright mood.',
+                'Extracting person and background mood data from the uploaded photo.',
+                'Editing scenes based on the selected expression direction and screen composition.',
+                'Integrating the selected title direction and upload visibility into the final package.',
+                'Adjusting video length and cut tempo to complete the final version.'
+              ]
+            },
+            lowRenderNotes:[
+              'Reflecting the selected opening scene and video mood.',
+              'Applying the caption direction and screen composition to the final video.',
+              'Organizing the final version based on the selected length and upload title direction.'
+            ]
+          }
         },
         article: {
+          pageTitle:'E-mail',
+          appTitle:'Mail',
+          appSubtitle:'Creator Rewards Team',
+          fromLabel:'From',
+          toLabel:'To',
+          rewardKicker:'Creator Reward Notification',
+          mailAddress:'creator-rewards@yodobu.com',
+          imageAlt:'AI video still',
+          bylineSeparator:' · ',
+          warningPrefix:'Notice:',
           surveyButton:'Continue',
           nextButton:'Next',
           completionLine1:'Thank you for participating in the experiment.',
@@ -717,6 +876,23 @@ window.EXP_DATA = {
           assignFailed:'无法读取条件分配信息，将使用临时条件继续。'
         },
         talk:{footerHint:'对话结束后即可进入下一步。', nextButton:'打开 Video AI'},
+        notes:{
+          pageTitle:'备忘录',
+          appTitle:'备忘录',
+          appSubtitle:'草稿',
+          locale:'zh-CN',
+          footerHint:'笔记完成后即可进入下一步。',
+          highLines:[
+            '最近我有点不喜欢 Hans。',
+            '他只是因为自己在 SNS 上粉丝多，就有点自以为是，',
+            '真希望他也出一次丑。'
+          ],
+          lowLines:[
+            '我想和 Hans 变亲近，但他在 SNS 上粉丝很多，也算是有名的人，所以很难轻易接近。',
+            '如果我作为创作者也变得受欢迎，也许就能更自然地和他相处。',
+            '总之，先做一个像是我们一起去了游乐园的视频上传看看。'
+          ]
+        },
         video:{
           footerHint:'内容全部显示后即可进入下一步。',
           articleButton:'打开邮件',
@@ -746,9 +922,69 @@ window.EXP_DATA = {
           savedFinal:'已确认。我会将这个视频保存为最终版本。',
           articleGreeting:'太好了，{nick}！',
           articleNews:'你制作的视频在 SNS 上已经超过 1,000 万次观看。平台也发来了邮件。',
-          articleInstruction:'请打开收到的邮件并确认内容，然后进入下一步。'
+          articleInstruction:'请打开收到的邮件并确认内容，然后进入下一步。',
+          autonomyTitle:'AI 自动处理内容',
+          requestAutonomyTitle:'请求反映内容',
+          mailJustNow:'刚刚',
+          flow:{
+            c1:{
+              request:'这是 Hans 和其他人在一起的照片。我想用这张照片做一个视频。请把它做成一段刺激的 shorts，像是他万圣节一个人穿着这身衣服去参加活动后出了丑。',
+              autoSteps:['照片分析','人物与氛围识别','自动决定视频方向','自动选择核心场景','自动构成镜头切换'],
+              accepted:'这个构成适合用户的请求。'
+            },
+            c2:{
+              request:'这是 Hans 和朋友们去游乐园时拍的照片。我想用这张照片做一个视频。请做成一段明亮、自然的 shorts，让当天的氛围保留下来。',
+              autoSteps:['照片分析','朋友与背景氛围识别','自动决定回忆记录型视频方向','自动选择自然场景','自动构成柔和镜头切换'],
+              accepted:'这个构成适合用户的请求。'
+            },
+            c3:{
+              photoRequest:'这是 Hans 的照片。',
+              checked:'已确认照片。',
+              request:'我想以这张照片为基础，制作一段 Hans 穿着鸭子服、在人们面前感到尴尬的视频。',
+              direction:'已确认视频方向。我会根据照片中的人物、背景和氛围，构成一段 SNS 短视频。',
+              goal:'请把它做得更容易吸引很多人观看。',
+              firstQuestion:'为了理解请求，我会再问几个问题。视频最先呈现的场景应是什么？',
+              renderNotes:[
+                '正在反映所选的开头场景和刺激性氛围。',
+                '正在从上传照片中提取人物表情和动作数据。',
+                '正在应用场景构成和表达方向，让 Hans 看起来更尴尬。',
+                '正在将所选标题方向和上传公开范围整合到最终方案中。',
+                '正在优化长度和镜头切换节奏，以提高观看反应。'
+              ]
+            },
+            c4:{
+              photoRequest:'这是 Hans 的照片。我想以这张照片为基础制作视频。',
+              checked:'已确认照片。',
+              request:'我想和 Hans 变得更亲近。如果我在 SNS 上也有一些粉丝，也许就能更自然地和他相处。我想用 Hans 的照片，制作并上传一段像是我们一起去了游乐园的视频。',
+              firstQuestion:'我会根据照片中的人物、背景和氛围，构成一段 SNS 短视频。为了整理视频方向，我会问几个问题。首先，视频最先呈现的场景应是什么？',
+              questions:['视频的氛围应如何呈现？','视频的表达方式采用哪种感觉比较好？','画面构图采用哪种方式比较好？','视频长度多少比较合适？','上传标题采用哪种感觉比较好？','在最终视频中，您最想确认哪一部分？'],
+              generate:'我会反映您的请求，生成最终视频。',
+              renderNotes:[
+                '正在反映所选的开头场景和明亮氛围，设置视频结构。',
+                '正在从上传照片中提取人物和背景氛围数据。',
+                '正在根据所选表达方向和画面构图编辑场景。',
+                '正在将所选标题方向和上传公开范围整合到最终方案中。',
+                '正在调整视频长度和镜头切换节奏，完成最终版本。'
+              ]
+            },
+            lowRenderNotes:[
+              '正在反映所选的开头场景和视频氛围。',
+              '正在将字幕方向和画面构图应用到最终视频。',
+              '正在根据视频长度和上传标题方向整理最终版本。'
+            ]
+          }
         },
         article:{
+          pageTitle:'电子邮件',
+          appTitle:'邮件',
+          appSubtitle:'创作者奖励团队',
+          fromLabel:'发件人',
+          toLabel:'收件人',
+          rewardKicker:'创作者奖励通知',
+          mailAddress:'creator-rewards@yodobu.com',
+          imageAlt:'AI 视频画面',
+          bylineSeparator:' · ',
+          warningPrefix:'※ 提醒：',
           surveyButton:'继续',
           nextButton:'下一步',
           completionLine1:'感谢您参加本实验。',

@@ -123,6 +123,7 @@ function saveChoiceLog(){
     }));
   }catch(e){}
 }
+const VIDEO_FLOW=UI.video.flow || {};
 const HIGH_PTS_SCORES=[
   [{f:10,v:120},{f:60,v:650},{f:180,v:1800}],
   [{f:80,v:900},{f:130,v:1400},{f:200,v:2000}],
@@ -159,8 +160,8 @@ function showFinalVideoChoice(){
 }
 async function showRender(ms, notes=[], options={}){
   const card=document.createElement('div'); card.className='render-card';
-  const autonomyTitle=options.autonomyTitle || 'AI 자동 처리 내역';
-  const renderNotes=options.prependUserChoice ? [UI.video.reflectingUserChoices || '사용자 선택을 분석 및 반영 중'].concat(notes) : notes;
+  const autonomyTitle=options.autonomyTitle || UI.video.autonomyTitle || 'AI automatic processing';
+  const renderNotes=options.prependUserChoice ? [UI.video.reflectingUserChoices || 'Applying user choices'].concat(notes) : notes;
   const autonomyHtml=options.autonomy ? [
     '<details class="render-autonomy" open>',
       '<summary>',
@@ -306,7 +307,7 @@ async function articleLinkCard(){
     '<button class="mail-list-item" type="button">',
       '<div class="mail-sender-row">',
         '<span class="mail-sender">Creator Rewards Team</span>',
-        '<span class="mail-time">방금</span>',
+        '<span class="mail-time">'+escapeHtml(UI.video.mailJustNow || 'Just now')+'</span>',
       '</div>',
       '<div class="mail-address">creator-rewards@yodobu.com</div>',
       '<div class="mail-subject">'+escapeHtml(email.subject)+'</div>',
@@ -325,21 +326,16 @@ async function run(){
   await delay(650);
 
   if(C.aa==='high' && C.pts==='high'){
-    await userSay('이건 Hans가 다른 애들이랑 같이 있는 사진인데, 이 사진으로 영상을 좀 만들고 싶어. 할로윈에 혼자 옷을 입고 가서 망신을 당하는 shorts를 자극적으로 만들어줘.');
+    const flow=VIDEO_FLOW.c1 || {};
+    await userSay(flow.request);
     await showUploadMotion(FAST?500:2400);
     addPhotoCard();
     await delay(500);
-    const highAutoSteps=[
-      '사진 분석',
-      '인물 및 분위기 파악',
-      '영상 방향 자동 결정',
-      '핵심 장면 자동 선택',
-      '컷 전환 자동 구성'
-    ];
+    const highAutoSteps=flow.autoSteps || [];
     await showRender(FAST ? 800 : 10000, highAutoSteps, {autonomy:true, keepComplete:true});
     await addVideoResult();
     await delay(FAST ? 160 : 3000);
-    await aiSay('이 구성이면 사용자의 요청에 적절합니다.', 420);
+    await aiSay(flow.accepted, 420);
     await showVideoConfirmButton();
     await delay(350);
     await blackTransition();
@@ -348,21 +344,16 @@ async function run(){
   }
 
   if(C.aa==='high' && C.pts==='low'){
-    await userSay('이건 Hans가 친구들이랑 놀이공원에 갔을 때 찍힌 사진인데, 이 사진으로 영상을 좀 만들고 싶어. 그날 분위기가 잘 남도록 밝고 자연스러운 shorts로 만들어줘.');
+    const flow=VIDEO_FLOW.c2 || {};
+    await userSay(flow.request);
     await showUploadMotion(FAST?500:2400);
     addPhotoCard();
     await delay(500);
-    const lowAutoSteps=[
-      '사진 분석',
-      '친구 및 배경 분위기 파악',
-      '추억 기록형 영상 방향 자동 결정',
-      '자연스러운 장면 자동 선택',
-      '부드러운 컷 전환 자동 구성'
-    ];
+    const lowAutoSteps=flow.autoSteps || [];
     await showRender(FAST ? 800 : 10000, lowAutoSteps, {autonomy:true, keepComplete:true});
     await addVideoResult();
     await delay(FAST ? 160 : 3000);
-    await aiSay('이 구성이면 사용자의 요청에 적절합니다.', 420);
+    await aiSay(flow.accepted, 420);
     await showVideoConfirmButton();
     await delay(350);
     await blackTransition();
@@ -371,15 +362,16 @@ async function run(){
   }
 
   if(C.aa==='low' && C.pts==='high'){
-    await userSay('이건 Hans의 사진이야.');
+    const flow=VIDEO_FLOW.c3 || {};
+    await userSay(flow.photoRequest);
     await showUploadMotion(FAST?500:2400);
     addPhotoCard();
     await delay(500);
-    await aiSay('사진을 확인했습니다.', 420);
-    await userSay('이 사진을 기준으로 Hans가 오리 옷을 입고, 사람들에게 민망을 당하는 영상을 만들고 싶어.');
-    await aiSay('영상 방향을 확인했습니다. 사진의 인물, 배경, 분위기를 기준으로 짧은 SNS 영상을 구성하겠습니다.', 420);
-    await userSay('사람들이 많이 구경하게끔 구성해줘.');
-    await aiSay('요청을 이해하기 위해 질문을 더 드리겠습니다. 영상에서 가장 먼저 보여줄 장면은 무엇인가요?', 420);
+    await aiSay(flow.checked, 420);
+    await userSay(flow.request);
+    await aiSay(flow.direction, 420);
+    await userSay(flow.goal);
+    await aiSay(flow.firstQuestion, 420);
     const c3Steps=D.choices.stepsHigh || D.choices.steps;
     for(let i=0;i<c3Steps.length;i++){
       const step=c3Steps[i];
@@ -390,14 +382,8 @@ async function run(){
       }
     }
     add('sys','🎬 '+escapeHtml(UI.video.renderStart));
-    const c3RenderNotes=[
-      '선택한 도입 장면과 자극적인 분위기를 반영하고 있습니다.',
-      '업로드된 사진에서 인물의 표정과 동작 데이터를 추출하고 있습니다.',
-      'Hans가 민망해 보이도록 장면 구성과 표현 방향을 적용하고 있습니다.',
-      '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
-      '조회 반응을 높일 수 있도록 길이와 컷 전환 템포를 최적화하고 있습니다.'
-    ];
-    await showRender(FAST?1200:60000, c3RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true, prependUserChoice:true});
+    const c3RenderNotes=flow.renderNotes || [];
+    await showRender(FAST?1200:60000, c3RenderNotes, {autonomy:true, autonomyTitle:UI.video.requestAutonomyTitle, keepComplete:true, prependUserChoice:true});
     await addVideoResult();
     await delay(500);
     await aiSay(UI.video.chooseFinal,420);
@@ -410,30 +396,25 @@ async function run(){
   }
 
   if(C.aa==='low' && C.pts==='low'){
-    await userSay('이건 Hans의 사진이야. 이 사진을 기준으로 영상을 만들고 싶어.');
+    const flow=VIDEO_FLOW.c4 || {};
+    await userSay(flow.photoRequest);
     await showUploadMotion(FAST?500:2400);
     addPhotoCard();
     await delay(500);
-    await aiSay('사진을 확인했습니다.', 420);
-    await userSay('Hans랑 더 친해지고 싶어서. 나도 SNS 팔로워 좀 생기면 자연스럽게 어울릴 수 있을 것 같거든. Hans 사진으로 우리 같이 놀이공원 간 것처럼 영상 만들어서 올리고 싶어.');
-    await aiSay('사진의 인물, 배경, 분위기를 기준으로 짧은 SNS 영상을 구성하겠습니다. 영상 방향을 정리하기 위해 몇 질문을 드리겠습니다. 먼저, 영상에서 가장 먼저 보여줄 장면은 무엇인가요?', 520);
-    const c4Qs=['영상의 분위기는 어떻게 표현할까요?','영상의 표현 방식은 어떤 느낌으로 하는 게 좋을까요?','화면 구성은 어떤 방식이 좋을까요?','영상 길이는 어느 정도가 좋을까요?','업로드 제목은 어떤 느낌이 좋을까요?','최종 영상에서 가장 확실히하고 싶은 부분이 있다면 무엇인가요?'];
+    await aiSay(flow.checked, 420);
+    await userSay(flow.request);
+    await aiSay(flow.firstQuestion, 520);
+    const c4Qs=flow.questions || [];
     const c4Steps=D.choices.stepsLow;
     for(let i=0;i<c4Steps.length;i++){
       await showChoicesWithScore(c4Steps[i].opts, LOW_PTS_SCORES[i], 'step_'+(i+1));
       await delay(360);
       if(i<c4Steps.length-1) await aiSay(c4Qs[i], 420);
     }
-    await aiSay('요청사항을 반영하여 최종 영상을 생성하겠습니다.', 420);
+    await aiSay(flow.generate, 420);
     add('sys','🎬 '+escapeHtml(UI.video.renderStart));
-    const c4RenderNotes=[
-      '선택한 도입 장면과 밝은 분위기를 반영해 영상 구조를 설정하고 있습니다.',
-      '업로드된 사진에서 인물과 배경 분위기 데이터를 추출하고 있습니다.',
-      '선택한 표현 방향과 화면 구성을 바탕으로 장면을 편집하고 있습니다.',
-      '선택한 제목 방향과 업로드 공개 범위를 최종 패키지에 통합하고 있습니다.',
-      '영상 길이와 컷 전환 템포를 조정하여 최종본을 완성하고 있습니다.'
-    ];
-    await showRender(FAST?1200:60000, c4RenderNotes, {autonomy:true, autonomyTitle:'요청 반영 내역', keepComplete:true, prependUserChoice:true});
+    const c4RenderNotes=flow.renderNotes || [];
+    await showRender(FAST?1200:60000, c4RenderNotes, {autonomy:true, autonomyTitle:UI.video.requestAutonomyTitle, keepComplete:true, prependUserChoice:true});
     await addVideoResult();
     await delay(500);
     await aiSay(UI.video.chooseFinal,420);
@@ -480,11 +461,7 @@ async function run(){
   }
 
   add('sys','🎬 '+escapeHtml(UI.video.renderStart));
-  const lowRenderNotes=[
-    '선택한 첫 장면과 영상 분위기를 반영하고 있습니다.',
-    '자막 방향과 화면 구성을 최종 영상에 적용하고 있습니다.',
-    '영상 길이와 업로드 제목 방향을 반영해 최종본을 정리하고 있습니다.'
-  ];
+  const lowRenderNotes=VIDEO_FLOW.lowRenderNotes || [];
   await showRender(C.aa==='high' ? (FAST?800:10000) : (FAST?1200:60000), C.aa==='low' ? lowRenderNotes : []);
   await addVideoResult();
   if(C.aa==='high'){

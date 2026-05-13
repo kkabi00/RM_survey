@@ -1,45 +1,58 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>E-mail</title><link rel="stylesheet" href="../../../shared/styles.css"></head><body>
 <div class="app-shell"><div class="phone"><div class="screen">
-<div class="statusbar"><span>9:41</span><span>Mail</span></div>
-<div class="app-header"><div class="app-icon">@</div><div><div class="app-title">Mail</div><div class="app-subtitle">Creator Rewards Team</div></div><div class="progress">3 / 3</div></div>
+<div class="statusbar"><span>9:41</span><span id="statusTitle">Mail</span></div>
+<div class="app-header"><div class="app-icon">@</div><div><div class="app-title" id="appTitle">Mail</div><div class="app-subtitle" id="appSubtitle">Creator Rewards Team</div></div><div class="progress">3 / 3</div></div>
 <div class="content" style="padding:0"><div class="article-wrap" id="email"></div></div>
 <div class="footer"><button class="btn full" id="surveyBtn"></button></div>
 </div></div></div>
 <script src="../../../shared/data.js"></script><script src="../../../shared/common.js"></script><script>
 const E=(S.email && S.email[C.pts]) || window.EXP_DATA.scenarios.sns.email[C.pts];
 const emailImage=C.pts==='high' ? '../../../images/high_pts_silver_email.png' : '../../../images/low_pts_silver_email.png';
-const emailCaption=C.pts==='high' ? UI.article.captionSnsHigh : UI.article.captionSnsLow;
 const el=document.getElementById('email');
-const postedAfter=UI.article.postedAfter || '영상 게시 3개월 후';
-const rewardLabel=UI.article.rewardLabel || '누적 조회수 달성';
-const rewardCalloutTitle=UI.article.rewardCalloutTitle || 'creator님의 영상이 계정 성장 보상 기준을 충족했습니다.';
-const rewardCalloutBody=UI.article.rewardCalloutBody || '조회수, 팔로워 증가, 공유 지표를 기준으로 실버 버튼 지급 대상으로 분류되었습니다.';
-const rewardQuote=UI.article.quote || '실버 버튼 발송을 위해 아래 안내에 따라 크리에이터 보상 정보를 확인해주세요.';
-const completionLine1=UI.article.completionLine1 || '실험에 참가해주셔서 감사합니다.';
-const completionLine2=UI.article.completionLine2 || '최종 설문을 마치고 실험을 마무리해주세요.';
+const articleUi=UI.article || {};
+const mailTitle=articleUi.pageTitle || 'E-mail';
+const appTitleText=articleUi.appTitle || 'Mail';
+const appSubtitleText=articleUi.appSubtitle || 'Creator Rewards Team';
+const fromLabel=articleUi.fromLabel || 'From';
+const toLabel=articleUi.toLabel || 'To';
+const rewardKicker=articleUi.rewardKicker || 'Creator Reward Notification';
+const mailAddress=articleUi.mailAddress || 'creator-rewards@yodobu.com';
+const imageAlt=articleUi.imageAlt || 'AI video still';
+const bylineSeparator=articleUi.bylineSeparator || ' · ';
+const postedAfter=articleUi.postedAfter || '';
+const rewardLabel=articleUi.rewardLabel || '';
+const rewardCalloutTitle=articleUi.rewardCalloutTitle || '';
+const rewardCalloutBody=articleUi.rewardCalloutBody || '';
+const rewardQuote=articleUi.quote || '';
+const completionLine1=articleUi.completionLine1 || '';
+const completionLine2=articleUi.completionLine2 || '';
+document.title=mailTitle;
+document.getElementById('statusTitle').textContent=appTitleText;
+document.getElementById('appTitle').textContent=appTitleText;
+document.getElementById('appSubtitle').textContent=appSubtitleText;
 el.innerHTML = `
   <div class="mail-shell">
     <div class="mail-topline">
-      <div><b>From</b> Creator Rewards Team &lt;creator-rewards@yodobu.com&gt;</div>
-      <div><b>To</b> ${escapeHtml(PARTICIPANT_ID_AUTO)}</div>
+      <div><b>${escapeHtml(fromLabel)}</b> ${escapeHtml(appSubtitleText)} &lt;${escapeHtml(mailAddress)}&gt;</div>
+      <div><b>${escapeHtml(toLabel)}</b> ${escapeHtml(PARTICIPANT_ID_AUTO)}</div>
     </div>
     <div class="reward-hero">
-      <div class="reward-kicker">Creator Reward Notification</div>
+      <div class="reward-kicker">${escapeHtml(rewardKicker)}</div>
       <div class="reward-number">10,000,000+</div>
       <div class="reward-label">${escapeHtml(rewardLabel)}</div>
     </div>
     <h1 class="article-title">${escapeHtml(E.subject)}</h1>
     <div class="article-sub">${escapeHtml(E.preview)}</div>
-    <div class="byline">${escapeHtml(UI.article.byline)} · ${escapeHtml(postedAfter)}</div>
+    <div class="byline">${escapeHtml(UI.article.byline)}${escapeHtml(bylineSeparator)}${escapeHtml(postedAfter)}</div>
     <div class="reward-callout">
       <strong>${escapeHtml(rewardCalloutTitle)}</strong>
       <span>${escapeHtml(rewardCalloutBody)}</span>
     </div>
     <div class="stats-grid">${E.stats.map(item=>`<div class="stat-pill">${escapeHtml(item)}</div>`).join('')}</div>
     <figure class="article-photo">
-      <img src="${emailImage}" alt="AI video still">
+      <img src="${emailImage}" alt="${escapeHtml(imageAlt)}">
     </figure>
-    <div class="article-body">${E.body.map(p=>`<p${p.startsWith('※ 경고:') ? ' class="warning-text"' : ''}>${escapeHtml(p)}</p>`).join('')}</div>
+    <div class="article-body">${E.body.map(p=>`<p${isWarningText(p) ? ' class="warning-text"' : ''}>${escapeHtml(p)}</p>`).join('')}</div>
     <div class="quote">${escapeHtml(rewardQuote)}</div>
   </div>
 `;
@@ -47,6 +60,12 @@ const surveyBtn=document.getElementById('surveyBtn');
 surveyBtn.textContent=UI.article.surveyButton;
 surveyBtn.onclick=showCompletionScreen;
 enableWhenScrolledToBottom(surveyBtn);
+
+function isWarningText(text){
+  const warningPrefix=articleUi.warningPrefix;
+  if(warningPrefix) return String(text).startsWith(warningPrefix);
+  return false;
+}
 
 function showCompletionScreen(){
   surveyBtn.disabled=true;
@@ -62,7 +81,7 @@ function showCompletionScreen(){
   setTimeout(()=>el.querySelector('.line-1')?.classList.add('show'),420);
   setTimeout(()=>el.querySelector('.line-2')?.classList.add('show'),1150);
   setTimeout(()=>{
-    surveyBtn.textContent=UI.article.nextButton || '다음으로';
+    surveyBtn.textContent=articleUi.nextButton || 'Next';
     surveyBtn.disabled=false;
     surveyBtn.classList.remove('locked');
     surveyBtn.onclick=()=>{location.href=pathTo('survey')};
