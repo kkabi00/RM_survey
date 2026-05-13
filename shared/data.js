@@ -301,6 +301,7 @@ window.EXP_DATA = {
       invalidYear: '출생연도를 YYYY 형식으로 입력해주세요.',
       missingDemo: '{id} 문항에 응답해주세요.',
       invalidEmail: '이메일 형식을 확인해주세요.',
+      saveError: '응답 저장 중 문제가 발생했습니다. 연구자에게 알려주세요.',
       csvFallback: 'Google Sheet 저장 URL이 설정되지 않아 CSV 파일로 저장합니다.',
       csvError: 'Google Sheet 저장에 실패해 CSV 백업 파일을 저장합니다.'
     }
@@ -581,6 +582,7 @@ window.EXP_DATA = {
           invalidYear:'Please enter your birth year in YYYY format.',
           missingDemo:'Please answer item {id}.',
           invalidEmail:'Please check the email format.',
+          saveError:'There was a problem saving your response. Please notify the researcher.',
           csvFallback:'The Google Sheet save URL is not configured, so the response will be saved as a CSV file.',
           csvError:'Saving to Google Sheet failed, so a CSV backup file will be saved.'
         }
@@ -785,6 +787,7 @@ window.EXP_DATA = {
           invalidYear:'请以 YYYY 格式输入出生年份。',
           missingDemo:'请回答 {id} 题。',
           invalidEmail:'请检查邮箱格式。',
+          saveError:'保存回答时出现问题。请告知研究者。',
           csvFallback:'未设置 Google Sheet 保存 URL，因此将以 CSV 文件保存。',
           csvError:'保存到 Google Sheet 失败，因此将保存 CSV 备份文件。'
         }

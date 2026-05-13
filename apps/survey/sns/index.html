@@ -248,6 +248,11 @@ async function saveSurvey(){
   const saved=document.getElementById('saved');
   nextBtn.disabled=true;
   nextBtn.textContent=UI.survey.submitting;
+  let choiceLog=null;
+  try{
+    const logRaw=localStorage.getItem('rm_choice_log');
+    if(logRaw) choiceLog=JSON.parse(logRaw);
+  }catch(e){}
   const payload={
     submittedAt,
     submittedAtKst,
@@ -260,6 +265,7 @@ async function saveSurvey(){
     scenarioMeta,
     followupEmail:demoResponses.result_email||'',
     answers,
+    choiceLog,
     header,
     wideRow,
     csv
@@ -269,30 +275,15 @@ async function saveSurvey(){
     if(result.ok){
       saved.textContent=UI.survey.thanks;
     }else{
-      downloadCsvFile(csv, `response_${SCENARIO}_${COND}.csv`);
-      saved.textContent=UI.survey.csvFallback;
+      saved.textContent=UI.survey.saveError;
     }
   }catch(err){
-    downloadCsvFile(csv, `response_${SCENARIO}_${COND}.csv`);
-    saved.textContent=UI.survey.csvError;
+    saved.textContent=UI.survey.saveError;
   }
   saved.style.display='block';
   submitted=true;
   nextBtn.disabled=true;
   nextBtn.textContent=UI.survey.submitted;
-  try{
-    const logRaw=localStorage.getItem('rm_choice_log');
-    if(logRaw){
-      const log=JSON.parse(logRaw);
-      const choiceHeader=['participant_id','condition','aa','pts','step','option_index','option_label','expected_views','expected_followers'];
-      const choiceRows=(log.choices||[]).map(c=>[
-        participantId,log.condition,log.aa,log.pts,
-        c.step,c.option_index,c.option_label,c.expected_views||'',c.expected_followers||''
-      ]);
-      const choiceCsv=[choiceHeader,...choiceRows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-      downloadCsvFile(choiceCsv,`choices_${log.scenario||SCENARIO}_${log.condition||COND}_${participantId}.csv`);
-    }
-  }catch(e){}
 }
 function allSameResponse(){
   const start=sectionStart(sectionIndex), count=sections[sectionIndex][1].length;
