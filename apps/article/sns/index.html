@@ -69,6 +69,7 @@ function isWarningText(text){
 
 function showCompletionScreen(){
   surveyBtn.disabled=true;
+  surveyBtn.onclick=null;
   surveyBtn.classList.add('locked');
   el.innerHTML = `
     <div class="experiment-complete">
