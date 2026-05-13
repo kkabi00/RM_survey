@@ -115,7 +115,7 @@ function renderSection(){
   let html='<div class="survey-intro-panel">'+introHtml+'</div><div class="survey-block">';
   items.forEach((item,i)=>{
     const n=start+i;
-    html += `<div class="survey-item"><div class="survey-q">Q${n}. ${escapeHtml(item.replace(/\s*\[역문항\]$/, ''))}</div>${likert('Q'+n)}</div>`;
+    html += `<div class="survey-item"><div class="survey-q">Q${n}. ${escapeHtml(item.replace(/\s*\[(역문항|Reverse-coded|反向题)\]$/, ''))}</div>${likert('Q'+n)}</div>`;
   });
   html += '</div><div class="saved" id="saved">'+escapeHtml(UI.survey.saved)+'</div>';
   surveyEl.innerHTML=html;

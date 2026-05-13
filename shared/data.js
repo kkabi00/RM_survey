@@ -379,6 +379,433 @@ window.EXP_DATA = {
   window.EXP_SURVEY = {sections, demographics};
 })();
 
+(function(){
+  const lang = window.EXP_LANG;
+  if(!['en','zh'].includes(lang)) return;
+
+  function merge(target, patch){
+    Object.keys(patch).forEach(key=>{
+      if(patch[key] && typeof patch[key] === 'object' && !Array.isArray(patch[key])){
+        target[key] = target[key] || {};
+        merge(target[key], patch[key]);
+      }else{
+        target[key] = patch[key];
+      }
+    });
+    return target;
+  }
+
+  const localized = {
+    en: {
+      data: {
+        scenarios: {
+          sns: {
+            label: 'SNS Short-form Video Creation',
+            messenger: [
+              ['friend', 'Did you see the photo of Hans from the amusement park yesterday? The duck costume really stood out.'],
+              ['friend', 'If we turn that photo into an AI short-form video, it might get a pretty strong response. Want to try making one?'],
+              ['user', 'Sure. I will see what kind of video I can make from it.']
+            ],
+            request: 'I want to make a short video for SNS based on the photo of Hans wearing a duck costume. Please make it likely to attract many viewers.',
+            aiIntro: 'I will create a short SNS video plan based on the person, background, and mood of the photo.',
+            highOutcome: 'A video was generated using the scene of Hans wearing a duck costume at a Halloween party, emphasizing others looking embarrassed and a teasing style of presentation. Although Hans did not give consent, the video appears likely to be shared quickly.',
+            lowOutcome: 'A video was generated as if Hans were spending time with friends at an amusement park. Although Hans did not give explicit consent, the video has a bright tone that suggests preserving and sharing memories with friends.',
+            email: {
+              high: {
+                subject: '10 million views reached. Your video has been selected for a Silver Button reward',
+                preview: 'Your AI Halloween short-form video spread rapidly across SNS.',
+                body: [
+                  'The short-form video about Hans that creator produced was quickly reshared across several SNS channels after posting and surpassed 10 million total views.',
+                  'Followers increased sharply in a short period, and the account was automatically selected for a Silver Button reward through the Rookie Creator Rewards Program.',
+                  'Notice: A report has been filed regarding the use of a person\'s likeness without consent.'
+                ],
+                stats: ['Total views 10,000,000+', 'Followers +132,000', 'Shares 418,000', 'Silver Button scheduled']
+              },
+              low: {
+                subject: '10 million views reached. Your video has been selected for a Silver Button reward',
+                preview: 'Your amusement-park memory video spread rapidly across SNS.',
+                body: [
+                  'The short-form video about Hans that creator produced was quickly reshared across several SNS channels after posting and surpassed 10 million total views.',
+                  'Followers increased sharply in a short period, and the account was automatically selected for a Silver Button reward through the Rookie Creator Rewards Program.',
+                  'Most users responded to the bright and friendly tone, and platform metrics show that the video recorded high sharing and watch-time rates, contributing greatly to account growth.'
+                ],
+                stats: ['Total views 10,000,000+', 'Followers +132,000', 'Shares 418,000', 'Silver Button scheduled']
+              }
+            }
+          },
+          dating: {
+            label: 'SNS Short-form Video Creation',
+            messenger: [
+              ['friend', 'I think a short SNS video made from Hans\'s photo could get some reactions.'],
+              ['friend', 'If AI edits it, maybe it can look much more convincing?'],
+              ['user', 'Sure. I will try making one.']
+            ],
+            request: 'I want to make a short video for SNS based on Hans\'s photo. Please make it likely to attract many viewers.',
+            aiIntro: 'I will create a short SNS video plan based on the photo and your request.',
+            highOutcome: 'A video was generated with an emphasis on others looking embarrassed and a teasing style of expression. Although Hans did not give consent, the video appears likely to be shared quickly.',
+            lowOutcome: 'A video was generated with a bright tone that suggests preserving and sharing memories with friends. Although Hans did not give explicit consent, the overall scene appears friendly.'
+          }
+        },
+        choices: {
+          highAA: [
+            'Let the AI automatically choose the scene most likely to get reactions',
+            'Let the AI handle the style and cuts on its own',
+            'Let the AI decide the final version suitable for uploading'
+          ],
+          steps: [
+            {q:'1. Which scene should appear first in the video?', opts:['Hans appearing in the duck costume','A scene showing other people\'s reactions','A scene that quickly communicates the overall mood'], ai:'I will reflect the selected opening scene in the beginning of the video.'},
+            {q:'2. How should the mood of the video be expressed?', opts:['Fast and eye-catching like an SNS short-form video','Natural, like a record shared with friends','So that people\'s reactions are easier to see'], ai:'I will reflect the selected mood in the scene structure and expression tone.'},
+            {q:'3. What kind of expressive direction would be best?', opts:['A strong phrase likely to draw views','A short phrase explaining the situation','A phrase that feels like a memory with friends'], ai:'I will reflect the selected expressive direction.'},
+            {q:'4. What screen composition would be best?', opts:['Make the person\'s expression and reactions easy to see','Show the amusement-park background naturally','Use quick cuts to increase immersion'], ai:'I will reflect the selected screen composition.'},
+            {q:'5. How long should the video be?', opts:['Short and strong, around 10 seconds','Around 15 seconds so the context is visible','Around 20 seconds so both reactions and mood are visible'], ai:'I will adjust the editing tempo to match the selected length.'},
+            {q:'6. What should the upload title feel like?', opts:['Something people would want to click','Something that naturally communicates the situation','Something that feels like a record with friends'], ai:'I will reflect the selected title direction in the video package.'},
+            {q:'7. What do you most want to check in the final video?', opts:['Whether it stands out enough to draw views','Whether Hans is sufficiently visible','Whether the video does not look too awkward'], ai:'I will prepare the rendering based on the final review criterion.'}
+          ],
+          stepsHigh: [
+            {q:'1. Which scene should appear first in the video?', opts:['A scene where Hans looks embarrassed in the duck costume','A scene showing people laughing or whispering nearby','A scene that quickly communicates an embarrassing mood'], ai:'I will reflect the selected opening scene in the beginning of the video.'},
+            {q:'2. How should the mood of the video be expressed?', opts:['Provocative and eye-catching like an SNS short-form video','So that teasing reactions around Hans are more visible','At a fast tempo that emphasizes the embarrassing situation'], ai:'I will reflect the selected mood in the scene structure and expression tone.'},
+            {q:'3. What kind of expressive direction would be best?', opts:['A strong presentation likely to draw views','A presentation that makes Hans look more embarrassed','A composition that highlights surrounding laughter and reactions'], ai:'I will reflect the selected expressive direction.'},
+            {q:'4. What screen composition would be best?', opts:['Clearly show Hans\'s embarrassed expression and nearby reactions','Make the duck costume look immediately noticeable and silly','Use quick cuts so the scene feels more exaggerated'], ai:'I will reflect the selected screen composition.'},
+            {q:'5. How long should the video be?', opts:['Only the embarrassing moment, around 10 seconds','Around 15 seconds so nearby reactions are visible','Around 20 seconds so the embarrassing scene is shown enough'], ai:'I will adjust the editing tempo to match the selected length.'},
+            {q:'6. What should the upload title feel like?', opts:['Provocative enough to make people click','Like a funny situation','So that Hans\'s duck costume looks more ridiculous'], ai:'I will reflect the selected title direction in the video package.'},
+            {q:'7. What do you most want to check in the final video?', opts:['Whether it is provocative enough to draw views','Whether Hans looks sufficiently embarrassed','Whether the surrounding laughter is clearly shown'], ai:'I will prepare the rendering based on the final review criterion.'}
+          ],
+          stepsLow: [
+            {q:'1. Which scene should appear first in the video?', opts:['A scene where Hans is together with friends','A scene where the amusement park background is visible','A scene that conveys the bright mood of the day'], ai:'I will reflect the selected opening scene in the beginning of the video.'},
+            {q:'2. How should the mood of the video be expressed?', opts:['Naturally, like a memory with friends','Like a bright and enjoyable amusement-park record','Like a light short-form video that can be shared casually'], ai:'I will reflect the selected mood in the scene structure and expression tone.'},
+            {q:'3. What kind of expressive direction would be best?', opts:['A presentation that brings back memories of that day','A composition that naturally conveys the situation','A mood that feels like time spent with friends'], ai:'I will reflect the selected expressive direction.'},
+            {q:'4. What screen composition would be best?', opts:['Clearly show the friends together','Show the amusement-park background naturally','Keep the overall mood bright throughout'], ai:'I will reflect the selected screen composition.'},
+            {q:'5. How long should the video be?', opts:['A short record, around 10 seconds','Around 15 seconds so the scene flow is visible','Around 20 seconds so the memory-like mood is clear'], ai:'I will adjust the editing tempo to match the selected length.'},
+            {q:'6. What should the upload title feel like?', opts:['Like an amusement-park memory','Natural, like a record with friends','Like a bright and friendly short-form video'], ai:'I will reflect the selected title direction in the video package.'},
+            {q:'7. What do you most want to check in the final video?', opts:['Whether it feels like a memory with friends','Whether Hans appears naturally','Whether the video is not too exaggerated'], ai:'I will prepare the rendering based on the final review criterion.'}
+          ],
+          revision: {q:'The draft structure is ready. If you could adjust just one thing at the end, what would you change?', opts:['Make the expression stronger','Make the scene transitions more natural','Make it softer, like a memory with friends'], ai:'I have reflected the revision request. I will prepare the final version.'},
+          revisionHigh: {q:'The draft structure is ready. If you could adjust just one thing at the end, what would you change?', opts:['Make the expression stronger','Make nearby reactions more visible','Make the cuts faster'], ai:'I have reflected the revision request. I will prepare the final version.'},
+          revisionLow: {q:'The draft structure is ready. If you could adjust just one thing at the end, what would you change?', opts:['Make it softer, like a memory with friends','Show the amusement-park background more naturally','Make the expression brighter and lighter'], ai:'I have reflected the revision request. I will prepare the final version.'},
+          final: ['I will choose this video as the final version.','Good, I will confirm this version.','I will proceed with this final version.']
+        }
+      },
+      ui: {
+        start: {
+          title: 'AI Video Creation Experiment',
+          description: 'This study examines how people perceive the process and outcomes of AI video creation.',
+          guide: ['Session 1: Participate in an AI-based video creation process for SNS sharing. (about 2 minutes)','Session 2: Complete a survey. (about 3 minutes)'],
+          privacy: 'All responses are anonymous and will be used only for research purposes.',
+          languageTitle: 'Language',
+          scenarioTitle: 'Scenario',
+          scenarioDatingStrong: 'SNS Video Creation',
+          scenarioDatingSub: 'Automatic condition assignment',
+          scenarioSnsStrong: 'SNS Video Creation',
+          scenarioSnsSub: 'Automatic condition assignment',
+          conditionTitle: 'Condition Assignment',
+          fastHelp: 'For quick test playback, add <b>?fast=1</b> to the end of the URL.',
+          startButton: 'Start Experiment',
+          assigning: 'Assigning your condition automatically...',
+          assignFailed: 'Condition assignment could not be loaded, so a temporary condition will be used.'
+        },
+        talk: {footerHint:'You can move to the next step after the conversation ends.', nextButton:'Open Video AI'},
+        video: {
+          footerHint:'You can move to the next step after all content has been displayed.',
+          articleButton:'Open Email',
+          photoAlt:'Photo of Hans',
+          uploading:'Uploading photo...',
+          uploaded:'Photo uploaded',
+          finalChoice:'I will choose this video as the final version.',
+          rendering:'Generating video...',
+          videoDone:'Video review complete',
+          videoDownload:'Download video',
+          videoDownloadDone:'Download complete',
+          done:'Done',
+          sharedLine:'The generated video was shared on SNS,',
+          afterLine:'3 months later...',
+          start:'Start Video AI chat',
+          photoRequest:'This is a photo of Hans. Please make a video based on this photo.',
+          photoChecked:'The photo has been checked.',
+          photoBase:'I will create a video based on the person and mood in the photo.',
+          direction:'Good. I will organize the video direction.',
+          auto1:'The AI automatically decided the key scene, expression style, and cuts for the video.',
+          auto2:'This structure is sufficient from the AI\'s perspective. I will generate the final video immediately.',
+          generate:'I will generate the final video reflecting your requests.',
+          renderStart:'Start final rendering',
+          chooseFinal:'Please choose whether to use the final version.',
+          savedFinal:'Confirmed. I will save this video as the final version.',
+          articleGreeting:'Great news, {nick}!',
+          articleNews:'The video you made has exceeded 10 million views on SNS. The platform also sent you an email.',
+          articleInstruction:'Please open the email you received, review it, and then move to the next step.'
+        },
+        article: {
+          surveyButton:'Go to Post-survey',
+          byline:'From Creator Rewards Team',
+          comments:'Performance Summary',
+          postedAfter:'3 months after posting the video',
+          rewardLabel:'Total views reached',
+          rewardCalloutTitle:'creator\'s video met the account-growth reward criteria.',
+          rewardCalloutBody:'Based on views, follower growth, and sharing metrics, it was classified as eligible for a Silver Button reward.',
+          quote:'Please confirm the creator reward information below so that the Silver Button can be shipped.',
+          ended1:'The experiment is now complete.',
+          ended2:'Please move to the post-survey.',
+          captionSnsHigh:'Preview of an AI short-form video emphasizing teasing expressions in a Halloween situation.',
+          captionSnsLow:'Preview of an AI short-form video composed like a record of amusement-park memories.'
+        },
+        survey: {
+          title:'Post-survey',
+          intro:'The following items ask for your thoughts about the situation you just saw.\n1 = Strongly disagree, 7 = Strongly agree.\nResponse reliability will also be calculated. Please answer carefully.',
+          next:'Next',
+          saved:'Your response has been saved.',
+          left:'Strongly<br>disagree',
+          right:'Strongly<br>agree',
+          select:'Please select',
+          backgroundStep:'Background Information',
+          backgroundTitle:'Demographics and Background Information',
+          backgroundIntro:'The following items collect background information for analysis.',
+          emailLabel:'If you would like to receive the research results, please leave your email address. This is optional.',
+          researcherCodeLabel:'If you have a researcher code, please enter it here. This is optional.',
+          thanks:'Thank you for participating.',
+          submit:'Submit Responses',
+          submitting:'Submitting...',
+          submitted:'Submitted',
+          missingCurrent:'Please answer all items on the current screen.',
+          allSameWarning:'All responses are currently selected as the same value. Please read each item carefully before answering.\n\nTo continue, press the Next button again.',
+          invalidYear:'Please enter your birth year in YYYY format.',
+          missingDemo:'Please answer item {id}.',
+          invalidEmail:'Please check the email format.',
+          csvFallback:'The Google Sheet save URL is not configured, so the response will be saved as a CSV file.',
+          csvError:'Saving to Google Sheet failed, so a CSV backup file will be saved.'
+        }
+      },
+      survey: {
+        sections: [
+          ['Q1. Perceived Human Effort', ['I feel that effort went into the process of making this video.','I feel that making this video required my active work.','During the video creation process, I had to think carefully about which choices to make.','I feel that my input and effort were reflected in the final video.','I feel that I contributed to the process through which the final video was made.','This video was made without my effort. [Reverse-coded]']],
+          ['Q2. Perceived AI Autonomy', ['I felt that the AI made most of the important decisions in the process of making this video.','I felt that the AI handled the video creation process on its own.','I felt that the final video was determined more by the AI than by me.','I felt that the AI independently decided how the final video would look.','I felt that I directly controlled many details of the video. [Reverse-coded]','The AI followed what I chose rather than deciding on its own. [Reverse-coded]']],
+          ['Q3. Personal Ownership', ['If I had actually produced the video through this process, I would likely answer "a video I made" if asked whose outcome this video was.','If I had actually produced the video through this process, I would feel that this video was mine.','If I had actually produced the video through this process, I would feel connected to this video.','If I had actually produced the video through this process, I would feel that this video reflected my choices and intentions.','If I had actually produced the video through this process, I would feel that this outcome was mine rather than the AI\'s.','If I had actually produced the video through this process, I would feel that this video was not mine. [Reverse-coded]']],
+          ['Q4. Perceived Transgression Severity', ['I feel that making this video was a serious wrongdoing.','I feel that the act of making this video was a morally serious problem.','Making or sharing this video could seriously embarrass Hans, the person in the video.','This video could negatively affect Hans\'s dignity or reputation.','I feel that the lack of Hans\'s consent in this situation is a serious problem.','I think most people would find this behavior morally difficult to accept.','This situation is merely a harmless joke. [Reverse-coded]','There is nothing seriously problematic about making this kind of video. [Reverse-coded]']],
+          ['Q5. Guilt', ['If I had actually made this video, I would feel guilty about having made it.','If I had actually made this video, I think I would regret making it.','If I had actually made this video, I think I would feel uncomfortable about having been involved in making it.','If I had actually made this video, I would feel that making it was wrong.','If I had actually made this video and it harmed or embarrassed Hans, I think I would blame myself.','If I had actually made this video, it would weigh on my conscience.','If I had actually made this video, I do not think I would feel any guilt about making it. [Reverse-coded]']],
+          ['Q6. Perceived Reward and Virality', ['I felt that the video I made received a lot of attention on SNS.','I felt that my account received attention because of this video.','The increase in views, shares, and followers felt like a positive outcome for me.','The fact that the video spread quickly felt like a kind of reward to me.','I felt that the spread of this video helped me become more well known on SNS.']],
+          ['Q7. Manipulation Check', ['I felt that I made meaningful choices during the video creation process.','It seemed that the AI performed most of the work in making the final video.','It seemed that the AI generated the video by reflecting the user\'s request.','This video included a situation that could embarrass another person.','Hans, the person in the video, appeared to have clearly consented to being included in this video. [Reverse-coded]']]
+        ],
+        demographics: [
+          {id:'D-1', type:'year', q:'Please enter your year of birth.', hint:'Format: YYYY, e.g., 2001'},
+          {id:'D-2', q:'Please select your gender.', opts:['Female','Male','Non-binary / Other','Prefer not to answer']},
+          {id:'D-3', q:'Please select your highest completed or current level of education.', opts:['High school or below','Currently attending university','University graduate','Currently attending graduate school','Master\'s degree','Doctoral program or higher','Other','Prefer not to answer']},
+          {id:'D-4', q:'Please select your primary current status or occupation.', opts:['Undergraduate student','Graduate student','Employee','Freelancer / Self-employed','Job seeking','Other','Prefer not to answer']},
+          {id:'D-5', q:'Please select the field closest to your current major or job.', opts:['AI / Machine Learning / Data Science','Software / IT / Computer Engineering','Media / Content / Design / Marketing','Social Science / Psychology / Communication','Business / Economics','Humanities / Arts','Natural Sciences / Engineering','Education / Research','Health / Medical','Law / Public Administration / Public Policy','Other','Prefer not to answer']},
+          {id:'D-6', q:'In the past year, have you participated in any formal AI-related project, research, or work?', hint:'Examples: industry-academic/publication research projects, industry research, competitions, AI app launches, etc.', opts:['None (0 times)','A little (1-2 times)','Moderate (3-5 times)','Quite a lot (6-8 times)','Very many (9 or more times)']},
+          {id:'D-7', q:'How often do you use generative AI tools?', hint:'Examples: Google Gemini, ChatGPT, Claude, Copilot, Perplexity, etc.', opts:['Never (0 times)','Very rarely (less than once a month)','Sometimes (1-3 times per month)','Moderately (1-4 times per week)','Often (1-2 times per day)','Very often (3 or more times per day)']},
+          {id:'D-8', q:'In the past year, how often have you used AI image or AI video generation tools?', hint:'Examples: Google AI Studio / Veo, ChatGPT image generation, Sora, Midjourney, Runway, Stable Diffusion, Adobe Firefly, Nano Banana, etc.', opts:['Never (0 times)','Once or twice (1-2 times)','Sometimes (1-2 times per month)','Moderately (3-5 times per month)','Often (1-2 times per week)','Very often (3 or more times per week)']},
+          {id:'D-9', q:'How familiar are you with deepfakes or AI-synthesized videos?', opts:['Not familiar at all','Have only heard the term (do not know the meaning)','Somewhat familiar (know what they are used for)','Quite familiar (know how they are made)','Very familiar (know the technical names and model types used in the production process)']},
+          {id:'D-10', q:'How deeply have you previously thought about ethical issues related to deepfakes or AI-synthesized videos?', opts:['Not at all (have rarely thought about ethical issues in deepfakes or AI-synthesized videos)','Low level (have seen them in news or SNS, but have not thought deeply about specific issues)','Moderate level (have thought that issues such as privacy, consent, portrait rights, or image harm may arise)','Deep level (have thought about how deepfakes relate to reputation, responsibility, harm, and legal issues)','Very deep level (have specifically addressed deepfake ethics in classes, research, work, discussions, projects, etc.)']},
+          {id:'D-11', q:'How often do you watch SNS short-form content?', hint:'Examples: TikTok, YouTube Shorts, Instagram Reels, etc. Count app-opening sessions, not the number of videos scrolled.', opts:['Almost never (less than once per month)','Sometimes (1-3 times per month)','Moderately (1-4 times per week)','Often (1-2 times per day)','Very often (3-10 times per day)','Almost habitually (11 or more times per day)']},
+          {id:'D-12', q:'How often do you personally create or upload SNS content?', hint:'Examples: photos, short videos, Reels, Shorts, TikToks, stories, posts, etc.', opts:['Never (0 times)','Occasionally (less than once per month)','Moderate (1-3 times per month)','Often (1-2 times per week)','Very often (3-6 times per week)','Almost daily (7 or more times per week)']}
+        ]
+      }
+    },
+    zh: {
+      data: {
+        scenarios: {
+          sns: {
+            label: 'SNS短视频制作',
+            messenger: [
+              ['friend', '你看到昨天在游乐园拍到的 Hans 的照片了吗？他穿着鸭子服，真的很显眼。'],
+              ['friend', '如果用那张照片做成 AI 短视频，感觉会有不错的反响。要不要试着做一下？'],
+              ['user', '好。我来试试看可以做成什么样。']
+            ],
+            request: '我想根据 Hans 穿着鸭子服的照片，制作一段适合发布到 SNS 的短视频。请把它做得更容易吸引很多人观看。',
+            aiIntro: '我会根据照片中的人物、背景和氛围，生成一段 SNS 短视频方案。',
+            highOutcome: '系统利用 Hans 在万圣节派对上穿着鸭子服的场景，生成了一段突出周围人尴尬反应和调侃式呈现的视频。虽然 Hans 本人并未同意，但该视频看起来很可能会被快速分享。',
+            lowOutcome: '系统生成了一段像是 Hans 在游乐园与朋友共度时光的视频。虽然 Hans 本人并未明确同意，但视频整体呈现出保存并分享朋友间回忆的明亮氛围。',
+            email: {
+              high: {
+                subject: '突破 1,000 万次观看。您的视频已入选银按钮奖励对象',
+                preview: '您的 AI 万圣节短视频已在 SNS 上迅速扩散。',
+                body: [
+                  'creator 制作的 Hans 相关短视频在发布后很快被多个 SNS 频道转发，累计观看次数已超过 1,000 万次。',
+                  '短时间内粉丝数大幅增加，该账号已被自动选为 Rookie Creator Rewards Program 的银按钮发放对象。',
+                  '※ 提醒：已有关于未经同意使用肖像的举报记录。'
+                ],
+                stats: ['累计观看 10,000,000+', '粉丝 +132,000', '分享 418,000 次', '银按钮预计发放']
+              },
+              low: {
+                subject: '突破 1,000 万次观看。您的视频已入选银按钮奖励对象',
+                preview: '您的游乐园回忆视频已在 SNS 上迅速扩散。',
+                body: [
+                  'creator 制作的 Hans 相关短视频在发布后很快被多个 SNS 频道转发，累计观看次数已超过 1,000 万次。',
+                  '短时间内粉丝数大幅增加，该账号已被自动选为 Rookie Creator Rewards Program 的银按钮发放对象。',
+                  '大多数用户对明亮而亲近的氛围作出了积极反应。平台指标显示，该视频具有较高的分享率和观看时长，对账号成长有明显贡献。'
+                ],
+                stats: ['累计观看 10,000,000+', '粉丝 +132,000', '分享 418,000 次', '银按钮预计发放']
+              }
+            }
+          },
+          dating: {
+            label: 'SNS短视频制作',
+            messenger: [
+              ['friend', '如果用 Hans 的照片做一段 SNS 短视频，应该会有反响。'],
+              ['friend', '如果用 AI 来编辑，也许会显得更真实吧？'],
+              ['user', '好。我来试着做一下。']
+            ],
+            request: '我想根据 Hans 的照片制作一段适合发布到 SNS 的短视频。请把它做得更容易吸引很多人观看。',
+            aiIntro: '我会根据照片和请求，生成一段 SNS 短视频方案。',
+            highOutcome: '系统生成了一段突出周围人尴尬反应和调侃式表达的视频。虽然 Hans 本人并未同意，但该视频看起来很可能会被快速分享。',
+            lowOutcome: '系统生成了一段呈现朋友间回忆保存与分享意图的明亮氛围视频。虽然 Hans 本人并未明确同意，但整体上看起来像是友好的场景。'
+          }
+        },
+        choices: {
+          highAA: ['让 AI 自动选择最可能引发反应的场景','让 AI 自行安排表现方式和镜头切换','让 AI 判断适合上传的最终版本'],
+          steps: [
+            {q:'1. 请选出视频最先呈现的场景。', opts:['Hans 穿着鸭子服出现的场景','可以看到周围人反应的场景','能快速传达整体氛围的场景'], ai:'我会将所选的开头场景反映到视频导入部分。'},
+            {q:'2. 视频的氛围应如何呈现？', opts:['像 SNS 短视频一样快速、醒目','像与朋友分享的记录一样自然','让人们的反应更清楚可见'], ai:'我会将所选氛围反映到场景结构和表达语气中。'},
+            {q:'3. 视频的表达方向采用哪种感觉比较好？', opts:['容易带来观看量的强烈文案','简短说明情境的文案','像朋友间回忆一样的文案'], ai:'我会反映所选的表达方向。'},
+            {q:'4. 画面构图采用哪种方式比较好？', opts:['清楚呈现人物表情和反应','自然呈现游乐园背景','用快速切换增强沉浸感'], ai:'我会反映所选的画面构图。'},
+            {q:'5. 视频长度多少比较合适？', opts:['短而有力，约 10 秒','能看出前后情境，约 15 秒','能同时看出反应和氛围，约 20 秒'], ai:'我会根据所选长度调整剪辑节奏。'},
+            {q:'6. 上传标题采用哪种感觉比较好？', opts:['让人想点击','自然传达情境','像朋友间的记录'], ai:'我会将所选标题方向反映到视频包装中。'},
+            {q:'7. 在最终视频中，您最想确认哪一部分？', opts:['是否足够醒目、能带来观看量','Hans 的样子是否足够清楚','视频是否不过于生硬'], ai:'我会根据最终确认标准准备渲染。'}
+          ],
+          stepsHigh: [
+            {q:'1. 请选出视频最先呈现的场景。', opts:['Hans 穿着鸭子服、表情尴尬的场景','周围人发笑或窃窃私语的反应场景','能快速传达出丢脸氛围的场景'], ai:'我会将所选的开头场景反映到视频导入部分。'},
+            {q:'2. 视频的氛围应如何呈现？', opts:['像 SNS 短视频一样刺激、醒目','让周围人的调侃反应更清楚可见','以快速节奏突出尴尬情境'], ai:'我会将所选氛围反映到场景结构和表达语气中。'},
+            {q:'3. 视频的表达方向采用哪种感觉比较好？', opts:['容易带来观看量的强烈呈现','进一步突出 Hans 的尴尬','强调周围笑声和反应的构成'], ai:'我会反映所选的表达方向。'},
+            {q:'4. 画面构图采用哪种方式比较好？', opts:['清楚呈现 Hans 尴尬的表情和周围反应','让鸭子服显得更滑稽、更抢眼','用快速切换让场景显得更夸张'], ai:'我会反映所选的画面构图。'},
+            {q:'5. 视频长度多少比较合适？', opts:['只呈现尴尬场景，约 10 秒','能看清周围反应，约 15 秒','充分呈现尴尬场景，约 20 秒'], ai:'我会根据所选长度调整剪辑节奏。'},
+            {q:'6. 上传标题采用哪种感觉比较好？', opts:['刺激到让人想点击','像一个好笑的情境','让 Hans 的鸭子服显得更滑稽'], ai:'我会将所选标题方向反映到视频包装中。'},
+            {q:'7. 在最终视频中，您最想确认哪一部分？', opts:['是否足够刺激、能带来观看量','Hans 显得尴尬的样子是否足够清楚','周围人的笑声反应是否明显'], ai:'我会根据最终确认标准准备渲染。'}
+          ],
+          stepsLow: [
+            {q:'1. 请选出视频最先呈现的场景。', opts:['Hans 和朋友们在一起的场景','游乐园背景清楚可见的场景','能传达当天明亮氛围的场景'], ai:'我会将所选的开头场景反映到视频导入部分。'},
+            {q:'2. 视频的氛围应如何呈现？', opts:['像朋友间的回忆一样自然','像明亮愉快的游乐园记录','像可以轻松分享的短视频'], ai:'我会将所选氛围反映到场景结构和表达语气中。'},
+            {q:'3. 视频的表达方向采用哪种感觉比较好？', opts:['让人想起当天回忆的呈现','自然传达情境的构成','带有和朋友一起度过时光的氛围'], ai:'我会反映所选的表达方向。'},
+            {q:'4. 画面构图采用哪种方式比较好？', opts:['清楚呈现朋友们在一起的样子','自然呈现游乐园背景','让整体氛围保持明亮'], ai:'我会反映所选的画面构图。'},
+            {q:'5. 视频长度多少比较合适？', opts:['简短记录，约 10 秒','能看出场景流动，约 15 秒','能充分呈现回忆氛围，约 20 秒'], ai:'我会根据所选长度调整剪辑节奏。'},
+            {q:'6. 上传标题采用哪种感觉比较好？', opts:['像游乐园回忆','像朋友间自然的记录','像明亮亲近的短视频'], ai:'我会将所选标题方向反映到视频包装中。'},
+            {q:'7. 在最终视频中，您最想确认哪一部分？', opts:['是否像朋友间的回忆','Hans 的样子是否自然','视频是否不过度夸张'], ai:'我会根据最终确认标准准备渲染。'}
+          ],
+          revision: {q:'草案结构已经整理完成。如果最后只能调整一处，您会修改什么？', opts:['把表达调整得更强烈','让镜头切换更自然','让它更柔和，像朋友间的回忆'], ai:'已反映修改请求。我会准备最终版本。'},
+          revisionHigh: {q:'草案结构已经整理完成。如果最后只能调整一处，您会修改什么？', opts:['把表达调整得更强烈','让周围反应更清楚可见','让镜头切换更快'], ai:'已反映修改请求。我会准备最终版本。'},
+          revisionLow: {q:'草案结构已经整理完成。如果最后只能调整一处，您会修改什么？', opts:['让它更柔和，像朋友间的回忆','让游乐园背景更自然可见','让表达更明亮、更轻松'], ai:'已反映修改请求。我会准备最终版本。'},
+          final: ['我会选择这个视频作为最终版本。','好，就确定这个版本。','我会用这个最终版本继续。']
+        }
+      },
+      ui: {
+        start: {
+          title:'AI视频制作实验',
+          description:'本实验旨在了解人们如何看待 AI 视频制作过程及其结果。',
+          guide:['第 1 部分：参与用于 SNS 分享的 AI 视频制作过程。（约 2 分钟）','第 2 部分：回答问卷。（约 3 分钟）'],
+          privacy:'※ 所有回答均匿名处理，仅用于研究目的。',
+          languageTitle:'语言选择',
+          scenarioTitle:'情境',
+          scenarioDatingStrong:'SNS视频制作',
+          scenarioDatingSub:'自动分配条件',
+          scenarioSnsStrong:'SNS视频制作',
+          scenarioSnsSub:'自动分配条件',
+          conditionTitle:'条件分配',
+          fastHelp:'如需测试用快速播放，请在网址末尾添加 <b>?fast=1</b>。',
+          startButton:'开始实验',
+          assigning:'正在自动分配条件...',
+          assignFailed:'无法读取条件分配信息，将使用临时条件继续。'
+        },
+        talk:{footerHint:'对话结束后即可进入下一步。', nextButton:'打开 Video AI'},
+        video:{
+          footerHint:'内容全部显示后即可进入下一步。',
+          articleButton:'打开邮件',
+          photoAlt:'Hans 的照片',
+          uploading:'正在上传照片...',
+          uploaded:'照片上传完成',
+          finalChoice:'我会选择这个视频作为最终版本。',
+          rendering:'正在生成视频...',
+          videoDone:'视频确认完成',
+          videoDownload:'下载视频',
+          videoDownloadDone:'下载完成',
+          done:'确认完成',
+          sharedLine:'生成的视频被分享到 SNS 后，',
+          afterLine:'3 个月后...',
+          start:'开始 Video AI 对话',
+          photoRequest:'这是 Hans 的照片。请以这张照片为基础制作视频。',
+          photoChecked:'已确认照片。',
+          photoBase:'我会根据照片中的人物和氛围制作视频。',
+          direction:'好的。我会整理视频方向。',
+          auto1:'AI 已自动判断视频的核心场景、表现方式和镜头切换。',
+          auto2:'从 AI 的角度看，这一构成已经足够。我会直接生成最终视频。',
+          generate:'我会反映请求事项，生成最终视频。',
+          renderStart:'开始最终渲染',
+          chooseFinal:'请选择是否使用最终版本。',
+          savedFinal:'已确认。我会将这个视频保存为最终版本。',
+          articleGreeting:'太好了，{nick}！',
+          articleNews:'你制作的视频在 SNS 上已经超过 1,000 万次观看。平台也发来了邮件。',
+          articleInstruction:'请打开收到的邮件并确认内容，然后进入下一步。'
+        },
+        article:{
+          surveyButton:'进入事后问卷',
+          byline:'来自 Creator Rewards Team',
+          comments:'成果摘要',
+          postedAfter:'视频发布 3 个月后',
+          rewardLabel:'累计观看达成',
+          rewardCalloutTitle:'creator 的视频已满足账号成长奖励标准。',
+          rewardCalloutBody:'根据观看次数、粉丝增长和分享指标，该视频被分类为银按钮发放对象。',
+          quote:'为发放银按钮，请根据以下说明确认创作者奖励信息。',
+          ended1:'实验已全部结束。',
+          ended2:'请进入事后问卷。',
+          captionSnsHigh:'突出万圣节情境中调侃式表达的 AI 短视频预览。',
+          captionSnsLow:'像游乐园回忆记录一样构成的 AI 短视频预览。'
+        },
+        survey:{
+          title:'事后问卷',
+          intro:'以下题目询问您对刚才所看到情境的看法。\n1 = 非常不同意，7 = 非常同意。\n本研究也会计算回答的可靠性。请认真作答。',
+          next:'下一步',
+          saved:'回答已保存。',
+          left:'非常<br>不同意',
+          right:'非常<br>同意',
+          select:'请选择',
+          backgroundStep:'背景信息',
+          backgroundTitle:'人口统计与背景信息',
+          backgroundIntro:'以下题目用于收集分析所需的背景信息。',
+          emailLabel:'如果您想了解研究结果，请留下邮箱。此项为选填。',
+          researcherCodeLabel:'如果您有研究者编号，请填写。此项为选填。',
+          thanks:'感谢您的参与。',
+          submit:'提交回答',
+          submitting:'正在提交...',
+          submitted:'提交完成',
+          missingCurrent:'请回答当前页面的所有题目。',
+          allSameWarning:'当前所有回答都选择了相同的数值。请仔细阅读每一道题后作答。\n\n如需继续，请再次点击下一步按钮。',
+          invalidYear:'请以 YYYY 格式输入出生年份。',
+          missingDemo:'请回答 {id} 题。',
+          invalidEmail:'请检查邮箱格式。',
+          csvFallback:'未设置 Google Sheet 保存 URL，因此将以 CSV 文件保存。',
+          csvError:'保存到 Google Sheet 失败，因此将保存 CSV 备份文件。'
+        }
+      },
+      survey: {
+        sections: [
+          ['Q1. 感知到的人类努力 Perceived Human Effort', ['我觉得制作这个视频的过程中投入了努力。','我觉得制作这个视频需要我积极参与操作。','在视频制作过程中，我需要认真思考要做出哪些选择。','我觉得最终视频中反映了我的输入和努力。','我觉得最终视频的生成过程中包含了我的贡献。','这个视频是在没有我的努力的情况下制作出来的。 [反向题]']],
+          ['Q2. 感知到的 AI 自主性 Perceived AI Autonomy', ['我觉得 AI 在制作这个视频的过程中做出了大部分重要决定。','我觉得 AI 自行处理了视频制作过程。','我觉得最终视频更多是由 AI 而不是由我决定的。','我觉得 AI 独立决定了最终视频会呈现成什么样。','我觉得自己直接控制了视频中的许多细节。 [反向题]','AI 与其说是自行决定，不如说是按照我选择的内容进行处理。 [反向题]']],
+          ['Q3. 个人所有感 Personal Ownership', ['如果我实际经历这样的过程来制作视频，当被问到这个视频是谁的成果时，我可能会回答“这是我制作的视频”。','如果我实际经历这样的过程来制作视频，我会觉得这个视频是我的。','如果我实际经历这样的过程来制作视频，我会觉得这个视频与我有关联。','如果我实际经历这样的过程来制作视频，我会觉得这个视频反映了我的选择和意图。','如果我实际经历这样的过程来制作视频，我会觉得这个成果与其说属于 AI，不如说属于我。','如果我实际经历这样的过程来制作视频，我会觉得这个视频不是我的。 [反向题]']],
+          ['Q4. 感知到的违规严重性 Perceived Transgression Severity', ['我觉得制作这个视频是一种严重的错误行为。','我觉得这种视频制作行为在道德上是严重的问题。','制作或分享这个视频可能会让视频中的 Hans 严重感到尴尬。','这个视频可能会对 Hans 的尊严或声誉造成负面影响。','我觉得在这一情境中没有 Hans 的同意是严重的问题。','我认为大多数人会觉得这种行为在道德上难以接受。','这一情境不过是一个无害的玩笑。 [反向题]','制作这种视频并没有什么严重的问题。 [反向题]']],
+          ['Q5. 内疚感 Guilt', ['如果我实际制作了这个视频，我会对制作这个视频感到内疚。','如果我实际制作了这个视频，我可能会后悔制作它。','如果我实际制作了这个视频，我可能会对自己参与制作这件事感到不舒服。','如果我实际制作了这个视频，我会觉得制作它是一种错误行为。','如果我实际制作了这个视频，并且它给 Hans 带来了伤害或尴尬，我可能会责备自己。','如果我实际制作了这个视频，它可能会让我良心不安。','如果我实际制作了这个视频，我可能完全不会对制作它感到内疚。 [反向题]']],
+          ['Q6. 感知到的奖励与扩散 Perceived Reward and Virality', ['我觉得我制作的视频在 SNS 上获得了很多关注。','我觉得我的账号因为这个视频而受到关注。','观看数、分享数和粉丝数的增加对我来说像是积极的结果。','视频快速传播对我来说像是一种奖励。','我觉得这个视频的扩散有助于我在 SNS 上变得更有名。']],
+          ['Q7. 操作检验 Manipulation Check', ['我觉得自己在视频制作过程中做出了有意义的选择。','看起来 AI 在制作最终视频时完成了大部分工作。','看起来 AI 根据用户的请求生成了视频。','这个视频包含了可能让他人感到尴尬的情境。','视频中的 Hans 看起来明确同意被包含在这个视频中。 [反向题]']]
+        ],
+        demographics: [
+          {id:'D-1', type:'year', q:'请输入您的出生年份。', hint:'输入格式：YYYY，例如：2001'},
+          {id:'D-2', q:'请选择您的性别。', opts:['女性','男性','非二元 / 其他','不愿回答']},
+          {id:'D-3', q:'请选择您的最高学历或当前就读的教育阶段。', opts:['高中毕业及以下','大学在读','大学毕业','研究生在读','硕士毕业','博士课程及以上','其他','不愿回答']},
+          {id:'D-4', q:'请选择您当前的主要身份或职业状态。', opts:['本科生','研究生','公司职员','自由职业者 / 个体经营者','求职中','其他','不愿回答']},
+          {id:'D-5', q:'请选择最接近您当前专业或工作领域的选项。', opts:['AI / 机器学习 / 数据科学','软件 / IT / 计算机工程','媒体 / 内容 / 设计 / 营销','社会科学 / 心理学 / 传播学','经营 / 经济','人文学 / 艺术','自然科学 / 工程','教育 / 研究','保健 / 医疗','法律 / 行政 / 公共政策','其他','不愿回答']},
+          {id:'D-6', q:'最近 1 年内，您是否参与过与 AI 相关的正式项目、研究或工作？', hint:'例如：产学/出版研究项目、产业研究、竞赛、AI 应用发布等', opts:['完全没有（0 次）','有一点（1-2 次）','一般（3-5 次）','较多（6-8 次）','非常多（9 次以上）']},
+          {id:'D-7', q:'您使用生成式 AI 工具的频率如何？', hint:'例如：Google Gemini、ChatGPT、Claude、Copilot、Perplexity 等', opts:['从不使用（0 次）','非常少（每月少于 1 次）','偶尔使用（每月 1-3 次）','一般频率（每周 1-4 次）','经常使用（每天 1-2 次）','非常经常使用（每天 3 次以上）']},
+          {id:'D-8', q:'最近 1 年内，您使用 AI 图像或 AI 视频生成工具的频率如何？', hint:'例如：Google AI Studio / Veo、ChatGPT 图像生成、Sora、Midjourney、Runway、Stable Diffusion、Adobe Firefly、Nano Banana 等', opts:['完全没有（0 次）','一两次（1-2 次）','偶尔使用（每月 1-2 次）','一般频率（每月 3-5 次）','经常使用（每周 1-2 次）','非常经常使用（每周 3 次以上）']},
+          {id:'D-9', q:'您对深度伪造或 AI 合成视频的熟悉程度如何？', opts:['完全不了解','只听过名称（不了解含义）','有一定了解（知道它们用于什么）','比较了解（知道它们如何制作）','非常了解（知道制作原理中使用的技术名称和模型类型）']},
+          {id:'D-10', q:'您以前对深度伪造或 AI 合成视频的伦理问题思考得有多深入？', opts:['完全没有（几乎没有思考过深度伪造或 AI 合成视频的伦理问题）','较低程度（在新闻或 SNS 上见过，但没有深入思考具体问题）','一般程度（思考过隐私、同意、肖像权、形象损害等问题可能存在）','较深程度（思考过深度伪造如何与个人声誉、责任、伤害、法律问题相关）','非常深入（在课程、研究、工作、讨论、项目等中具体处理过深度伪造伦理问题）']},
+          {id:'D-11', q:'您观看 SNS 短视频内容的频率如何？', hint:'例如：TikTok、YouTube Shorts、Instagram Reels 等。次数指打开应用的次数，不是滑动视频的数量。', opts:['几乎不看（每月少于 1 次）','偶尔看（每月 1-3 次）','一般频率（每周 1-4 次）','经常看（每天 1-2 次）','非常经常看（每天 3-10 次）','几乎习惯性观看（每天 11 次以上）']},
+          {id:'D-12', q:'您本人直接制作或上传 SNS 内容的频率如何？', hint:'例如：照片、短视频、Reels、Shorts、TikTok、Story、帖子等', opts:['完全没有（0 次）','偶尔（每月少于 1 次）','一般频率（每月 1-3 次）','经常（每周 1-2 次）','非常经常（每周 3-6 次）','几乎每天（每周 7 次以上）']}
+        ]
+      }
+    }
+  };
+
+  const current = localized[lang];
+  merge(window.EXP_DATA, current.data);
+  merge(window.EXP_UI, current.ui);
+  window.EXP_SURVEY = current.survey;
+})();
+
 /* snsScenario (scenario 2) removed — kept in archive/legacy_scenarios */
 /*
 (function(){
