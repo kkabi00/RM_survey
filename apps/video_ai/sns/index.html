@@ -209,6 +209,15 @@ function addVideoResult(){
   const filename='draft_ver1.mp4';
   const box=document.createElement('div'); box.className='video-box';
   box.innerHTML='<video class="result-video" src="'+video+'" controls playsinline preload="metadata"></video><div class="video-caption">'+escapeHtml(body)+'</div>';
+  const nameRow=document.createElement('div');
+  nameRow.style.cssText='padding:10px 14px 0';
+  const nameInput=document.createElement('input');
+  nameInput.type='text';
+  nameInput.className='text-input';
+  nameInput.placeholder=LANG==='en'?'File name (optional)':LANG==='zh'?'文件名（可选）':'파일 이름 (선택 사항)';
+  nameInput.maxLength=80;
+  nameRow.appendChild(nameInput);
+  box.appendChild(nameRow);
   const dlBtn=document.createElement('button');
   dlBtn.className='btn video-download';
   dlBtn.type='button';
@@ -254,7 +263,9 @@ function addVideoResult(){
       if(dlBtn.disabled) return;
       dlBtn.disabled=true;
       const url=await prepareDownload;
-      triggerDownload(url, filename);
+      const raw=nameInput.value.trim().replace(/[/\\:*?"<>|]/g,'');
+      const name=raw?(raw.toLowerCase().endsWith('.mp4')?raw:raw+'.mp4'):filename;
+      triggerDownload(url, name);
       setTimeout(()=>{
         if(preparedUrl) URL.revokeObjectURL(preparedUrl);
         dlBtn.disabled=false;
