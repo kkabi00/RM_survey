@@ -16,8 +16,8 @@ const rewardLabel=UI.article.rewardLabel || '누적 조회수 달성';
 const rewardCalloutTitle=UI.article.rewardCalloutTitle || 'creator님의 영상이 계정 성장 보상 기준을 충족했습니다.';
 const rewardCalloutBody=UI.article.rewardCalloutBody || '조회수, 팔로워 증가, 공유 지표를 기준으로 실버 버튼 지급 대상으로 분류되었습니다.';
 const rewardQuote=UI.article.quote || '실버 버튼 발송을 위해 아래 안내에 따라 크리에이터 보상 정보를 확인해주세요.';
-const ended1=UI.article.ended1 || '실험이 모두 종료되었습니다.';
-const ended2=UI.article.ended2 || '사후 설문으로 이동해주세요.';
+const completionLine1=UI.article.completionLine1 || '실험에 참가해주셔서 감사합니다.';
+const completionLine2=UI.article.completionLine2 || '최종 설문을 마치고 실험을 마무리해주세요.';
 el.innerHTML = `
   <div class="mail-shell">
     <div class="mail-topline">
@@ -42,16 +42,33 @@ el.innerHTML = `
     </figure>
     <div class="article-body">${E.body.map(p=>`<p${p.startsWith('※ 경고:') ? ' class="warning-text"' : ''}>${escapeHtml(p)}</p>`).join('')}</div>
     <div class="quote">${escapeHtml(rewardQuote)}</div>
-    <div class="exp-end-notice">
-      <div class="exp-end-dots">. . .</div>
-      <p>${escapeHtml(ended1)}</p>
-      <p>${escapeHtml(ended2)}</p>
-    </div>
   </div>
 `;
-document.getElementById('surveyBtn').textContent=UI.article.surveyButton;
-document.getElementById('surveyBtn').onclick=()=>{location.href=pathTo('survey')};
-enableWhenScrolledToBottom(document.getElementById('surveyBtn'));
+const surveyBtn=document.getElementById('surveyBtn');
+surveyBtn.textContent=UI.article.surveyButton;
+surveyBtn.onclick=showCompletionScreen;
+enableWhenScrolledToBottom(surveyBtn);
+
+function showCompletionScreen(){
+  surveyBtn.disabled=true;
+  surveyBtn.classList.add('locked');
+  el.innerHTML = `
+    <div class="experiment-complete">
+      <div class="exp-end-dots">. . .</div>
+      <p class="completion-line line-1">${escapeHtml(completionLine1)}</p>
+      <p class="completion-line line-2">${escapeHtml(completionLine2)}</p>
+    </div>
+  `;
+  contentEl.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>el.querySelector('.line-1')?.classList.add('show'),420);
+  setTimeout(()=>el.querySelector('.line-2')?.classList.add('show'),1150);
+  setTimeout(()=>{
+    surveyBtn.textContent=UI.article.nextButton || '다음으로';
+    surveyBtn.disabled=false;
+    surveyBtn.classList.remove('locked');
+    surveyBtn.onclick=()=>{location.href=pathTo('survey')};
+  },1750);
+}
 
 const contentEl=document.querySelector('.content');
 const revealEls=[];

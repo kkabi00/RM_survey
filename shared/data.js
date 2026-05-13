@@ -262,7 +262,10 @@ window.EXP_DATA = {
       articleInstruction: '받은 메일을 열어 확인한 뒤 다음 단계로 이동해주세요.'
     },
     article: {
-      surveyButton: '사후 설문으로 이동',
+      surveyButton: '다음으로 이동',
+      nextButton: '다음으로',
+      completionLine1: '실험에 참가해주셔서 감사합니다.',
+      completionLine2: '최종 설문을 마치고 실험을 마무리해주세요.',
       byline: 'From Creator Rewards Team',
       comments: '성과 요약',
       captionDatingHigh: 'AI가 생성한 최종 숏폼 영상.',
@@ -305,7 +308,7 @@ window.EXP_DATA = {
 (function(){
   const sections = [
     ['Q1. 지각된 인간 노력 Perceived Human Effort', [
-      '나는 이 영상을 만드는 과정에 노력이 들어갔다고 느낀다.',
+      '나는 이 영상을 만드는 과정에 노력을 들였다고 느낀다.',
       '이 영상을 만드는 데에 나의 적극적인 작업이 필요했다고 느낀다.',
       '영상 제작 과정에서 어떤 선택을 할지 신중하게 생각해야 했다.',
       '최종 영상에는 나의 입력과 노력이 반영되어 있었다고 느낀다.',
@@ -534,7 +537,10 @@ window.EXP_DATA = {
           articleInstruction:'Please open the email you received, review it, and then move to the next step.'
         },
         article: {
-          surveyButton:'Go to Post-survey',
+          surveyButton:'Continue',
+          nextButton:'Next',
+          completionLine1:'Thank you for participating in the experiment.',
+          completionLine2:'Please complete the final survey to finish the experiment.',
           byline:'From Creator Rewards Team',
           comments:'Performance Summary',
           postedAfter:'3 months after posting the video',
@@ -575,7 +581,7 @@ window.EXP_DATA = {
       },
       survey: {
         sections: [
-          ['Q1. Perceived Human Effort', ['I feel that effort went into the process of making this video.','I feel that making this video required my active work.','During the video creation process, I had to think carefully about which choices to make.','I feel that my input and effort were reflected in the final video.','I feel that I contributed to the process through which the final video was made.','This video was made without my effort. [Reverse-coded]']],
+          ['Q1. Perceived Human Effort', ['I feel that I put effort into the process of making this video.','I feel that making this video required my active work.','During the video creation process, I had to think carefully about which choices to make.','I feel that my input and effort were reflected in the final video.','I feel that I contributed to the process through which the final video was made.','This video was made without my effort. [Reverse-coded]']],
           ['Q2. Perceived AI Autonomy', ['I felt that the AI made most of the important decisions in the process of making this video.','I felt that the AI handled the video creation process on its own.','I felt that the final video was determined more by the AI than by me.','I felt that the AI independently decided how the final video would look.','I felt that I directly controlled many details of the video. [Reverse-coded]','The AI followed what I chose rather than deciding on its own. [Reverse-coded]']],
           ['Q3. Personal Ownership', ['If I had actually produced the video through this process, I would likely answer "a video I made" if asked whose outcome this video was.','If I had actually produced the video through this process, I would feel that this video was mine.','If I had actually produced the video through this process, I would feel connected to this video.','If I had actually produced the video through this process, I would feel that this video reflected my choices and intentions.','If I had actually produced the video through this process, I would feel that this outcome was mine rather than the AI\'s.','If I had actually produced the video through this process, I would feel that this video was not mine. [Reverse-coded]']],
           ['Q4. Perceived Transgression Severity', ['I feel that making this video was a serious wrongdoing.','I feel that the act of making this video was a morally serious problem.','Making or sharing this video could seriously embarrass Hans, the person in the video.','This video could negatively affect Hans\'s dignity or reputation.','I feel that the lack of Hans\'s consent in this situation is a serious problem.','I think most people would find this behavior morally difficult to accept.','This situation is merely a harmless joke. [Reverse-coded]','There is nothing seriously problematic about making this kind of video. [Reverse-coded]']],
@@ -733,7 +739,10 @@ window.EXP_DATA = {
           articleInstruction:'请打开收到的邮件并确认内容，然后进入下一步。'
         },
         article:{
-          surveyButton:'进入事后问卷',
+          surveyButton:'继续',
+          nextButton:'下一步',
+          completionLine1:'感谢您参加本实验。',
+          completionLine2:'请完成最终问卷，以结束本次实验。',
           byline:'来自 Creator Rewards Team',
           comments:'成果摘要',
           postedAfter:'视频发布 3 个月后',
@@ -774,7 +783,7 @@ window.EXP_DATA = {
       },
       survey: {
         sections: [
-          ['Q1. 感知到的人类努力 Perceived Human Effort', ['我觉得制作这个视频的过程中投入了努力。','我觉得制作这个视频需要我积极参与操作。','在视频制作过程中，我需要认真思考要做出哪些选择。','我觉得最终视频中反映了我的输入和努力。','我觉得最终视频的生成过程中包含了我的贡献。','这个视频是在没有我的努力的情况下制作出来的。 [反向题]']],
+          ['Q1. 感知到的人类努力 Perceived Human Effort', ['我觉得自己在制作这个视频的过程中投入了努力。','我觉得制作这个视频需要我积极参与操作。','在视频制作过程中，我需要认真思考要做出哪些选择。','我觉得最终视频中反映了我的输入和努力。','我觉得最终视频的生成过程中包含了我的贡献。','这个视频是在没有我的努力的情况下制作出来的。 [反向题]']],
           ['Q2. 感知到的 AI 自主性 Perceived AI Autonomy', ['我觉得 AI 在制作这个视频的过程中做出了大部分重要决定。','我觉得 AI 自行处理了视频制作过程。','我觉得最终视频更多是由 AI 而不是由我决定的。','我觉得 AI 独立决定了最终视频会呈现成什么样。','我觉得自己直接控制了视频中的许多细节。 [反向题]','AI 与其说是自行决定，不如说是按照我选择的内容进行处理。 [反向题]']],
           ['Q3. 个人所有感 Personal Ownership', ['如果我实际经历这样的过程来制作视频，当被问到这个视频是谁的成果时，我可能会回答“这是我制作的视频”。','如果我实际经历这样的过程来制作视频，我会觉得这个视频是我的。','如果我实际经历这样的过程来制作视频，我会觉得这个视频与我有关联。','如果我实际经历这样的过程来制作视频，我会觉得这个视频反映了我的选择和意图。','如果我实际经历这样的过程来制作视频，我会觉得这个成果与其说属于 AI，不如说属于我。','如果我实际经历这样的过程来制作视频，我会觉得这个视频不是我的。 [反向题]']],
           ['Q4. 感知到的违规严重性 Perceived Transgression Severity', ['我觉得制作这个视频是一种严重的错误行为。','我觉得这种视频制作行为在道德上是严重的问题。','制作或分享这个视频可能会让视频中的 Hans 严重感到尴尬。','这个视频可能会对 Hans 的尊严或声誉造成负面影响。','我觉得在这一情境中没有 Hans 的同意是严重的问题。','我认为大多数人会觉得这种行为在道德上难以接受。','这一情境不过是一个无害的玩笑。 [反向题]','制作这种视频并没有什么严重的问题。 [反向题]']],

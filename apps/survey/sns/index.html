@@ -2,7 +2,6 @@
 <div class="survey-page">
   <div class="survey-top">
     <div>
-      <span class="badge" id="surveyBadge">Post-survey</span>
       <h1 id="surveyTitle">사후 설문</h1>
       <div class="survey-meta"><span data-scenario-label></span> · <span data-cond-label></span></div>
     </div>
@@ -87,7 +86,6 @@ if(window.EXP_SURVEY){
   sections.splice(0, sections.length, ...window.EXP_SURVEY.sections);
   demographics.splice(0, demographics.length, ...window.EXP_SURVEY.demographics);
 }
-document.getElementById('surveyBadge').textContent=UI.survey.badge;
 document.getElementById('surveyTitle').textContent=UI.survey.title;
 document.getElementById('nextBtn').textContent=UI.survey.next;
 function likert(name){
@@ -166,7 +164,6 @@ function demoOptions(item){
 function renderDemographics(){
   demographicsMode=true;
   surveyStep.textContent=UI.survey.backgroundStep;
-  document.querySelector('.survey-top .badge').textContent=UI.survey.backgroundBadge;
   document.querySelector('.survey-top h1').textContent=UI.survey.backgroundTitle;
   const topIntro=document.querySelector('.survey-top .small');
   if(topIntro) topIntro.textContent=UI.survey.backgroundIntro;

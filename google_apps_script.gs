@@ -3,12 +3,13 @@ const SHEET_NAME = 'responses_wide';
 function doPost(e) {
   const payload = JSON.parse(e.postData.contents || '{}');
   const sheet = getResponseSheet_();
-  ensureHeader_(sheet);
+  ensureHeader_(sheet, payload.header || []);
 
   const answers = payload.answers || rowsToAnswers_(payload.rows || []);
   const scenarioMeta = payload.scenarioMeta || {};
   const rowMap = {
     submitted_at: payload.submittedAt || new Date().toISOString(),
+    language: payload.language || '',
     scenario: payload.scenario || '',
     scenario_label: payload.scenarioLabel || '',
     condition: payload.condition || '',
@@ -47,11 +48,16 @@ function doGet(e) {
   const sheet = getResponseSheet_();
   ensureHeader_(sheet);
   const values = sheet.getDataRange().getValues();
+  const header = values[0] || [];
+  const scenarioIndex = header.indexOf('scenario');
+  const conditionIndex = header.indexOf('condition');
   const counts = {c1: 0, c2: 0, c3: 0, c4: 0};
 
   for (var i = 1; i < values.length; i++) {
-    if (values[i][1] === scenario && counts.hasOwnProperty(values[i][3])) {
-      counts[values[i][3]]++;
+    const rowScenario = scenarioIndex >= 0 ? values[i][scenarioIndex] : '';
+    const rowCondition = conditionIndex >= 0 ? values[i][conditionIndex] : '';
+    if (rowScenario === scenario && counts.hasOwnProperty(rowCondition)) {
+      counts[rowCondition]++;
     }
   }
 
@@ -72,15 +78,26 @@ function getResponseSheet_() {
   return spreadsheet.getSheetByName(SHEET_NAME) || spreadsheet.insertSheet(SHEET_NAME);
 }
 
-function ensureHeader_(sheet) {
+function ensureHeader_(sheet, extraHeader) {
   const header = [
     'submitted_at',
+    'language',
     'scenario',
     'scenario_label',
     'condition',
     'condition_label',
     'nickname'
   ].concat(getScenarioMetaKeys_()).concat(getAnswerKeys_());
+  const seen = {};
+  header.forEach(function(key) {
+    seen[key] = true;
+  });
+  (extraHeader || []).forEach(function(key) {
+    if (key && !seen[key]) {
+      header.push(key);
+      seen[key] = true;
+    }
+  });
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(header);
     return;
@@ -147,9 +164,10 @@ function getScenarioMetaKeys_() {
 
 function getAnswerKeys_() {
   const keys = [];
-  for (var i = 1; i <= 27; i++) keys.push('Q' + i);
+  for (var i = 1; i <= 43; i++) keys.push('Q' + i);
   for (var d = 1; d <= 12; d++) keys.push('D-' + d);
   keys.push('result_email');
+  keys.push('researcher_code');
   return keys;
 }
 

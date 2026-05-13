@@ -14,7 +14,7 @@ document.documentElement.lang = LANG;
 const S = D.scenarios[SCENARIO];
 const C = D.conds[COND];
 // Google Apps Script를 웹앱으로 배포한 뒤, /google_apps_script.gs의 배포 URL을 여기에 넣습니다.
-const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxF-iP-hX1SbjinZX6BO_bHEjXCwejwLxQe4uqs67hLgMutPg3yv5DRGUOvPvd17YP1/exec';
+const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzqSa5CgbElqjEIEqfKgb6BcYo26Onv_wkhMHwwJxuaaOMchYKv3R9jR3oIgJfBS7_K/exec';
 function enc(v){return encodeURIComponent(v)}
 function pathTo(app){
   return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}&nick=${enc(NICK)}&lang=${enc(LANG)}${FAST?'&fast=1':''}`;
