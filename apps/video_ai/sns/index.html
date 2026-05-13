@@ -213,7 +213,7 @@ function addVideoResult(){
   nameRow.style.cssText='padding:10px 14px 0';
   const nameLabel=document.createElement('div');
   nameLabel.style.cssText='font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text)';
-  nameLabel.textContent=LANG==='en'?'File name:':LANG==='zh'?'文件名：':'파일 이름:';
+  nameLabel.innerHTML=(LANG==='en'?'File name':LANG==='zh'?'文件名':'파일 이름')+' <span style="color:#b42318">*</span>';
   nameRow.appendChild(nameLabel);
   const nameInput=document.createElement('input');
   nameInput.type='text';
@@ -228,6 +228,9 @@ function addVideoResult(){
   dlBtn.textContent=UI.video.videoDownload;
   dlBtn.disabled=true;
   box.appendChild(dlBtn);
+  let blobReady=false;
+  function syncDlBtn(){ dlBtn.disabled=!(blobReady && nameInput.value.trim().length>0); }
+  nameInput.addEventListener('input', syncDlBtn);
   log.appendChild(box);
   box.scrollIntoView({block:'start', behavior: FAST ? 'auto' : 'smooth'});
   let preparedUrl='';
@@ -239,12 +242,12 @@ function addVideoResult(){
     .then(blob=>{
       if(!blob.size) throw new Error('empty download');
       preparedUrl=URL.createObjectURL(blob);
-      dlBtn.disabled=false;
+      blobReady=true; syncDlBtn();
       return preparedUrl;
     })
     .catch(err=>{
       console.warn('Blob download preparation failed; falling back to browser download.', err);
-      dlBtn.disabled=false;
+      blobReady=true; syncDlBtn();
       return video;
     });
   function triggerDownload(url, name){
@@ -277,7 +280,7 @@ function addVideoResult(){
       triggerDownload(url, name);
       setTimeout(()=>{
         if(preparedUrl) URL.revokeObjectURL(preparedUrl);
-        dlBtn.disabled=false;
+        syncDlBtn();
         dlBtn.textContent=UI.video.videoDownloadDone;
         dlBtn.classList.add('downloaded');
         resolve();
