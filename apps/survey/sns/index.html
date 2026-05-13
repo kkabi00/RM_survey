@@ -284,6 +284,7 @@ async function saveSurvey(){
   submitted=true;
   nextBtn.disabled=true;
   nextBtn.textContent=UI.survey.submitted;
+  setTimeout(()=>location.href='../../../goodbye.html',1500);
 }
 function allSameResponse(){
   const start=sectionStart(sectionIndex), count=sections[sectionIndex][1].length;
