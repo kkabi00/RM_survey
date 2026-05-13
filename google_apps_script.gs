@@ -14,7 +14,7 @@ function doPost(e) {
     scenario_label: payload.scenarioLabel || '',
     condition: payload.condition || '',
     condition_label: payload.conditionLabel || '',
-    nickname: payload.nickname || ''
+    participant_id: payload.participantId || payload.nickname || ''
   };
 
   getScenarioMetaKeys_().forEach(function(key) {
@@ -86,7 +86,7 @@ function ensureHeader_(sheet, extraHeader) {
     'scenario_label',
     'condition',
     'condition_label',
-    'nickname'
+    'participant_id'
   ].concat(getScenarioMetaKeys_()).concat(getAnswerKeys_());
   const seen = {};
   header.forEach(function(key) {

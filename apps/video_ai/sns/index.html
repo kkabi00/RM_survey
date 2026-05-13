@@ -114,7 +114,7 @@ function saveChoiceLog(){
   try{
     localStorage.setItem('rm_choice_log', JSON.stringify({
       saved_at: new Date().toISOString(),
-      nickname: NICK,
+      participant_id: PARTICIPANT_ID_AUTO,
       scenario: SCENARIO,
       condition: COND,
       aa: C.aa,

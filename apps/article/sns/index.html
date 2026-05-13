@@ -9,7 +9,6 @@
 const E=(S.email && S.email[C.pts]) || window.EXP_DATA.scenarios.sns.email[C.pts];
 const emailImage=C.pts==='high' ? '../../../images/high_pts_silver_email.png' : '../../../images/low_pts_silver_email.png';
 const emailCaption=C.pts==='high' ? UI.article.captionSnsHigh : UI.article.captionSnsLow;
-const nickname=qs('nick',UI.participantNickname);
 const el=document.getElementById('email');
 const postedAfter=UI.article.postedAfter || '영상 게시 3개월 후';
 const rewardLabel=UI.article.rewardLabel || '누적 조회수 달성';
@@ -22,7 +21,7 @@ el.innerHTML = `
   <div class="mail-shell">
     <div class="mail-topline">
       <div><b>From</b> Creator Rewards Team &lt;creator-rewards@yodobu.com&gt;</div>
-      <div><b>To</b> ${escapeHtml(nickname)}</div>
+      <div><b>To</b> ${escapeHtml(PARTICIPANT_ID_AUTO)}</div>
     </div>
     <div class="reward-hero">
       <div class="reward-kicker">Creator Reward Notification</div>

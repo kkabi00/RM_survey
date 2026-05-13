@@ -6,7 +6,21 @@ function qs(name, fallback=''){
 const LANG = ['ko','en','zh'].includes(qs('lang','ko')) ? qs('lang','ko') : 'ko';
 const SCENARIO = qs('s','sns');
 const COND = qs('c','c1');
-const NICK = qs('nick', window.EXP_UI?.participantNickname || 'creator');
+function getOrCreateParticipantId(){
+  const fromUrl = qs('pid','').trim();
+  if(fromUrl) return fromUrl;
+  try{
+    const key = 'rm_participant_id';
+    const saved = localStorage.getItem(key);
+    if(saved) return saved;
+    const generated = 'P-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+    localStorage.setItem(key, generated);
+    return generated;
+  }catch(err){
+    return 'P-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+  }
+}
+const PARTICIPANT_ID_AUTO = getOrCreateParticipantId();
 const FAST = qs('fast','') === '1';
 const D = window.EXP_DATA;
 const UI = window.EXP_UI || {};
@@ -14,13 +28,13 @@ document.documentElement.lang = LANG;
 const S = D.scenarios[SCENARIO];
 const C = D.conds[COND];
 // Google Apps Script를 웹앱으로 배포한 뒤, /google_apps_script.gs의 배포 URL을 여기에 넣습니다.
-const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzqSa5CgbElqjEIEqfKgb6BcYo26Onv_wkhMHwwJxuaaOMchYKv3R9jR3oIgJfBS7_K/exec';
+const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbya93yxUly2mjifoWanAqcd9D6Zmvv2YrFdMal93L229js8W_TE_vKAQ5Zl3eToUaDW/exec';
 function enc(v){return encodeURIComponent(v)}
 function pathTo(app){
-  return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}&nick=${enc(NICK)}&lang=${enc(LANG)}${FAST?'&fast=1':''}`;
+  return `../../${app}/${SCENARIO}/index.html?s=${enc(SCENARIO)}&c=${enc(COND)}&pid=${enc(PARTICIPANT_ID_AUTO)}&lang=${enc(LANG)}${FAST?'&fast=1':''}`;
 }
 function rootPath(app,scenario=SCENARIO,cond=COND){
-  return `apps/${app}/${scenario}/index.html?s=${enc(scenario)}&c=${enc(cond)}&nick=${enc(NICK)}&lang=${enc(LANG)}${FAST?'&fast=1':''}`;
+  return `apps/${app}/${scenario}/index.html?s=${enc(scenario)}&c=${enc(cond)}&pid=${enc(PARTICIPANT_ID_AUTO)}&lang=${enc(LANG)}${FAST?'&fast=1':''}`;
 }
 function delay(ms){ return new Promise(r => setTimeout(r, FAST ? Math.min(ms,120) : ms)); }
 function humanDelay(text, base=420){ return FAST ? 80 : Math.min(1600, base + String(text).length * 28); }

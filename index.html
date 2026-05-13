@@ -69,7 +69,7 @@ document.querySelectorAll('[data-lang]').forEach(btn=>{
 });
 applyLanguage();
 document.getElementById('startBtn').onclick=()=>{
-  const next=new URLSearchParams({s:'sns',c:selectedCondition,nick:'creator',lang});
+  const next=new URLSearchParams({s:'sns',c:selectedCondition,lang});
   if(fast) next.set('fast','1');
   location.href=`apps/messenger/sns/index.html?${next.toString()}`;
 };
